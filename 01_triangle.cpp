@@ -1,6 +1,6 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
-
+#include <Eigen/Core>
 #include <iostream>
 
 #include "glrender.h"
@@ -12,52 +12,20 @@ void processInput(GLFWwindow *window);
 const unsigned int SCR_WIDTH = 800;
 const unsigned int SCR_HEIGHT = 600;
 
-const char *vertexShaderSource =
-    "#version 330 core\n"
-    "layout (location = 0) in vec3 aPos;\n"
-    "void main()\n"
-    "{\n"
-    "   gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);\n"
-    "}\0";
-const char *fragmentShaderSource =
-    "#version 330 core\n"
-    "out vec4 FragColor;\n"
-    "void main()\n"
-    "{\n"
-    "   FragColor = vec4(1.0f, 0.5f, 0.2f, 1.0f);\n"
-    "}\n\0";
-
 int main() {
-  // glfw: initialize and configure
-  // ------------------------------
-  glfwInit();
-  glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-  glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
-  glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-
-#ifdef __APPLE__
-  glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
-#endif
-
-  // glfw window creation
-  // --------------------
+  glrender::init_glfw();
   GLFWwindow *window =
       glrender::create_window(SCR_WIDTH, SCR_HEIGHT, "LearnOpenGL");
-  glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
+  glrender::init_glad();
 
-  // glad: load all OpenGL function pointers
-  // ---------------------------------------
-  if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
-    std::cout << "Failed to initialize GLAD" << std::endl;
-    return -1;
-  }
+  glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 
   // build and compile our shader program
 
-  glrender::Shader vertex_shader =
-      glrender::create_shader(vertexShaderSource, GL_VERTEX_SHADER);
-  glrender::Shader fragment_shader =
-      glrender::create_shader(fragmentShaderSource, GL_FRAGMENT_SHADER);
+  glrender::Shader vertex_shader = glrender::create_shader(
+      glrender::source::basic_uv_shader.vertex, GL_VERTEX_SHADER);
+  glrender::Shader fragment_shader = glrender::create_shader(
+      glrender::source::basic_uv_shader.fragment, GL_FRAGMENT_SHADER);
 
   glrender::Program program =
       glrender::create_program(vertex_shader, fragment_shader);
@@ -68,51 +36,99 @@ int main() {
 
   // set up vertex data (and buffer(s)) and configure vertex attributes
   // ------------------------------------------------------------------
-  float vertices[] = {
-      -0.5f, -0.5f, 0.0f,  // left
-      0.5f,  -0.5f, 0.0f,  // right
-      0.0f,  0.5f,  0.0f   // top
-  };
+  Eigen::VectorXf vertices(12);
+  vertices << -0.5f, -0.5f, 0.0f,  // left
+      0.5f, -0.5f, 0.0f,           // right
+      -0.5f, 0.5f, 0.0f,           // top left
+      0.5f, 0.5f, 0.0f;            // top right
+  int n_vertices = vertices.size() / 3;
+  Eigen::VectorXf texCoords(8);
+  texCoords << 0.0f, 0.0f,  // lower-left corner
+      1.0f, 0.0f,           // lower-right corner
+      0.0f, 1.0f,           // top-left corner
+      1.0f, 1.0f;           // top-right corner
+  Eigen::VectorXi indices(6);
+  indices << 0, 1, 2,  // first triangle
+      1, 3, 2;         // second triangle
+  int n_faces = indices.size() / 3;
 
   glrender::VAO vao = glrender::create_vao();
   glrender::bind_vao(vao);
 
-  glrender::VBO vbo = glrender::create_vbo();
-  glrender::bind_vbo(vbo);
-  glrender::set_vbo_static_data(vertices, sizeof(vertices));
+  glrender::EBO index_buffer = glrender::create_ebo();
+  glrender::bind_ebo(index_buffer);
+  glrender::set_ebo_static_data(indices.data(), indices.size() * sizeof(int));
+
+  glrender::VBO vertex_buffer = glrender::create_vbo();
+  glrender::bind_vbo(vertex_buffer);
+  glrender::set_vbo_static_data(vertices.data(),
+                                vertices.size() * sizeof(float));
 
   glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void *)0);
   glEnableVertexAttribArray(0);
-
   glrender::unbind_vbo();
+
+  glrender::VBO uv_buffer = glrender::create_vbo();
+  glrender::bind_vbo(uv_buffer);
+  glrender::set_vbo_static_data(texCoords.data(),
+                                texCoords.size() * sizeof(float));
+  glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), (void *)0);
+  glEnableVertexAttribArray(1);
+  glrender::unbind_vbo();
+
   glrender::unbind_vao();
 
-  glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+  glrender::Texture tex = glrender::create_texture();
+  glrender::bind_texture(tex);
+  glrender::set_texture_wrap(GL_REPEAT);
+  glrender::set_texture_filter(GL_LINEAR_MIPMAP_LINEAR, GL_LINEAR);
+  glrender::Image img =
+      glrender::load_image(std::string(ASSETS_PATH) + "/" + "awesomeface.png");
+  glrender::set_texture_image(0, img, GL_RGBA, GL_RGBA, GL_UNSIGNED_BYTE);
+  glrender::generate_texture_mipmap();
+  glrender::free_image(img);
+  glrender::unbind_texture();
 
-  // render loop
-  // -----------
+  // set blend mode
+  glrender::set_blend_transparent();
+  glrender::set_wireframe_mode(false);
+
+  glrender::Camera camera = glrender::create_camera();
+  camera.position = Eigen::Vector3f(0.0f, 0.0f, 3.0f);
+  camera.lookat = Eigen::Vector3f(0.0f, 0.0f, 0.0f);
+  camera.up = Eigen::Vector3f(0.0f, 1.0f, 0.0f);
+  camera.aspect = float(SCR_WIDTH) / float(SCR_HEIGHT);
+  glrender::update_camera(camera);
+  // std::cout << camera.projection << std::endl;
+
+  glrender::use_program(program);
+  glrender::set_uniform_mat4(program, "projection", camera.projection);
+  glrender::unuse_program();
+
+  float prev_time = glfwGetTime();
+
   while (!glfwWindowShouldClose(window)) {
-    // input
-    // -----
     processInput(window);
 
-    // render
-    // ------
     glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT);
 
-    // draw our first triangle
-    // glUseProgram(shaderProgram);
+    glrender::bind_texture(tex);
     glrender::use_program(program);
-    glrender::bind_vao(vao);  // seeing as we only have a single VAO there's no
-                              // need to bind it every time, but we'll do so to
-                              // keep things a bit more organized
-    glDrawArrays(GL_TRIANGLES, 0, 3);
-    // glBindVertexArray(0); // no need to unbind it every time
+    glrender::bind_vao(vao);
 
-    // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved
-    // etc.)
-    // -------------------------------------------------------------------------------
+    float curr_time = glfwGetTime();
+    glrender::orbit_camera_control(window, camera, 10.0, curr_time - prev_time);
+    prev_time = curr_time;
+    glrender::set_uniform_mat4(program, "projection", camera.projection);
+
+    // glDrawArrays(GL_TRIANGLES, 0, 3);
+    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+
+    glrender::unbind_texture();
+    glrender::unbind_vao();
+    glrender::unuse_program();
+
     glfwSwapBuffers(window);
     glfwPollEvents();
   }
@@ -120,7 +136,9 @@ int main() {
   // optional: de-allocate all resources once they've outlived their purpose:
   // ------------------------------------------------------------------------
   glrender::delete_vao(vao);
-  glrender::delete_vbo(vbo);
+  glrender::delete_vbo(vertex_buffer);
+  glrender::delete_vbo(uv_buffer);
+  glrender::delete_ebo(index_buffer);
   glrender::delete_program(program);
 
   // glfw: terminate, clearing all previously allocated GLFW resources.
@@ -129,19 +147,11 @@ int main() {
   return 0;
 }
 
-// process all input: query GLFW whether relevant keys are pressed/released this
-// frame and react accordingly
-// ---------------------------------------------------------------------------------------------------------
 void processInput(GLFWwindow *window) {
   if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
     glfwSetWindowShouldClose(window, true);
 }
 
-// glfw: whenever the window size changed (by OS or user resize) this callback
-// function executes
-// ---------------------------------------------------------------------------------------------
 void framebuffer_size_callback(GLFWwindow *window, int width, int height) {
-  // make sure the viewport matches the new window dimensions; note that width
-  // and height will be significantly larger than specified on retina displays.
   glViewport(0, 0, width, height);
 }

@@ -7,12 +7,17 @@ set(CMAKE_CXX_STANDARD_REQUIRED True)
 
 add_definitions(-DCMAKE_EXPORT_COMPILE_COMMANDS=ON)
 
+get_filename_component(ABS_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR} ABSOLUTE)
+add_definitions(-DASSETS_PATH="${ABS_SOURCE_DIR}/assets")
+
 # find opengl and glfw
 find_package(OpenGL REQUIRED)
 find_package(glfw3 REQUIRED)
+find_package(Eigen3 REQUIRED)
 
 # add glad
-add_subdirectory(glad)
+include("${CMAKE_CURRENT_SOURCE_DIR}/cmake/glad.cmake")
+include ("${CMAKE_CURRENT_SOURCE_DIR}/cmake/imgui.cmake")
 
 # glob all cpp files in src folder
 file(GLOB_RECURSE SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp")
@@ -30,6 +35,7 @@ function(add_gl_target target_name)
     target_link_libraries(${target_name}
       PRIVATE
       OpenGL::GL
+      Eigen3::Eigen
       glfw
       glad)
 endfunction()

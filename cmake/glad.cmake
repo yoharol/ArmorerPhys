@@ -1,9 +1,9 @@
 # integrate glad into a cmake static library
 set(GLAD_SOURCES
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/glad.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/glad/src/glad.c
 )
 set(GLAD_INCLUDE_DIRS
-    ${CMAKE_CURRENT_SOURCE_DIR}/include
+    ${CMAKE_CURRENT_SOURCE_DIR}/glad/include
 )
 
 add_library(glad STATIC ${GLAD_SOURCES})
