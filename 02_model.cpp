@@ -1,7 +1,10 @@
+
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include <Eigen/Core>
 #include <iostream>
+
+#include <igl/readMESH.h>
 
 #include "gl_render.h"
 
@@ -23,9 +26,9 @@ int main() {
   // build and compile our shader program
 
   glrender::Shader vertex_shader = glrender::create_shader(
-      glrender::source::basic_uv_shader.vertex, GL_VERTEX_SHADER);
+      glrender::source::basic_shader.vertex, GL_VERTEX_SHADER);
   glrender::Shader fragment_shader = glrender::create_shader(
-      glrender::source::basic_uv_shader.fragment, GL_FRAGMENT_SHADER);
+      glrender::source::basic_shader.fragment, GL_FRAGMENT_SHADER);
 
   glrender::Program program =
       glrender::create_program(vertex_shader, fragment_shader);
@@ -34,68 +37,44 @@ int main() {
   glrender::delete_shader(vertex_shader);
   glrender::delete_shader(fragment_shader);
 
-  // set up vertex data (and buffer(s)) and configure vertex attributes
-  // ------------------------------------------------------------------
-  Eigen::VectorXf vertices(12);
-  vertices << -0.5f, -0.5f, 0.0f,  // left
-      0.5f, -0.5f, 0.0f,           // right
-      -0.5f, 0.5f, 0.0f,           // top left
-      0.5f, 0.5f, 0.0f;            // top right
-  int n_vertices = vertices.size() / 3;
-  Eigen::VectorXf texCoords(8);
-  texCoords << 0.0f, 0.0f,  // lower-left corner
-      1.0f, 0.0f,           // lower-right corner
-      0.0f, 1.0f,           // top-left corner
-      1.0f, 1.0f;           // top-right corner
-  Eigen::VectorXi indices(6);
-  indices << 0, 1, 2,  // first triangle
-      1, 3, 2;         // second triangle
-  int n_faces = indices.size() / 3;
+  Eigen::Matrix<float, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor> V;
+  Eigen::Matrix<int, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor> F, T;
+
+  igl::readMESH(std::string(ASSETS_PATH) + "/spot.mesh", V, T, F);
+  Eigen::Matrix<int, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor> F2(
+      F.rows() / 2, F.cols());
+  for (int i = 0; i < F.rows() / 2; i++) {
+    for (int j = 0; j < F.cols(); j++) {
+      F2(i, j) = F(i * 2, j);
+    }
+  }
+
+  int n_vertices = V.rows();
+  int n_faces = F2.rows();
 
   glrender::VAO vao = glrender::create_vao();
   glrender::bind_vao(vao);
 
   glrender::EBO index_buffer = glrender::create_ebo();
   glrender::bind_ebo(index_buffer);
-  glrender::set_ebo_static_data(indices.data(), indices.size() * sizeof(int));
+  glrender::set_ebo_static_data(F2.data(), F2.size() * sizeof(int));
 
   glrender::VBO vertex_buffer = glrender::create_vbo();
   glrender::bind_vbo(vertex_buffer);
-  glrender::set_vbo_static_data(vertices.data(),
-                                vertices.size() * sizeof(float));
+  glrender::set_vbo_static_data(V.data(), V.size() * sizeof(float));
 
   glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void *)0);
   glEnableVertexAttribArray(0);
   glrender::unbind_vbo();
 
-  glrender::VBO uv_buffer = glrender::create_vbo();
-  glrender::bind_vbo(uv_buffer);
-  glrender::set_vbo_static_data(texCoords.data(),
-                                texCoords.size() * sizeof(float));
-  glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), (void *)0);
-  glEnableVertexAttribArray(1);
-  glrender::unbind_vbo();
-
   glrender::unbind_vao();
 
-  glrender::Texture tex = glrender::create_texture();
-  glrender::bind_texture(tex);
-  glrender::set_texture_wrap(GL_CLAMP);
-  glrender::set_texture_filter(GL_LINEAR_MIPMAP_LINEAR, GL_LINEAR);
-  glrender::Image img =
-      glrender::load_image(std::string(ASSETS_PATH) + "/" + "awesomeface.png");
-  glrender::set_texture_image(0, img, GL_RGBA, GL_RGBA, GL_UNSIGNED_BYTE);
-  glrender::generate_texture_mipmap();
-  glrender::free_image(img);
-  glrender::unbind_texture();
-
-  // set blend mode
-  glrender::set_blend_transparent();
+  // glrender::set_wireframe_mode(true);
   glrender::set_wireframe_mode(false);
 
   glrender::Camera camera = glrender::create_camera();
   camera.position = Eigen::Vector3f(0.0f, 0.0f, 3.0f);
-  camera.lookat = Eigen::Vector3f(0.0f, 0.0f, 0.0f);
+  camera.lookat = Eigen::Vector3f(0.0f, 0.35f, 0.0f);
   camera.up = Eigen::Vector3f(0.0f, 1.0f, 0.0f);
   camera.aspect = float(SCR_WIDTH) / float(SCR_HEIGHT);
   glrender::update_camera(camera);
@@ -105,15 +84,18 @@ int main() {
   glrender::set_uniform_mat4(program, "projection", camera.projection);
   glrender::unuse_program();
 
+  glEnable(GL_CULL_FACE);
+  glCullFace(GL_BACK);
+  glFrontFace(GL_CW);
+
   float prev_time = glfwGetTime();
 
   while (!glfwWindowShouldClose(window)) {
     processInput(window);
 
     glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
-    glClear(GL_COLOR_BUFFER_BIT);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    glrender::bind_texture(tex);
     glrender::use_program(program);
     glrender::bind_vao(vao);
 
@@ -123,7 +105,9 @@ int main() {
     glrender::set_uniform_mat4(program, "projection", camera.projection);
 
     // glDrawArrays(GL_TRIANGLES, 0, 3);
-    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+    // glPointSize(15.0f);
+    // glDrawArrays(GL_POINTS, 0, n_vertices);
+    glDrawElements(GL_TRIANGLES, n_faces * 3, GL_UNSIGNED_INT, 0);
 
     glrender::unbind_texture();
     glrender::unbind_vao();
@@ -137,7 +121,6 @@ int main() {
   // ------------------------------------------------------------------------
   glrender::delete_vao(vao);
   glrender::delete_vbo(vertex_buffer);
-  glrender::delete_vbo(uv_buffer);
   glrender::delete_ebo(index_buffer);
   glrender::delete_program(program);
 

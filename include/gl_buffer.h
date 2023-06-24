@@ -5,7 +5,7 @@
 #include <GLFW/glfw3.h>
 #include <Eigen/Core>
 
-#include "glimage.h"
+#include "gl_image.h"
 
 namespace glrender {
 
@@ -148,6 +148,11 @@ inline void set_uniform_float2(Program program, const char* name, float value1,
 inline void set_uniform_float3(Program program, const char* name, float value1,
                                float value2, float value3) {
   glUniform3f(glGetUniformLocation(program.id, name), value1, value2, value3);
+}
+
+inline void set_uniform_float3(Program program, const char* name, Vec3f value) {
+  glUniform3f(glGetUniformLocation(program.id, name), value.x(), value.y(),
+              value.z());
 }
 
 inline void set_uniform_float4(Program program, const char* name, float value1,

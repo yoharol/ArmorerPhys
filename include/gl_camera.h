@@ -33,8 +33,8 @@ inline Camera create_camera() {
   camera.up = Eigen::Vector3f(0.0f, 1.0f, 0.0f);
   camera.projection = Eigen::Matrix4f::Identity();
   camera.type = CameraType::Perspective;
-  camera.near = 0.1f;
-  camera.far = 500.0f;
+  camera.near = 0.5f;
+  camera.far = 100.0f;
   camera.fov = 45.0f;
   camera.aspect = 1.0f;
   return camera;
