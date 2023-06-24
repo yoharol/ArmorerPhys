@@ -92,10 +92,6 @@ int main() {
   glrender::set_uniform_mat4(program, "view", camera.view);
   glrender::unuse_program();
 
-  // glEnable(GL_CULL_FACE);
-  // glCullFace(GL_BACK);
-  // glFrontFace(GL_CW);
-
   RenderFunc render_mesh = [&](int idx) {
     glrender::bind_vao(vao);
     glDrawElements(GL_TRIANGLES, n_faces * 3, GL_UNSIGNED_INT, 0);
@@ -117,21 +113,13 @@ int main() {
     glrender::orbit_camera_control(window, camera, 10.0, curr_time - prev_time);
     prev_time = curr_time;
     glrender::set_uniform_mat4(program, "projection", camera.projection);
-    glrender::set_uniform_float3(program, "lightPos",
-                                 glrender::Vec3f(0.0f, 0.0f, 3.0f));
+    glrender::set_uniform_float3(program, "lightPos", camera.position);
     glrender::set_uniform_float3(program, "lightColor",
                                  glrender::Vec3f(1.0f, 0.0f, 0.0f));
     glrender::set_uniform_float3(program, "objectColor",
                                  glrender::Vec3f(0.96f, 0.96f, 0.96f));
     glrender::set_uniform_float3(program, "ambientColor",
                                  glrender::Vec3f(0.0f, 0.0f, 0.2f));
-
-    // glDrawArrays(GL_TRIANGLES, 0, 3);
-    // glPointSize(15.0f);
-    // glDrawArrays(GL_POINTS, 0, n_vertices);
-    // glDrawElements(GL_TRIANGLES, n_faces * 3, GL_UNSIGNED_INT, 0);
-
-    // glrender::unbind_vao();
 
     render_mesh(0);
 

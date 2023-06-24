@@ -27,9 +27,9 @@ TexturedMesh create_textured_mesh(const Eigen::MatrixXf &vertices,
                                   const Eigen::MatrixXi &indices,
                                   const ShaderSource &shader,
                                   bool dynamic = false) {
-  assert(vertics.IsRowMajor());
-  assert(texCoords.IsRowMajor());
-  assert(indices.IsRowMajor());
+  assert(vertices.IsRowMajor);
+  assert(texCoords.IsRowMajor);
+  assert(indices.IsRowMajor);
 
   TexturedMesh mesh{
       create_vao(),

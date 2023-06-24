@@ -23,6 +23,7 @@ void init_glad() {
     std::cout << "Failed to initialize GLAD" << std::endl;
     exit(-1);
   }
+  glEnable(GL_DEPTH_TEST);
 }
 
 GLFWwindow* create_window(int width, int height, const char* title) {

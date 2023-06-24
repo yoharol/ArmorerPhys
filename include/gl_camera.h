@@ -4,7 +4,7 @@
 #include <Eigen/Core>
 #include <Eigen/Geometry>
 #include <cmath>
-#include <glfw/glfw3.h>
+#include <GLFW/glfw3.h>
 
 namespace glrender {
 
@@ -65,7 +65,7 @@ inline void update_camera(Camera& camera) {
   Eigen::Matrix4f orthographic;
   orthographic << 2.0f / xscale, 0.0f, 0.0f, 0.0f,     //
       0.0f, 2.0f / yscale, 0.0f, 0.0f,                 //
-      0.0f, 0.0f, 2.0f / (n - f), -(n + f) / (n - f),  //
+      0.0f, 0.0f, -2.0f / (n - f), (n + f) / (n - f),  //
       0.0f, 0.0f, 0.0f, 1.0f;
 
   camera.projection = orthographic * perspective * to_camera_space;
@@ -114,7 +114,22 @@ inline void orbit_camera_control(GLFWwindow* window, Camera& camera,
     pos -= top * speed * delta_time;
     pos = lookat + (pos - lookat).normalized() * radius;
   }
+
+  float lookat_speed = 0.5f;
+  if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS) {
+    lookat += top * speed * delta_time * lookat_speed;
+  }
+  if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS) {
+    lookat -= top * speed * delta_time * lookat_speed;
+  }
+  if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS) {
+    lookat -= right * speed * delta_time * lookat_speed;
+  }
+  if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS) {
+    lookat += right * speed * delta_time * lookat_speed;
+  }
   camera.position = pos;
+  camera.lookat = lookat;
   update_camera(camera);
 }
 
