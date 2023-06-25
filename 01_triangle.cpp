@@ -5,9 +5,6 @@
 
 #include "gl_render.h"
 
-void framebuffer_size_callback(GLFWwindow *window, int width, int height);
-void processInput(GLFWwindow *window);
-
 // settings
 const unsigned int SCR_WIDTH = 800;
 const unsigned int SCR_HEIGHT = 600;
@@ -17,10 +14,6 @@ int main() {
   GLFWwindow *window =
       glrender::create_window(SCR_WIDTH, SCR_HEIGHT, "LearnOpenGL");
   glrender::init_glad();
-
-  glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
-
-  // build and compile our shader program
 
   glrender::Shader vertex_shader = glrender::create_shader(
       glrender::source::basic_uv_shader.vertex, GL_VERTEX_SHADER);
@@ -93,13 +86,9 @@ int main() {
   glrender::set_blend_transparent();
   glrender::set_wireframe_mode(false);
 
-  glrender::Camera camera = glrender::create_camera();
-  camera.position = Eigen::Vector3f(0.0f, 0.0f, 3.0f);
-  camera.lookat = Eigen::Vector3f(0.0f, 0.0f, 0.0f);
-  camera.up = Eigen::Vector3f(0.0f, 1.0f, 0.0f);
-  camera.aspect = float(SCR_WIDTH) / float(SCR_HEIGHT);
-  glrender::update_camera(camera);
-  // std::cout << camera.projection << std::endl;
+  glrender::Camera camera = glrender::create_camera(
+      {0.0f, 0.0f, 3.0f}, {0.0f, 0.0f, 0.0f}, {0.0f, 1.0f, 0.0f},
+      float(SCR_WIDTH) / float(SCR_HEIGHT));
 
   glrender::use_program(program);
   glrender::set_uniform_mat4(program, "projection", camera.projection);
@@ -108,8 +97,6 @@ int main() {
   float prev_time = glfwGetTime();
 
   while (!glfwWindowShouldClose(window)) {
-    processInput(window);
-
     glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT);
 
@@ -145,13 +132,4 @@ int main() {
   // ------------------------------------------------------------------
   glfwTerminate();
   return 0;
-}
-
-void processInput(GLFWwindow *window) {
-  if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
-    glfwSetWindowShouldClose(window, true);
-}
-
-void framebuffer_size_callback(GLFWwindow *window, int width, int height) {
-  glViewport(0, 0, width, height);
 }

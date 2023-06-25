@@ -155,6 +155,11 @@ inline void set_uniform_float3(Program program, const char* name, Vec3f value) {
               value.z());
 }
 
+inline void set_uniform_RGB(Program program, const char* name, RGB value) {
+  glUniform3f(glGetUniformLocation(program.id, name), float(value.x()) / 255.0f,
+              float(value.y()) / 255.0f, float(value.z()) / 255.0f);
+}
+
 inline void set_uniform_float4(Program program, const char* name, float value1,
                                float value2, float value3, float value4) {
   glUniform4f(glGetUniformLocation(program.id, name), value1, value2, value3,

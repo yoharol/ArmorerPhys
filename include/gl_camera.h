@@ -6,6 +6,8 @@
 #include <cmath>
 #include <GLFW/glfw3.h>
 
+#include "gl_type.h"
+
 namespace glrender {
 
 enum CameraType {
@@ -26,17 +28,20 @@ struct Camera {
   float fov;
 };
 
-inline Camera create_camera() {
+inline void update_camera(Camera& camera);
+
+inline Camera create_camera(Vec3f pos, Vec3f lookat, Vec3f up, float aspect) {
   Camera camera;
-  camera.position = Eigen::Vector3f(0.0f, 0.0f, 3.0f);
-  camera.lookat = Eigen::Vector3f(0.0f, 0.0f, 0.0f);
-  camera.up = Eigen::Vector3f(0.0f, 1.0f, 0.0f);
+  camera.position = pos;
+  camera.lookat = lookat;
+  camera.up = up;
   camera.projection = Eigen::Matrix4f::Identity();
   camera.type = CameraType::Perspective;
   camera.near = 0.5f;
   camera.far = 100.0f;
   camera.fov = 45.0f;
-  camera.aspect = 1.0f;
+  camera.aspect = aspect;
+  update_camera(camera);
   return camera;
 }
 

@@ -11,5 +11,6 @@
 #include "gl_objs.h"
 #include "gl_os.h"
 #include "gl_camera.h"
+#include "gl_scene.h"
 
 #endif  // GLRENDER_H_

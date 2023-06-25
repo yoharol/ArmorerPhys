@@ -10,6 +10,7 @@ using MatXf =
 using MatXi =
     Eigen::Matrix<int, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor>;
 using Vec3f = Eigen::Vector3f;
+using RGB = Eigen::Vector3i;
 
 }  // namespace glrender
 

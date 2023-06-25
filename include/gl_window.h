@@ -12,6 +12,7 @@ void init_glfw() {
   glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
   glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
   glfwWindowHint(GLFW_SAMPLES, 4);
+  glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
 
 #ifdef __APPLE__
   glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
@@ -48,6 +49,10 @@ void set_wireframe_mode(bool wireframe) {
   } else {
     glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
   }
+}
+
+void set_background_RGB(RGB color) {
+  glClearColor(color(0) / 255.0f, color(1) / 255.0f, color(2) / 255.0f, 1.0f);
 }
 
 }  // namespace glrender

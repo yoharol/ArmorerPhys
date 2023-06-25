@@ -1,4 +1,3 @@
-
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include <Eigen/Core>
@@ -25,11 +24,6 @@ int main() {
   glrender::init_glad();
 
   glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
-
-  // build and compile our shader program
-
-  std::cout << glrender::source::basic_diffuse_shader.vertex << std::endl;
-  std::cout << glrender::source::basic_diffuse_shader.fragment << std::endl;
 
   glrender::Shader vertex_shader = glrender::create_shader(
       glrender::source::basic_diffuse_shader.vertex, GL_VERTEX_SHADER);
@@ -78,18 +72,24 @@ int main() {
   // glrender::set_wireframe_mode(true);
   glrender::set_wireframe_mode(false);
 
-  glrender::Camera camera = glrender::create_camera();
-  camera.position = Eigen::Vector3f(0.0f, 0.0f, 3.0f);
-  camera.lookat = Eigen::Vector3f(0.0f, 0.35f, 0.0f);
-  camera.up = Eigen::Vector3f(0.0f, 1.0f, 0.0f);
-  camera.aspect = float(SCR_WIDTH) / float(SCR_HEIGHT);
-  glrender::update_camera(camera);
+  glrender::Camera camera = glrender::create_camera(
+      {2.0f, 0.0f, -2.0f}, {0.0f, 0.35f, 0.0f}, {0.0f, 1.0f, 0.0f},
+      float(SCR_WIDTH) / float(SCR_HEIGHT));
 
   // std::cout << camera.projection << std::endl;
 
   glrender::use_program(program);
   glrender::set_uniform_mat4(program, "projection", camera.projection);
-  glrender::set_uniform_mat4(program, "view", camera.view);
+  // glrender::set_uniform_mat4(program, "view", camera.view);
+  glrender::set_uniform_RGB(program, "lightColor", glrender::RGB(242, 76, 61));
+  glrender::set_uniform_RGB(program, "diffuseColor",
+                            glrender::RGB(244, 244, 244));
+  glrender::set_uniform_RGB(program, "specularColor",
+                            glrender::RGB(255, 255, 255));
+  glrender::set_uniform_RGB(program, "ambientColor", glrender::RGB(9, 5, 128));
+  glrender::set_uniform_float(program, "specularStrength", 0.5f);
+  glrender::set_uniform_float3(program, "lightPos",
+                               glrender::Vec3f(0.0f, 0.35f, 5.0f));
   glrender::unuse_program();
 
   RenderFunc render_mesh = [&](int idx) {
@@ -99,11 +99,13 @@ int main() {
   };
 
   float prev_time = glfwGetTime();
+  float start_time = prev_time;
 
   while (!glfwWindowShouldClose(window)) {
     processInput(window);
 
-    glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+    glrender::set_background_RGB(glrender::RGB(250, 240, 228));
+
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     glrender::use_program(program);
@@ -113,13 +115,11 @@ int main() {
     glrender::orbit_camera_control(window, camera, 10.0, curr_time - prev_time);
     prev_time = curr_time;
     glrender::set_uniform_mat4(program, "projection", camera.projection);
-    glrender::set_uniform_float3(program, "lightPos", camera.position);
-    glrender::set_uniform_float3(program, "lightColor",
-                                 glrender::Vec3f(1.0f, 0.0f, 0.0f));
-    glrender::set_uniform_float3(program, "objectColor",
-                                 glrender::Vec3f(0.96f, 0.96f, 0.96f));
-    glrender::set_uniform_float3(program, "ambientColor",
-                                 glrender::Vec3f(0.0f, 0.0f, 0.2f));
+    glrender::set_uniform_float3(program, "viewPos", camera.position);
+    glrender::set_uniform_float3(
+        program, "lightPos",
+        glrender::Vec3f(5.0f * sin((curr_time - start_time) * 1.0f), 0.35f,
+                        5.0f * cos((curr_time - start_time) * 1.0f)));
 
     render_mesh(0);
 
