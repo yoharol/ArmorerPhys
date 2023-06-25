@@ -20,7 +20,6 @@ int main() {
   glrender::DiffuseMaterial material{{255, 255, 255},  //
                                      {255, 255, 255},  //
                                      0.5f};
-
   glrender::Scene scene = glrender::create_scene(
       glrender::Light{{242, 76, 61}, {9, 5, 128}, {0.0f, 0.35f, 5.0f}},
       glrender::create_camera({2.0f, 0.0f, -2.0f}, {0.0f, 0.35f, 0.0f},
@@ -48,13 +47,10 @@ int main() {
   while (!glfwWindowShouldClose(window)) {
     glrender::set_background_RGB(glrender::RGB(250, 240, 228));
 
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
     float curr_time = glfwGetTime();
     glrender::orbit_camera_control(window, scene.camera, 10.0,
                                    curr_time - prev_time);
     prev_time = curr_time;
-
     scene.light.position =
         glrender::Vec3f(5.0f * sin((curr_time - start_time) * 1.0f), 0.35f,
                         5.0f * cos((curr_time - start_time) * 1.0f));
@@ -67,12 +63,8 @@ int main() {
     glfwPollEvents();
   }
 
-  // optional: de-allocate all resources once they've outlived their purpose:
-  // ------------------------------------------------------------------------
   glrender::delete_mesh(mesh);
 
-  // glfw: terminate, clearing all previously allocated GLFW resources.
-  // ------------------------------------------------------------------
   glfwTerminate();
   return 0;
 }

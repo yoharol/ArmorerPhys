@@ -15,6 +15,8 @@ int main() {
       glrender::create_window(SCR_WIDTH, SCR_HEIGHT, "LearnOpenGL");
   glrender::init_glad();
 
+  // build and compile our shader program
+
   glrender::Shader vertex_shader = glrender::create_shader(
       glrender::source::basic_uv_shader.vertex, GL_VERTEX_SHADER);
   glrender::Shader fragment_shader = glrender::create_shader(
@@ -97,12 +99,12 @@ int main() {
   float prev_time = glfwGetTime();
 
   while (!glfwWindowShouldClose(window)) {
-    glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
-    glClear(GL_COLOR_BUFFER_BIT);
+    glrender::set_background_RGB(glrender::RGB(30, 50, 50));
 
     glrender::bind_texture(tex);
     glrender::use_program(program);
     glrender::bind_vao(vao);
+    glrender::bind_ebo(index_buffer);
 
     float curr_time = glfwGetTime();
     glrender::orbit_camera_control(window, camera, 10.0, curr_time - prev_time);
@@ -114,6 +116,7 @@ int main() {
 
     glrender::unbind_texture();
     glrender::unbind_vao();
+    glrender::unbind_ebo();
     glrender::unuse_program();
 
     glfwSwapBuffers(window);

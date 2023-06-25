@@ -52,6 +52,7 @@ void set_wireframe_mode(bool wireframe) {
 }
 
 void set_background_RGB(RGB color) {
+  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
   glClearColor(color(0) / 255.0f, color(1) / 255.0f, color(2) / 255.0f, 1.0f);
 }
 
