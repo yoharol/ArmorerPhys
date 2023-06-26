@@ -29,6 +29,16 @@ Scene create_scene(Light light, Camera camera) {
   return scene;
 }
 
+void add_render_func(Scene &scene, RenderFunc func) {
+  scene.render_funcs.push_back(func);
+}
+
+void render_scene(Scene scene) {
+  for (RenderFunc func : scene.render_funcs) {
+    func(scene);
+  }
+}
+
 struct DiffuseMesh {
   VAO vertex_array;
   VBO vertex_buffer;

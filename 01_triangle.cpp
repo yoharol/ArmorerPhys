@@ -11,8 +11,8 @@ const unsigned int SCR_HEIGHT = 600;
 
 int main() {
   glrender::init_glfw();
-  GLFWwindow *window =
-      glrender::create_window(SCR_WIDTH, SCR_HEIGHT, "LearnOpenGL");
+  GLFWwindow *window = glrender::create_window(SCR_WIDTH, SCR_HEIGHT,
+                                               "Example1: Textured Triangles");
   glrender::init_glad();
 
   // build and compile our shader program

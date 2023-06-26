@@ -14,17 +14,26 @@ const unsigned int SCR_HEIGHT = 600;
 int main() {
   glrender::init_glfw();
   GLFWwindow *window =
-      glrender::create_window(SCR_WIDTH, SCR_HEIGHT, "Example3: Lighting");
+      glrender::create_window(SCR_WIDTH, SCR_HEIGHT, "Example4: Pipeline");
   glrender::init_glad();
 
-  glrender::DiffuseMaterial material{{255, 255, 255},  //
-                                     {255, 255, 255},  //
-                                     0.5f};
+  glrender::DiffuseMaterial material{
+      {255, 255, 255},  // diffuse color
+      {255, 255, 255},  // specular color
+      0.5f              // specular strength
+  };
   glrender::Scene scene = glrender::create_scene(
-      glrender::Light{{242, 76, 61}, {9, 5, 128}, {0.0f, 0.35f, 5.0f}},
-      glrender::create_camera({2.0f, 0.0f, -2.0f}, {0.0f, 0.35f, 0.0f},
-                              {0.0f, 1.0f, 0.0f},
-                              float(SCR_WIDTH) / float(SCR_HEIGHT)));
+      glrender::Light{
+          {242, 76, 61},       // light color
+          {9, 5, 128},         // ambient color
+          {0.0f, 0.35f, 5.0f}  // light position
+      },
+      glrender::create_camera(
+          {2.0f, 0.0f, -2.0f},                  // camera position
+          {0.0f, 0.35f, 0.0f},                  // camera target
+          {0.0f, 1.0f, 0.0f},                   // camera up axis
+          float(SCR_WIDTH) / float(SCR_HEIGHT)  // camera aspect
+          ));
 
   glrender::MatXf V;
   glrender::MatXi F;
@@ -34,12 +43,10 @@ int main() {
 
   glrender::DiffuseMesh mesh = glrender::create_diffuse_mesh(material);
   glrender::set_mesh_data(mesh, V, F);
-  scene.render_funcs.push_back(glrender::get_render_func(mesh));
+  // scene.render_funcs.push_back(glrender::get_render_func(mesh));
+  glrender::add_render_func(scene, glrender::get_render_func(mesh));
 
-  // glrender::set_wireframe_mode(true);
   glrender::set_wireframe_mode(false);
-
-  // glrender::update_camera(camera);
 
   float prev_time = glfwGetTime();
   float start_time = prev_time;
@@ -55,9 +62,7 @@ int main() {
         glrender::Vec3f(5.0f * sin((curr_time - start_time) * 1.0f), 0.35f,
                         5.0f * cos((curr_time - start_time) * 1.0f));
 
-    for (auto render_func : scene.render_funcs) {
-      render_func(scene);
-    }
+    glrender::render_scene(scene);
 
     glfwSwapBuffers(window);
     glfwPollEvents();

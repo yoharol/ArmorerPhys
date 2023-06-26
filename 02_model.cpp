@@ -15,7 +15,7 @@ const unsigned int SCR_HEIGHT = 600;
 int main() {
   glrender::init_glfw();
   GLFWwindow *window =
-      glrender::create_window(SCR_WIDTH, SCR_HEIGHT, "LearnOpenGL");
+      glrender::create_window(SCR_WIDTH, SCR_HEIGHT, "Example2: Load Model");
   glrender::init_glad();
 
   // build and compile our shader program
