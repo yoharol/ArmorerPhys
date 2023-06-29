@@ -41,10 +41,19 @@ int main() {
   int n_vertices = V.rows();
   int n_faces = F.rows();
 
+  std::vector<glrender::Vec3f> points;
+  points.resize(4);
+  points[0] = V.row(289).transpose();
+  points[1] = V.row(577).transpose();
+  points[2] = V.row(572).transpose();
+  points[3] = V.row(284).transpose();
+  glrender::ContinuousLines lines{points, {}, {255, 0, 0}, 100.0f, true};
+
   glrender::DiffuseMesh mesh = glrender::create_diffuse_mesh(material);
   glrender::set_mesh_data(mesh, V, F);
-  // scene.render_funcs.push_back(glrender::get_render_func(mesh));
+
   glrender::add_render_func(scene, glrender::get_render_func(mesh));
+  glrender::add_render_func(scene, glrender::get_render_func(lines));
 
   glrender::set_wireframe_mode(false);
 
@@ -63,6 +72,23 @@ int main() {
                         5.0f * cos((curr_time - start_time) * 1.0f));
 
     glrender::render_scene(scene);
+
+    glPointSize(10.0f);
+    glBegin(GL_POINTS);
+    glColor3ub(255, 0, 0);
+    glVertex3f(0.0f, 0.0f, 0.0f);
+    glEnd();
+
+    glLineWidth(10.0f);
+    glColor3ub(255, 0, 0);
+    glBegin(GL_LINES);
+    // glVertex3f(-0.09f, -0.73f, 0.62f);
+    // glVertex3f(-0.3f, -0.64f, 0.68f);
+    glVertex2f(0.0f, 0.0f);
+    glVertex2f(1.0f, 1.0f);
+    // glrender::draw_line({-0.09f, -0.73f, 0.62f}, {-0.3f, -0.64f, 0.68f},
+    //                     glrender::RGB(255, 0, 0), 10.0f);
+    glEnd();
 
     glfwSwapBuffers(window);
     glfwPollEvents();

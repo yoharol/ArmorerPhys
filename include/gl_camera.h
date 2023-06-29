@@ -16,11 +16,11 @@ enum CameraType {
 };
 
 struct Camera {
-  Eigen::Vector3f position;
-  Eigen::Vector3f lookat;
-  Eigen::Vector3f up;
-  Eigen::Matrix4f view;
-  Eigen::Matrix4f projection;
+  Vec3f position;
+  Vec3f lookat;
+  Vec3f up;
+  Mat4f view;
+  Mat4f projection;
   CameraType type;
   float aspect;
   float near;
@@ -52,22 +52,22 @@ inline void update_camera(Camera& camera) {
   float n = -camera.near;
   float f = -camera.far;
 
-  Eigen::Matrix4f to_camera_space;
-  Eigen::Vector3f z = (camera.position - camera.lookat).normalized();
-  Eigen::Vector3f x = camera.up.cross(z).normalized();
-  Eigen::Vector3f y = z.cross(x).normalized();
+  Mat4f to_camera_space;
+  Vec3f z = (camera.position - camera.lookat).normalized();
+  Vec3f x = camera.up.cross(z).normalized();
+  Vec3f y = z.cross(x).normalized();
   to_camera_space << x.x(), x.y(), x.z(), -x.dot(camera.position),  //
       y.x(), y.y(), y.z(), -y.dot(camera.position),                 //
       z.x(), z.y(), z.z(), -z.dot(camera.position),                 //
       0.0f, 0.0f, 0.0f, 1.0f;
 
-  Eigen::Matrix4f perspective;
+  Mat4f perspective;
   perspective << n, 0.0f, 0.0f, 0.0f,  //
       0.0f, n, 0.0f, 0.0f,             //
       0.0f, 0.0f, n + f, -f * n,       //
       0.0f, 0.0f, 1.0f, 0.0f;
 
-  Eigen::Matrix4f orthographic;
+  Mat4f orthographic;
   orthographic << 2.0f / xscale, 0.0f, 0.0f, 0.0f,     //
       0.0f, 2.0f / yscale, 0.0f, 0.0f,                 //
       0.0f, 0.0f, -2.0f / (n - f), (n + f) / (n - f),  //
@@ -76,8 +76,7 @@ inline void update_camera(Camera& camera) {
   camera.projection = orthographic * perspective * to_camera_space;
 }
 
-inline void set_camera(Camera& camera, Eigen::Vector3f position,
-                       Eigen::Vector3f lookat, Eigen::Vector3f up,
+inline void set_camera(Camera& camera, Vec3f position, Vec3f lookat, Vec3f up,
                        CameraType type = CameraType::Perspective) {
   camera.position = position;
   camera.lookat = lookat;
@@ -89,13 +88,13 @@ inline void set_camera(Camera& camera, Eigen::Vector3f position,
 inline void orbit_camera_control(GLFWwindow* window, Camera& camera,
                                  float speed = 1.0f,
                                  float delta_time = 1.0f / 60.0f) {
-  Eigen::Vector3f lookat(camera.lookat);
-  Eigen::Vector3f pos(camera.position);
-  Eigen::Vector3f up(camera.up);
+  Vec3f lookat(camera.lookat);
+  Vec3f pos(camera.position);
+  Vec3f up(camera.up);
   float radius = (lookat - pos).norm();
-  Eigen::Vector3f right = (lookat - pos).cross(up).normalized();
-  Eigen::Vector3f forward = (lookat - pos).normalized();
-  Eigen::Vector3f top = right.cross(forward).normalized();
+  Vec3f right = (lookat - pos).cross(up).normalized();
+  Vec3f forward = (lookat - pos).normalized();
+  Vec3f top = right.cross(forward).normalized();
   if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
     pos += forward * speed * delta_time;
     camera.position = pos;

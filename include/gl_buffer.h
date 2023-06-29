@@ -166,8 +166,7 @@ inline void set_uniform_float4(Program program, const char* name, float value1,
               value4);
 }
 
-inline void set_uniform_mat4(Program program, const char* name,
-                             Eigen::Matrix4f value) {
+inline void set_uniform_mat4(Program program, const char* name, Mat4f value) {
   glUniformMatrix4fv(glGetUniformLocation(program.id, name), 1, GL_FALSE,
                      value.data());
 }

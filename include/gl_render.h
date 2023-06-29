@@ -2,6 +2,8 @@
 #define GLRENDER_H_
 
 #include "gl_type.h"
+#include "gl_math.h"
+#include "gl_draw.h"
 #include "gl_buffer.h"
 #include "gl_window.h"
 #include "gl_image.h"
