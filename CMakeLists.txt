@@ -55,6 +55,7 @@ function(add_gl_target target_name)
       OpenGL::GL
       Eigen3::Eigen
       igl::core
+      imgui
       glfw
       glad)
 endfunction()
@@ -63,3 +64,4 @@ add_gl_target(01_triangle)
 add_gl_target(02_model)
 add_gl_target(03_lighting)
 add_gl_target(04_pipeline)
+add_gl_target(05_2d_game)

@@ -8,14 +8,12 @@
 #include "gl_render.h"
 
 // settings
-const unsigned int SCR_WIDTH = 800;
-const unsigned int SCR_HEIGHT = 600;
+const unsigned int SCR_WIDTH = 1000;
+const unsigned int SCR_HEIGHT = 800;
 
 int main() {
-  glrender::init_glfw();
   GLFWwindow *window =
       glrender::create_window(SCR_WIDTH, SCR_HEIGHT, "Example4: Pipeline");
-  glrender::init_glad();
 
   glrender::DiffuseMaterial material{
       {255, 255, 255},  // diffuse color
@@ -24,8 +22,8 @@ int main() {
   };
   glrender::Scene scene = glrender::create_scene(
       glrender::Light{
-          {242, 76, 61},       // light color
-          {9, 5, 128},         // ambient color
+          {242, 242, 242},     // light color
+          {9, 5, 88},          // ambient color
           {0.0f, 0.35f, 5.0f}  // light position
       },
       glrender::create_camera(
@@ -34,6 +32,13 @@ int main() {
           {0.0f, 1.0f, 0.0f},                   // camera up axis
           float(SCR_WIDTH) / float(SCR_HEIGHT)  // camera aspect
           ));
+  glrender::Gui gui = glrender::create_gui(window, "gui");
+
+  glrender::Vec3f diffuse_color(0.0f, 211.f / 255.f, 239.f / 255.f);
+  glrender::add_gui_func(gui, [&diffuse_color]() {
+    ImGui::Text("Diffuse Color:");
+    ImGui::ColorEdit3("#c1", diffuse_color.data());
+  });
 
   glrender::MatXf V;
   glrender::MatXi F;
@@ -47,13 +52,17 @@ int main() {
   points[1] = V.row(577).transpose();
   points[2] = V.row(572).transpose();
   points[3] = V.row(284).transpose();
-  glrender::ContinuousLines lines{points, {}, {255, 0, 0}, 100.0f, true};
+  glrender::Points point_cloud{points, {}, {0, 255, 255}, 15.0f};
+  glrender::ContinuousLines lines{points, {}, {255, 0, 0}, 5.0f, true};
 
   glrender::DiffuseMesh mesh = glrender::create_diffuse_mesh(material);
   glrender::set_mesh_data(mesh, V, F);
 
   glrender::add_render_func(scene, glrender::get_render_func(mesh));
-  glrender::add_render_func(scene, glrender::get_render_func(lines));
+  glrender::add_render_func(scene, glrender::get_render_func(lines),
+                            false);  // disable depth test
+  glrender::add_render_func(scene, glrender::get_render_func(point_cloud),
+                            false);  // disable depth test
 
   glrender::set_wireframe_mode(false);
 
@@ -72,30 +81,17 @@ int main() {
                         5.0f * cos((curr_time - start_time) * 1.0f));
 
     glrender::render_scene(scene);
+    glrender::render_gui(gui);
 
-    glPointSize(10.0f);
-    glBegin(GL_POINTS);
-    glColor3ub(255, 0, 0);
-    glVertex3f(0.0f, 0.0f, 0.0f);
-    glEnd();
-
-    glLineWidth(10.0f);
-    glColor3ub(255, 0, 0);
-    glBegin(GL_LINES);
-    // glVertex3f(-0.09f, -0.73f, 0.62f);
-    // glVertex3f(-0.3f, -0.64f, 0.68f);
-    glVertex2f(0.0f, 0.0f);
-    glVertex2f(1.0f, 1.0f);
-    // glrender::draw_line({-0.09f, -0.73f, 0.62f}, {-0.3f, -0.64f, 0.68f},
-    //                     glrender::RGB(255, 0, 0), 10.0f);
-    glEnd();
+    glrender::use_program(mesh.program);
+    glrender::set_uniform_float3(mesh.program, "diffuseColor", diffuse_color);
+    glrender::unuse_program();
 
     glfwSwapBuffers(window);
     glfwPollEvents();
   }
-
   glrender::delete_mesh(mesh);
-
+  glrender::destroy_gui(gui);
   glfwTerminate();
   return 0;
 }

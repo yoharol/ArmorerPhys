@@ -140,7 +140,6 @@ RenderFunc get_render_func(DiffuseMesh &mesh) {
   RenderFunc render_func = [&](Scene scene) {
     use_program(mesh.program);
     set_uniform_mat4(mesh.program, "projection", scene.camera.projection);
-    set_uniform_mat4(mesh.program, "view", scene.camera.view);
     set_uniform_RGB(mesh.program, "lightColor", scene.light.light_color);
     set_uniform_RGB(mesh.program, "ambientColor", scene.light.ambient_color);
     set_uniform_float3(mesh.program, "lightPos", scene.light.position);
@@ -168,11 +167,25 @@ void delete_mesh(DiffuseMesh &mesh) {
 }
 
 struct Points {
-  std::vector<Vec3f> points;
-  std::vector<Vec3f> per_point_color;
+  List3f points;
+  List3f per_point_color;
   RGB color;
   float point_size;
 };
+
+void set_points_data(Points &points, const Mat3f &points_data,
+                     const Mat3f &per_point_color) {
+  Mat3fToList3f(points_data, points.points);
+  if (per_point_color.rows() > 0)
+    Mat3fToList3f(per_point_color, points.per_point_color);
+}
+
+void set_points_data(Points &points, const Mat2f &points_data,
+                     const Mat3f &per_point_color) {
+  Mat2fToList3f(points_data, points.points);
+  if (per_point_color.rows() > 0)
+    Mat3fToList3f(per_point_color, points.per_point_color);
+}
 
 RenderFunc get_render_func(Points &points) {
   RenderFunc render_func = [&](Scene scene) {
@@ -193,12 +206,25 @@ RenderFunc get_render_func(Points &points) {
 }
 
 struct ContinuousLines {
-  std::vector<Vec3f> points;
-  std::vector<Vec3f> per_line_color;
+  List3f points;
+  List3f per_line_color;
   RGB color;
   float line_width;
   bool loop;
 };
+
+void set_continuous_lines_data(ContinuousLines &lines, const Mat3f &points_data,
+                               const Mat3f &per_line_color) {
+  Mat3fToList3f(points_data, lines.points);
+  if (per_line_color.rows() != 0)
+    Mat3fToList3f(per_line_color, lines.per_line_color);
+}
+void set_continuous_lines_data(ContinuousLines &lines, const Mat2f &points_data,
+                               const Mat3f &per_line_color) {
+  Mat2fToList3f(points_data, lines.points);
+  if (per_line_color.rows() != 0)
+    Mat3fToList3f(per_line_color, lines.per_line_color);
+}
 
 RenderFunc get_render_func(ContinuousLines &lines) {
   RenderFunc render_func = [&](Scene scene) {

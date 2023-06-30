@@ -12,14 +12,13 @@ namespace glrender {
 
 enum CameraType {
   Perspective,
-  Orthographic,
+  View2d,
 };
 
 struct Camera {
   Vec3f position;
   Vec3f lookat;
   Vec3f up;
-  Mat4f view;
   Mat4f projection;
   CameraType type;
   float aspect;
@@ -43,6 +42,23 @@ inline Camera create_camera(Vec3f pos, Vec3f lookat, Vec3f up, float aspect) {
   camera.aspect = aspect;
   update_camera(camera);
   return camera;
+}
+
+inline void set_2d_camera(Camera& camera, float left, float right, float bottom,
+                          float top) {
+  float l = left;
+  float r = right;
+  float b = bottom;
+  float t = bottom + (right - left) / camera.aspect;
+  Mat4f projection;
+  projection <<  //
+      2.0f / (r - l),
+      0.0f, 0.0f, -(r + l) / (r - l),                  // x
+      0.0f, 2.0f / (t - b), 0.0f, -(t + b) / (t - b),  // y
+      0.0f, 0.0f, 0.0f, 0.0f,                          // z
+      0.0f, 0.0f, 0.0f, 1.0f;                          // w
+  camera.projection = projection;
+  camera.type = CameraType::View2d;
 }
 
 inline void update_camera(Camera& camera) {

@@ -3,6 +3,7 @@
 
 #include "gl_type.h"
 #include "gl_math.h"
+#include "gl_utils.h"
 #include "gl_draw.h"
 #include "gl_buffer.h"
 #include "gl_window.h"
@@ -14,5 +15,6 @@
 #include "gl_os.h"
 #include "gl_camera.h"
 #include "gl_scene.h"
+#include "gl_imgui.h"
 
 #endif  // GLRENDER_H_

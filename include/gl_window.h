@@ -6,11 +6,16 @@
 
 namespace glrender {
 
+void GLFW_error(int error, const char* description) {
+  fputs(description, stderr);
+}
+
 void init_glfw() {
+  glfwSetErrorCallback(GLFW_error);
   glfwInit();
   glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-  glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
-  glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+  glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2);
+  glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_COMPAT_PROFILE);
   glfwWindowHint(GLFW_SAMPLES, 4);
   glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
 
@@ -28,6 +33,7 @@ void init_glad() {
 }
 
 GLFWwindow* create_window(int width, int height, const char* title) {
+  init_glfw();
   GLFWwindow* window = glfwCreateWindow(width, height, title, NULL, NULL);
   if (window == NULL) {
     std::cout << "Failed to create GLFW window" << std::endl;
@@ -35,6 +41,7 @@ GLFWwindow* create_window(int width, int height, const char* title) {
     exit(-1);
   }
   glfwMakeContextCurrent(window);
+  init_glad();
   return window;
 }
 

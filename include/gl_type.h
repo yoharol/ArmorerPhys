@@ -14,6 +14,12 @@ using Vec3f = Eigen::Vector3f;
 using Vec2f = Eigen::Vector2f;
 using Mat4f = Eigen::Matrix4f;
 using RGB = Eigen::Vector3i;
+using List3f = std::vector<Vec3f>;
+using List2f = std::vector<Vec2f>;
+using Mat3f = Eigen::Matrix<float, Eigen::Dynamic, 3, Eigen::RowMajor>;
+using Mat2f = Eigen::Matrix<float, Eigen::Dynamic, 2, Eigen::RowMajor>;
+
+List3f EmptyList3f = List3f(0);
 
 }  // namespace glrender
 

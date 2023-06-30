@@ -18,6 +18,7 @@ struct Scene {
   Light light;
   Camera camera;
   std::vector<RenderFunc> render_funcs;
+  std::vector<bool> depth_test;
 };
 
 Scene create_scene(Light light, Camera camera) {
@@ -25,16 +26,23 @@ Scene create_scene(Light light, Camera camera) {
   scene.light = light;
   scene.camera = camera;
   scene.render_funcs = std::vector<RenderFunc>();
+  scene.depth_test = std::vector<bool>();
   return scene;
 }
 
-void add_render_func(Scene &scene, RenderFunc func) {
+void add_render_func(Scene& scene, RenderFunc func, bool depth_test = true) {
   scene.render_funcs.push_back(func);
+  scene.depth_test.push_back(depth_test);
 }
 
 void render_scene(Scene scene) {
-  for (RenderFunc func : scene.render_funcs) {
-    func(scene);
+  for (int i = 0; i < scene.render_funcs.size(); ++i) {
+    if (scene.depth_test[i]) {
+      glEnable(GL_DEPTH_TEST);
+    } else {
+      glDisable(GL_DEPTH_TEST);
+    }
+    scene.render_funcs[i](scene);
   }
 }
 
