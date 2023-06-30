@@ -2,3 +2,4 @@ build/
 CMakeFiles/
 .DS_Store
 .vscode/
+imgui.ini
