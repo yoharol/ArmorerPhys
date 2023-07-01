@@ -46,14 +46,22 @@ int main() {
   int n_vertices = V.rows();
   int n_faces = F.rows();
 
-  std::vector<glrender::Vec3f> points;
-  points.resize(4);
-  points[0] = V.row(289).transpose();
-  points[1] = V.row(577).transpose();
-  points[2] = V.row(572).transpose();
-  points[3] = V.row(284).transpose();
-  glrender::Points point_cloud{points, {}, {0, 255, 255}, 15.0f};
-  glrender::ContinuousLines lines{points, {}, {255, 0, 0}, 5.0f, true};
+  glrender::MatXf v_p(4, 3);
+  // select 289, 577, 572, 284 vertex from V to v_p
+  v_p.row(0) = V.row(289);
+  v_p.row(1) = V.row(577);
+  v_p.row(2) = V.row(572);
+  v_p.row(3) = V.row(284);
+
+  glrender::Points points = glrender::create_points();
+  points.color = {255, 0, 0};
+  points.point_size = 10.0f;
+  glrender::Lines lines = glrender::create_lines();
+  lines.color = {0, 155, 155};
+  lines.mode = GL_LINE_LOOP;
+
+  glrender::set_points_data(points, v_p, glrender::MatXf());
+  glrender::set_lines_data(lines, v_p, glrender::MatXf());
 
   glrender::DiffuseMesh mesh = glrender::create_diffuse_mesh(material);
   glrender::set_mesh_data(mesh, V, F);
@@ -61,7 +69,7 @@ int main() {
   glrender::add_render_func(scene, glrender::get_render_func(mesh));
   glrender::add_render_func(scene, glrender::get_render_func(lines),
                             false);  // disable depth test
-  glrender::add_render_func(scene, glrender::get_render_func(point_cloud),
+  glrender::add_render_func(scene, glrender::get_render_func(points),
                             false);  // disable depth test
 
   glrender::set_wireframe_mode(false);

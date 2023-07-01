@@ -132,7 +132,6 @@ void set_mesh_data(DiffuseMesh &mesh, MatXf &V, MatXi &F) {
   set_uniform_float(mesh.program, "specularStrength",
                     mesh.material.specular_strength);
   unuse_program();
-
   unbind_vao();
 }
 
@@ -144,15 +143,13 @@ RenderFunc get_render_func(DiffuseMesh &mesh) {
     set_uniform_RGB(mesh.program, "ambientColor", scene.light.ambient_color);
     set_uniform_float3(mesh.program, "lightPos", scene.light.position);
     set_uniform_float3(mesh.program, "viewPos", scene.camera.position);
-    glrender::set_uniform_mat4(mesh.program, "projection",
-                               scene.camera.projection);
-    glrender::set_uniform_float3(mesh.program, "viewPos",
-                                 scene.camera.position);
-    glrender::bind_vao(mesh.vertex_array);
-    glrender::bind_ebo(mesh.index_buffer);
+    set_uniform_mat4(mesh.program, "projection", scene.camera.projection);
+    set_uniform_float3(mesh.program, "viewPos", scene.camera.position);
+    bind_vao(mesh.vertex_array);
+    bind_ebo(mesh.index_buffer);
     glDrawElements(GL_TRIANGLES, mesh.n_faces * 3, GL_UNSIGNED_INT, 0);
-    glrender::unbind_vao();
-    glrender::unbind_ebo();
+    unbind_vao();
+    unbind_ebo();
     unuse_program();
   };
   return render_func;
@@ -167,89 +164,160 @@ void delete_mesh(DiffuseMesh &mesh) {
 }
 
 struct Points {
-  List3f points;
-  List3f per_point_color;
+  int n_points;
+  VAO vertex_array;
+  VBO vertex_buffer;
+  VBO color_buffer;
+  Program program;
   RGB color;
+  bool uniform_color;
   float point_size;
 };
 
-void set_points_data(Points &points, const Mat3f &points_data,
-                     const Mat3f &per_point_color) {
-  Mat3fToList3f(points_data, points.points);
-  if (per_point_color.rows() > 0)
-    Mat3fToList3f(per_point_color, points.per_point_color);
+Points create_points() {
+  glEnable(GL_PROGRAM_POINT_SIZE);
+  return Points{
+      0,
+      create_vao(),    //
+      create_vbo(),    //
+      create_vbo(),    //
+      create_program(  //
+          create_shader(source::point_shader.vertex, GL_VERTEX_SHADER),
+          create_shader(source::point_shader.fragment, GL_FRAGMENT_SHADER)),
+      RGB(255, 0, 0),  //
+      true,            //
+      1.0f};
 }
 
-void set_points_data(Points &points, const Mat2f &points_data,
-                     const Mat3f &per_point_color) {
-  Mat2fToList3f(points_data, points.points);
-  if (per_point_color.rows() > 0)
-    Mat3fToList3f(per_point_color, points.per_point_color);
+void set_points_data(Points &points, const MatXf &points_data,
+                     const MatXf &per_point_color) {
+  points.n_points = points_data.rows();
+
+  use_program(points.program);
+
+  bind_vao(points.vertex_array);
+  bind_vbo(points.vertex_buffer);
+
+  if (points_data.cols() == 2) {
+    MatXf points_data_3d(points_data.rows(), 3);
+    points_data_3d << points_data, MatXf::Zero(points_data.rows(), 1);
+    set_vbo_dynamic_data(points_data_3d.data(),
+                         points_data_3d.size() * sizeof(float));
+  } else
+    set_vbo_dynamic_data(points_data.data(),
+                         points_data.size() * sizeof(float));
+  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void *)0);
+  glEnableVertexAttribArray(0);
+  unbind_vbo();
+
+  if (per_point_color.rows() > 0) {
+    bind_vbo(points.color_buffer);
+    set_vbo_dynamic_data(per_point_color.data(),
+                         per_point_color.size() * sizeof(float));
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float),
+                          (void *)0);
+    glEnableVertexAttribArray(1);
+    unbind_vbo();
+    points.uniform_color = false;
+  } else {
+    points.uniform_color = true;
+  }
+  unbind_vao();
+  unuse_program();
 }
 
 RenderFunc get_render_func(Points &points) {
   RenderFunc render_func = [&](Scene scene) {
-    Mat4f projection = scene.camera.projection;
-    for (int i = 0; i < points.points.size(); i++) {
-      Vec4f pos = projection * Vec4f(points.points[i](0), points.points[i](1),
-                                     points.points[i](2), 1.0f);
-      pos = pos / pos(3);
-      if (points.per_point_color.size() == points.points.size()) {
-        draw_point(Vec3f(pos(0), pos(1), pos(2)), points.per_point_color[i],
-                   points.point_size);
-      } else
-        draw_point(Vec3f(pos(0), pos(1), pos(2)), points.color,
-                   points.point_size);
-    }
+    use_program(points.program);
+    set_uniform_mat4(points.program, "projection", scene.camera.projection);
+    set_uniform_RGB(points.program, "color", points.color);
+    set_uniform_float(points.program, "pointSize", points.point_size);
+    if (points.uniform_color)
+      set_uniform_float(points.program, "choice", 1.0f);
+    else
+      set_uniform_float(points.program, "choice", 0.0f);
+    bind_vao(points.vertex_array);
+    glDrawArrays(GL_POINTS, 0, points.n_points);
+    unbind_vao();
+    unuse_program();
   };
   return render_func;
 }
 
-struct ContinuousLines {
-  List3f points;
-  List3f per_line_color;
+struct Lines {
+  int n_points;
+  VAO vertex_array;
+  VBO vertex_buffer;
+  VBO color_buffer;
+  Program program;
   RGB color;
-  float line_width;
-  bool loop;
+  bool uniform_color;
+  GLenum mode;
 };
 
-void set_continuous_lines_data(ContinuousLines &lines, const Mat3f &points_data,
-                               const Mat3f &per_line_color) {
-  Mat3fToList3f(points_data, lines.points);
-  if (per_line_color.rows() != 0)
-    Mat3fToList3f(per_line_color, lines.per_line_color);
-}
-void set_continuous_lines_data(ContinuousLines &lines, const Mat2f &points_data,
-                               const Mat3f &per_line_color) {
-  Mat2fToList3f(points_data, lines.points);
-  if (per_line_color.rows() != 0)
-    Mat3fToList3f(per_line_color, lines.per_line_color);
+Lines create_lines() {
+  return Lines{
+      0,
+      create_vao(),    //
+      create_vbo(),    //
+      create_vbo(),    //
+      create_program(  //
+          create_shader(source::line_shader.vertex, GL_VERTEX_SHADER),
+          create_shader(source::line_shader.fragment, GL_FRAGMENT_SHADER)),
+      RGB(255, 0, 0),  //
+      true,
+      GL_LINE_STRIP};
 }
 
-RenderFunc get_render_func(ContinuousLines &lines) {
+void set_lines_data(Lines &lines, const MatXf &points_data,
+                    const MatXf &per_line_color) {
+  lines.n_points = points_data.rows();
+
+  use_program(lines.program);
+
+  bind_vao(lines.vertex_array);
+  bind_vbo(lines.vertex_buffer);
+  if (points_data.cols() == 2) {
+    MatXf points_data_3d(points_data.rows(), 3);
+    points_data_3d << points_data, MatXf::Zero(points_data.rows(), 1);
+    set_vbo_dynamic_data(points_data_3d.data(),
+                         points_data_3d.size() * sizeof(float));
+  } else
+    set_vbo_dynamic_data(points_data.data(),
+                         points_data.size() * sizeof(float));
+  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void *)0);
+  glEnableVertexAttribArray(0);
+  unbind_vbo();
+
+  if (per_line_color.rows() > 0) {
+    bind_vbo(lines.color_buffer);
+    set_vbo_dynamic_data(per_line_color.data(),
+                         per_line_color.size() * sizeof(float));
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float),
+                          (void *)0);
+    glEnableVertexAttribArray(1);
+    unbind_vbo();
+    lines.uniform_color = false;
+  } else {
+    lines.uniform_color = true;
+  }
+  unbind_vao();
+  unuse_program();
+}
+
+RenderFunc get_render_func(Lines &lines) {
   RenderFunc render_func = [&](Scene scene) {
-    int diff = 1;
-    if (lines.loop) diff = 0;
-    for (int i = 0; i < lines.points.size() - diff; i++) {
-      int idx1 = i;
-      int idx2 = (i + 1) % lines.points.size();
-      Vec4f pos_start = scene.camera.projection *
-                        Vec4f(lines.points[idx1](0), lines.points[idx1](1),
-                              lines.points[idx1](2), 1.0f);
-      Vec4f pos_end = scene.camera.projection *
-                      Vec4f(lines.points[idx2](0), lines.points[idx2](1),
-                            lines.points[idx2](2), 1.0f);
-      pos_start = pos_start / pos_start(3);
-      pos_end = pos_end / pos_end(3);
-      if (lines.per_line_color.size() != 0)
-        draw_line(Vec3f(pos_start(0), pos_start(1), pos_start(2)),
-                  Vec3f(pos_end(0), pos_end(1), pos_end(2)),
-                  lines.per_line_color[i], lines.line_width);
-      else
-        draw_line(Vec3f(pos_start(0), pos_start(1), pos_start(2)),
-                  Vec3f(pos_end(0), pos_end(1), pos_end(2)), lines.color,
-                  lines.line_width);
-    }
+    use_program(lines.program);
+    set_uniform_mat4(lines.program, "projection", scene.camera.projection);
+    set_uniform_RGB(lines.program, "color", lines.color);
+    if (lines.uniform_color)
+      set_uniform_float(lines.program, "choice", 1.0f);
+    else
+      set_uniform_float(lines.program, "choice", 0.0f);
+    bind_vao(lines.vertex_array);
+    glDrawArrays(lines.mode, 0, lines.n_points);
+    unbind_vao();
+    unuse_program();
   };
   return render_func;
 }

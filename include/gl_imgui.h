@@ -19,7 +19,7 @@ struct Gui {
 };
 
 Gui create_gui(GLFWwindow *window, std::string name,
-               const char *glsl_version = "#version 150") {
+               const char *glsl_version = "#version 120") {
   IMGUI_CHECKVERSION();
   ImGui::CreateContext();
   ImGuiIO &io = ImGui::GetIO();

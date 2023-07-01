@@ -66,6 +66,78 @@ const ShaderSource basic_uv_shader = {
     }
   )"};
 
+const ShaderSource point_shader = {
+    R"(
+    #version 330 core
+    layout (location = 0) in vec3 aPos;
+    layout (location = 1) in vec3 aColor;
+
+    uniform vec3 color;
+    uniform float choice;
+    uniform mat4 projection;
+    uniform float pointSize;
+
+    out vec3 vertexColor;
+    out float radius;
+    void main() {
+      gl_Position = projection * vec4(aPos, 1.0);
+      gl_Position = gl_Position / gl_Position.w;
+      gl_PointSize = pointSize;
+      vertexColor = aColor * (1.0-choice) + choice * color;
+      radius = pointSize;
+    }
+  )",
+    R"(
+    #version 330 core
+
+    in float radius;
+    in vec3 vertexColor;
+    out vec4 FragColor;
+
+    void main() {
+      vec2 center = vec2(0.5, 0.5); // Center of the point
+      float dist = distance(center, gl_PointCoord.xy);
+      if (dist > 0.5){
+          FragColor = vec4(0.0, 0.0, 0.0, 0.0);
+      }
+      else
+      {
+          float alpha = smoothstep(0.4, 0.5, dist);
+          alpha = 1.0 - alpha * alpha;
+          FragColor = vec4(vertexColor, alpha);
+      }
+
+    }
+  )"};
+
+const ShaderSource line_shader = {
+    R"(
+    #version 330 core
+    layout (location = 0) in vec3 aPos;
+    layout (location = 1) in vec3 aColor;
+
+    uniform vec3 color;
+    uniform float choice;
+    uniform mat4 projection;
+
+    out vec3 vertexColor;
+    void main() {
+      gl_Position = projection * vec4(aPos, 1.0);
+      gl_Position = gl_Position / gl_Position.w;
+      vertexColor = aColor * (1.0-choice) + choice * color;
+    }
+  )",
+    R"(
+    #version 330 core
+
+    in vec3 vertexColor;
+    out vec4 FragColor;
+
+    void main() {
+      FragColor = vec4(vertexColor, 1.0);
+    }
+  )"};
+
 const ShaderSource basic_diffuse_shader = {
     R"(
     #version 330 core

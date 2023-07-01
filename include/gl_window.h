@@ -13,9 +13,9 @@ void GLFW_error(int error, const char* description) {
 void init_glfw() {
   glfwSetErrorCallback(GLFW_error);
   glfwInit();
-  glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 2);
-  glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1);
-  // glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+  glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+  glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+  glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
   glfwWindowHint(GLFW_SAMPLES, 4);
   glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
 
@@ -30,6 +30,9 @@ void init_glad() {
     exit(-1);
   }
   glEnable(GL_DEPTH_TEST);
+  // enable transparent blend
+  glEnable(GL_BLEND);
+  glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 }
 
 GLFWwindow* create_window(int width, int height, const char* title) {

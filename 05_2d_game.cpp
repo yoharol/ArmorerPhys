@@ -31,21 +31,28 @@ int main() {
   glrender::set_2d_camera(scene.camera, left, right, bottom, top);
   glrender::Gui gui = glrender::create_gui(window, "gui");
 
-  glrender::Points points{{}, {}, {255, 0, 0}, 25.0f};
-  glrender::ContinuousLines lines{{}, {}, {0, 205, 205}, 10.0f, true};
+  glrender::Points points = glrender::create_points();
+  glrender::Lines lines = glrender::create_lines();
 
   glrender::Mat2f v_p;
   v_p.resize(2, 2);
   v_p << 1.0f, 1.0f,  //
       1.0f, 0.5f;     //
+  glrender::Mat3f v_color;
+  v_color.resize(2, 3);
+  v_color << 0.0f, 0.0f, 0.0f,  //
+      1.0f, 0.2f, 0.0f;         //
   glrender::Mat2f v_p_ref = v_p;
   float l0 = (v_p.row(0) - v_p.row(1)).norm();
   glrender::Mat2f v_vel;
   v_vel.resize(2, 2);
   v_vel << 0.0f, 0.0f,  //
       0.0f, 0.0f;       //
-  glrender::set_points_data(points, v_p, {});
-  glrender::set_continuous_lines_data(lines, v_p, {});
+  glrender::set_points_data(points, v_p, v_color);
+  points.color = glrender::RGB(255, 0, 0);
+  points.point_size = 30.0f;
+  glrender::set_lines_data(lines, v_p, v_color);
+  lines.color = glrender::RGB(255, 0, 0);
 
   glrender::Vec2f gravity(0.0f, -10.0f);
   float mass = 1.0f;
@@ -55,8 +62,8 @@ int main() {
   auto reset = [&]() {
     v_p = v_p_ref;
     v_vel.setZero();
-    glrender::set_points_data(points, v_p, {});
-    glrender::set_continuous_lines_data(lines, v_p, {});
+    glrender::set_points_data(points, v_p, v_color);
+    glrender::set_lines_data(lines, v_p, v_color);
   };
 
   glrender::add_gui_func(gui,
@@ -95,8 +102,8 @@ int main() {
       v_p += v_vel * dt;
     }
 
-    glrender::set_points_data(points, v_p, {});
-    glrender::set_continuous_lines_data(lines, v_p, {});
+    glrender::set_points_data(points, v_p, v_color);
+    glrender::set_lines_data(lines, v_p, v_color);
 
     // glrender::Mat2fToList3f(v_p, pos);
     glrender::render_scene(scene);

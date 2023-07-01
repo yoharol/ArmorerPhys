@@ -18,8 +18,7 @@ using List3f = std::vector<Vec3f>;
 using List2f = std::vector<Vec2f>;
 using Mat3f = Eigen::Matrix<float, Eigen::Dynamic, 3, Eigen::RowMajor>;
 using Mat2f = Eigen::Matrix<float, Eigen::Dynamic, 2, Eigen::RowMajor>;
-
-List3f EmptyList3f = List3f(0);
+using Mat3i = Eigen::Matrix<float, Eigen::Dynamic, 3, Eigen::RowMajor>;
 
 }  // namespace glrender
 
