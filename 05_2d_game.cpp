@@ -5,8 +5,8 @@
 
 #include "gl_render.h"
 
-const unsigned int SCR_WIDTH = 800;
-const unsigned int SCR_HEIGHT = 800;
+const unsigned int SCR_WIDTH = 700;
+const unsigned int SCR_HEIGHT = 700;
 
 int main() {
   GLFWwindow* window =

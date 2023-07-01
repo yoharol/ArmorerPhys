@@ -55,7 +55,7 @@ int main() {
 
   glrender::Points points = glrender::create_points();
   points.color = {255, 0, 0};
-  points.point_size = 10.0f;
+  points.point_size = 20.0f;
   glrender::Lines lines = glrender::create_lines();
   lines.color = {0, 155, 155};
   lines.mode = GL_LINE_LOOP;
