@@ -1,10 +1,11 @@
 cmake_minimum_required(VERSION 3.21)
 
-project(LearnOpengl)
+project(ArmorerGL
+  DESCRIPTION "A simple OpenGL library"
+  LANGUAGES CXX C)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
-
 add_definitions(-DCMAKE_EXPORT_COMPILE_COMMANDS=ON)
 
 get_filename_component(ABS_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR} ABSOLUTE)
@@ -21,8 +22,8 @@ endfunction()
 
 # find opengl and glfw
 find_package_with_targets(OpenGL)
-find_package_with_targets(glfw3)
 find_package_with_targets(Eigen3)
+find_package_with_targets(glfw3)
 find_package_with_targets(glm)
 
 include(FetchContent)
@@ -37,8 +38,11 @@ FetchContent_MakeAvailable(libigl)
 include("${CMAKE_CURRENT_SOURCE_DIR}/cmake/glad.cmake")
 include ("${CMAKE_CURRENT_SOURCE_DIR}/cmake/imgui.cmake")
 
-# glob all cpp files in src folder
-file(GLOB_RECURSE SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp")
+# add all header files in /include into a header only library
+set(LIBRARY_NAME ArmorerGL)
+add_library(${LIBRARY_NAME} INTERFACE)
+target_include_directories(${LIBRARY_NAME} INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/include)
+target_link_libraries(${LIBRARY_NAME} INTERFACE OpenGL::GL Eigen3::Eigen igl::core imgui glfw glad)
 
 # a cmake function that create an executable target with opengl linked
 function(add_gl_target target_name)
@@ -52,16 +56,14 @@ function(add_gl_target target_name)
       ${CMAKE_CURRENT_SOURCE_DIR}/include)
     target_link_libraries(${target_name}
       PRIVATE
-      OpenGL::GL
-      Eigen3::Eigen
-      igl::core
-      imgui
-      glfw
-      glad)
+      ${LIBRARY_NAME})
 endfunction()
 
-add_gl_target(01_triangle)
-add_gl_target(02_model)
-add_gl_target(03_lighting)
-add_gl_target(04_pipeline)
-add_gl_target(05_2d_game)
+if(PROJECT_IS_TOP_LEVEL)
+  add_gl_target(01_triangle)
+  add_gl_target(02_model)
+  add_gl_target(03_lighting)
+  add_gl_target(04_pipeline)
+  add_gl_target(05_2d_game)
+endif()
+

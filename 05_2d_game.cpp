@@ -3,7 +3,7 @@
 #include <Eigen/Core>
 #include <iostream>
 
-#include "gl_render.h"
+#include "ArmorerGL.h"
 
 const unsigned int SCR_WIDTH = 700;
 const unsigned int SCR_HEIGHT = 700;

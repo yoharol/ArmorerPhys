@@ -6,7 +6,7 @@
 
 #include <igl/readOBJ.h>
 
-#include "gl_render.h"
+#include "ArmorerGL.h"
 
 typedef std::function<void(int)> RenderFunc;
 

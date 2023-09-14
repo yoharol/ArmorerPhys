@@ -3,7 +3,7 @@
 #include <Eigen/Core>
 #include <iostream>
 
-#include "gl_render.h"
+#include "ArmorerGL.h"
 
 // settings
 const unsigned int SCR_WIDTH = 800;
