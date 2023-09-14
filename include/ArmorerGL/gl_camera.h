@@ -8,7 +8,7 @@
 
 #include "gl_type.h"
 
-namespace glrender {
+namespace armgl {
 
 enum CameraType {
   Perspective,
@@ -158,6 +158,6 @@ inline void set_camera_aspect(Camera& camera, float aspect) {
   update_camera(camera);
 }
 
-}  // namespace glrender
+}  // namespace armgl
 
 #endif  // GL_CAMERA_H_

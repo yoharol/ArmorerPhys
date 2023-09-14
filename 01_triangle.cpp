@@ -10,24 +10,24 @@ const unsigned int SCR_WIDTH = 800;
 const unsigned int SCR_HEIGHT = 600;
 
 int main() {
-  glrender::init_glfw();
-  GLFWwindow *window = glrender::create_window(SCR_WIDTH, SCR_HEIGHT,
-                                               "Example1: Textured Triangles");
-  glrender::init_glad();
+  armgl::init_glfw();
+  GLFWwindow *window = armgl::create_window(SCR_WIDTH, SCR_HEIGHT,
+                                            "Example1: Textured Triangles");
+  armgl::init_glad();
 
   // build and compile our shader program
 
-  glrender::Shader vertex_shader = glrender::create_shader(
-      glrender::source::basic_uv_shader.vertex, GL_VERTEX_SHADER);
-  glrender::Shader fragment_shader = glrender::create_shader(
-      glrender::source::basic_uv_shader.fragment, GL_FRAGMENT_SHADER);
+  armgl::Shader vertex_shader = armgl::create_shader(
+      armgl::source::basic_uv_shader.vertex, GL_VERTEX_SHADER);
+  armgl::Shader fragment_shader = armgl::create_shader(
+      armgl::source::basic_uv_shader.fragment, GL_FRAGMENT_SHADER);
 
-  glrender::Program program =
-      glrender::create_program(vertex_shader, fragment_shader);
+  armgl::Program program =
+      armgl::create_program(vertex_shader, fragment_shader);
 
   // link shaders
-  glrender::delete_shader(vertex_shader);
-  glrender::delete_shader(fragment_shader);
+  armgl::delete_shader(vertex_shader);
+  armgl::delete_shader(fragment_shader);
 
   // set up vertex data (and buffer(s)) and configure vertex attributes
   // ------------------------------------------------------------------
@@ -47,77 +47,76 @@ int main() {
       1, 3, 2;         // second triangle
   int n_faces = indices.size() / 3;
 
-  glrender::VAO vao = glrender::create_vao();
-  glrender::bind_vao(vao);
+  armgl::VAO vao = armgl::create_vao();
+  armgl::bind_vao(vao);
 
-  glrender::EBO index_buffer = glrender::create_ebo();
-  glrender::bind_ebo(index_buffer);
-  glrender::set_ebo_static_data(indices.data(), indices.size() * sizeof(int));
+  armgl::EBO index_buffer = armgl::create_ebo();
+  armgl::bind_ebo(index_buffer);
+  armgl::set_ebo_static_data(indices.data(), indices.size() * sizeof(int));
 
-  glrender::VBO vertex_buffer = glrender::create_vbo();
-  glrender::bind_vbo(vertex_buffer);
-  glrender::set_vbo_static_data(vertices.data(),
-                                vertices.size() * sizeof(float));
+  armgl::VBO vertex_buffer = armgl::create_vbo();
+  armgl::bind_vbo(vertex_buffer);
+  armgl::set_vbo_static_data(vertices.data(), vertices.size() * sizeof(float));
 
   glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void *)0);
   glEnableVertexAttribArray(0);
-  glrender::unbind_vbo();
+  armgl::unbind_vbo();
 
-  glrender::VBO uv_buffer = glrender::create_vbo();
-  glrender::bind_vbo(uv_buffer);
-  glrender::set_vbo_static_data(texCoords.data(),
-                                texCoords.size() * sizeof(float));
+  armgl::VBO uv_buffer = armgl::create_vbo();
+  armgl::bind_vbo(uv_buffer);
+  armgl::set_vbo_static_data(texCoords.data(),
+                             texCoords.size() * sizeof(float));
   glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), (void *)0);
   glEnableVertexAttribArray(1);
-  glrender::unbind_vbo();
+  armgl::unbind_vbo();
 
-  glrender::unbind_vao();
+  armgl::unbind_vao();
 
-  glrender::Texture tex = glrender::create_texture();
-  glrender::bind_texture(tex);
-  glrender::set_texture_wrap(GL_CLAMP);
-  glrender::set_texture_filter(GL_LINEAR_MIPMAP_LINEAR, GL_LINEAR);
-  glrender::Image img =
-      glrender::load_image(std::string(ASSETS_PATH) + "/" + "awesomeface.png");
-  glrender::set_texture_image(0, img, GL_RGBA, GL_RGBA, GL_UNSIGNED_BYTE);
-  glrender::generate_texture_mipmap();
-  glrender::free_image(img);
-  glrender::unbind_texture();
+  armgl::Texture tex = armgl::create_texture();
+  armgl::bind_texture(tex);
+  armgl::set_texture_wrap(GL_CLAMP);
+  armgl::set_texture_filter(GL_LINEAR_MIPMAP_LINEAR, GL_LINEAR);
+  armgl::Image img =
+      armgl::load_image(std::string(ASSETS_PATH) + "/" + "awesomeface.png");
+  armgl::set_texture_image(0, img, GL_RGBA, GL_RGBA, GL_UNSIGNED_BYTE);
+  armgl::generate_texture_mipmap();
+  armgl::free_image(img);
+  armgl::unbind_texture();
 
   // set blend mode
-  glrender::set_blend_transparent();
-  glrender::set_wireframe_mode(false);
+  armgl::set_blend_transparent();
+  armgl::set_wireframe_mode(false);
 
-  glrender::Camera camera = glrender::create_camera(
+  armgl::Camera camera = armgl::create_camera(
       {0.0f, 0.0f, 3.0f}, {0.0f, 0.0f, 0.0f}, {0.0f, 1.0f, 0.0f},
       float(SCR_WIDTH) / float(SCR_HEIGHT));
 
-  glrender::use_program(program);
-  glrender::set_uniform_mat4(program, "projection", camera.projection);
-  glrender::unuse_program();
+  armgl::use_program(program);
+  armgl::set_uniform_mat4(program, "projection", camera.projection);
+  armgl::unuse_program();
 
   float prev_time = glfwGetTime();
 
   while (!glfwWindowShouldClose(window)) {
-    glrender::set_background_RGB(glrender::RGB(30, 50, 50));
+    armgl::set_background_RGB(armgl::RGB(30, 50, 50));
 
-    glrender::bind_texture(tex);
-    glrender::use_program(program);
-    glrender::bind_vao(vao);
-    glrender::bind_ebo(index_buffer);
+    armgl::bind_texture(tex);
+    armgl::use_program(program);
+    armgl::bind_vao(vao);
+    armgl::bind_ebo(index_buffer);
 
     float curr_time = glfwGetTime();
-    glrender::orbit_camera_control(window, camera, 10.0, curr_time - prev_time);
+    armgl::orbit_camera_control(window, camera, 10.0, curr_time - prev_time);
     prev_time = curr_time;
-    glrender::set_uniform_mat4(program, "projection", camera.projection);
+    armgl::set_uniform_mat4(program, "projection", camera.projection);
 
     // glDrawArrays(GL_TRIANGLES, 0, 3);
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
-    glrender::unbind_texture();
-    glrender::unbind_vao();
-    glrender::unbind_ebo();
-    glrender::unuse_program();
+    armgl::unbind_texture();
+    armgl::unbind_vao();
+    armgl::unbind_ebo();
+    armgl::unuse_program();
 
     glfwSwapBuffers(window);
     glfwPollEvents();
@@ -125,11 +124,11 @@ int main() {
 
   // optional: de-allocate all resources once they've outlived their purpose:
   // ------------------------------------------------------------------------
-  glrender::delete_vao(vao);
-  glrender::delete_vbo(vertex_buffer);
-  glrender::delete_vbo(uv_buffer);
-  glrender::delete_ebo(index_buffer);
-  glrender::delete_program(program);
+  armgl::delete_vao(vao);
+  armgl::delete_vbo(vertex_buffer);
+  armgl::delete_vbo(uv_buffer);
+  armgl::delete_ebo(index_buffer);
+  armgl::delete_program(program);
 
   // glfw: terminate, clearing all previously allocated GLFW resources.
   // ------------------------------------------------------------------

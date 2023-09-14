@@ -4,7 +4,7 @@
 #include "gl_type.h"
 #include "gl_buffer.h"
 
-namespace glrender {
+namespace armgl {
 
 struct ShaderSource {
   const char* vertex;
@@ -259,6 +259,6 @@ struct Light {
   Vec3f position;
 };
 
-}  // namespace glrender
+}  // namespace armgl
 
 #endif  // GL_SHADER_H_

@@ -5,7 +5,7 @@
 #include "stb_image.h"
 #include <iostream>
 
-namespace glrender {
+namespace armgl {
 
 struct Image {
   unsigned char* data;
@@ -28,6 +28,6 @@ Image load_image(const std::string path) {
 
 void free_image(Image image) { stbi_image_free(image.data); }
 
-}  // namespace glrender
+}  // namespace armgl
 
 #endif  // GL_IMAGE_H_

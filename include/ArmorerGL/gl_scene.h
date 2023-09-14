@@ -9,7 +9,7 @@
 #include "gl_camera.h"
 #include "gl_geom.h"
 
-namespace glrender {
+namespace armgl {
 
 struct Scene;
 typedef std::function<void(Scene)> RenderFunc;
@@ -46,6 +46,6 @@ void render_scene(Scene scene) {
   }
 }
 
-}  // namespace glrender
+}  // namespace armgl
 
 #endif  // GL_WARP_H_

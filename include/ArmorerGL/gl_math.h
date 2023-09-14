@@ -6,7 +6,7 @@
 #include <vector>
 #include <cassert>
 
-namespace glrender {
+namespace armgl {
 
 Vec3f heat_rgb(float value, float minv, float maxv) {
   float ratio = 2 * (value - minv) / (maxv - minv);
@@ -53,6 +53,6 @@ void Mat2fToList3f(const Mat2f& mat, List3f& vec) {
   }
 }
 
-};  // namespace glrender
+};  // namespace armgl
 
 #endif  // GL_MATH_H_

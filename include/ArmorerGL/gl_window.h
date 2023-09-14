@@ -4,7 +4,7 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
-namespace glrender {
+namespace armgl {
 
 void GLFW_error(int error, const char* description) {
   fputs(description, stderr);
@@ -66,6 +66,6 @@ void set_background_RGB(RGB color) {
   glClearColor(color(0) / 255.0f, color(1) / 255.0f, color(2) / 255.0f, 1.0f);
 }
 
-}  // namespace glrender
+}  // namespace armgl
 
 #endif  // GL_WINDOW_H_

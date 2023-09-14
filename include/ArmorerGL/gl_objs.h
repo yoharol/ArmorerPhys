@@ -12,7 +12,7 @@
 #include "gl_draw.h"
 #include "gl_scene.h"
 
-namespace glrender {
+namespace armgl {
 
 struct TexturedMesh {
   VAO vertex_array;
@@ -121,7 +121,7 @@ void set_mesh_data(DiffuseMesh &mesh, MatXf &V, MatXi &F) {
   unbind_vbo();
 
   bind_vbo(mesh.normal_buffer);
-  MatXf normals = glrender::get_normals(V, F);
+  MatXf normals = armgl::get_normals(V, F);
   set_vbo_dynamic_data(normals.data(), normals.size() * sizeof(float));
   glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void *)0);
   glEnableVertexAttribArray(1);
@@ -322,6 +322,6 @@ RenderFunc get_render_func(Lines &lines) {
   return render_func;
 }
 
-}  // namespace glrender
+}  // namespace armgl
 
 #endif  // GL_OBJS_H_

@@ -7,7 +7,7 @@
 #include "imgui_impl_glfw.h"
 #include "imgui_impl_opengl3.h"
 
-namespace glrender {
+namespace armgl {
 
 typedef std::function<void()> GuiFunc;
 
@@ -122,6 +122,6 @@ void StyleColorsSpectrum() {
   style.Colors[ImGuiCol_TextSelectedBg] = ImVec4(0.26f, 0.59f, 0.98f, 0.35f);
 }
 
-}  // namespace glrender
+}  // namespace armgl
 
 #endif  // GL_IMGUI_H_

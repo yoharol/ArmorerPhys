@@ -13,83 +13,83 @@ const unsigned int SCR_WIDTH = 800;
 const unsigned int SCR_HEIGHT = 600;
 
 int main() {
-  glrender::init_glfw();
+  armgl::init_glfw();
   GLFWwindow *window =
-      glrender::create_window(SCR_WIDTH, SCR_HEIGHT, "Example2: Load Model");
-  glrender::init_glad();
+      armgl::create_window(SCR_WIDTH, SCR_HEIGHT, "Example2: Load Model");
+  armgl::init_glad();
 
   // build and compile our shader program
 
-  glrender::Shader vertex_shader = glrender::create_shader(
-      glrender::source::basic_shader.vertex, GL_VERTEX_SHADER);
-  glrender::Shader fragment_shader = glrender::create_shader(
-      glrender::source::basic_shader.fragment, GL_FRAGMENT_SHADER);
+  armgl::Shader vertex_shader = armgl::create_shader(
+      armgl::source::basic_shader.vertex, GL_VERTEX_SHADER);
+  armgl::Shader fragment_shader = armgl::create_shader(
+      armgl::source::basic_shader.fragment, GL_FRAGMENT_SHADER);
 
-  glrender::Program program =
-      glrender::create_program(vertex_shader, fragment_shader);
+  armgl::Program program =
+      armgl::create_program(vertex_shader, fragment_shader);
 
   // link shaders
-  glrender::delete_shader(vertex_shader);
-  glrender::delete_shader(fragment_shader);
+  armgl::delete_shader(vertex_shader);
+  armgl::delete_shader(fragment_shader);
 
-  glrender::MatXf V;
-  glrender::MatXi F;
+  armgl::MatXf V;
+  armgl::MatXi F;
 
   igl::readOBJ(std::string(ASSETS_PATH) + "/spot.obj", V, F);
 
   int n_vertices = V.rows();
   int n_faces = F.rows();
 
-  glrender::VAO vao = glrender::create_vao();
-  glrender::bind_vao(vao);
+  armgl::VAO vao = armgl::create_vao();
+  armgl::bind_vao(vao);
 
-  glrender::EBO index_buffer = glrender::create_ebo();
-  glrender::bind_ebo(index_buffer);
-  glrender::set_ebo_static_data(F.data(), F.size() * sizeof(int));
+  armgl::EBO index_buffer = armgl::create_ebo();
+  armgl::bind_ebo(index_buffer);
+  armgl::set_ebo_static_data(F.data(), F.size() * sizeof(int));
 
-  glrender::VBO vertex_buffer = glrender::create_vbo();
-  glrender::bind_vbo(vertex_buffer);
-  glrender::set_vbo_static_data(V.data(), V.size() * sizeof(float));
+  armgl::VBO vertex_buffer = armgl::create_vbo();
+  armgl::bind_vbo(vertex_buffer);
+  armgl::set_vbo_static_data(V.data(), V.size() * sizeof(float));
 
   glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void *)0);
   glEnableVertexAttribArray(0);
-  glrender::unbind_vbo();
+  armgl::unbind_vbo();
 
-  glrender::unbind_vao();
+  armgl::unbind_vao();
 
-  // glrender::set_wireframe_mode(true);
-  glrender::set_wireframe_mode(false);
+  // armgl::set_wireframe_mode(true);
+  armgl::set_wireframe_mode(false);
 
-  glrender::Camera camera = glrender::create_camera(
+  armgl::Camera camera = armgl::create_camera(
       {0.0f, 0.0f, 3.0f}, {0.0f, 0.35f, 0.0f}, {0.0f, 1.0f, 0.0f},
       float(SCR_WIDTH) / float(SCR_HEIGHT));
   // std::cout << camera.projection << std::endl;
 
-  glrender::use_program(program);
-  glrender::set_uniform_mat4(program, "projection", camera.projection);
-  glrender::unuse_program();
+  armgl::use_program(program);
+  armgl::set_uniform_mat4(program, "projection", camera.projection);
+  armgl::unuse_program();
 
   float prev_time = glfwGetTime();
 
   while (!glfwWindowShouldClose(window)) {
-    glrender::set_background_RGB(glrender::RGB(30, 50, 50));
+    armgl::set_background_RGB(armgl::RGB(30, 50, 50));
 
-    glrender::use_program(program);
-    glrender::bind_vao(vao);
+    armgl::use_program(program);
+    armgl::bind_vao(vao);
 
     float curr_time = glfwGetTime();
-    glrender::orbit_camera_control(window, camera, 10.0, curr_time - prev_time);
+    armgl::orbit_camera_control(window, camera, 10.0, curr_time - prev_time);
     prev_time = curr_time;
-    glrender::set_uniform_mat4(program, "projection", camera.projection);
+    armgl::set_uniform_mat4(program, "projection", camera.projection);
 
     // glDrawArrays(GL_TRIANGLES, 0, 3);
     // glPointSize(15.0f);
     // glDrawArrays(GL_POINTS, 0, n_vertices);
     glDrawElements(GL_TRIANGLES, n_faces * 3, GL_UNSIGNED_INT, 0);
 
-    glrender::unbind_texture();
-    glrender::unbind_vao();
-    glrender::unuse_program();
+    armgl::unbind_texture();
+    armgl::unbind_vao();
+    armgl::unuse_program();
 
     glfwSwapBuffers(window);
     glfwPollEvents();
@@ -97,10 +97,10 @@ int main() {
 
   // optional: de-allocate all resources once they've outlived their purpose:
   // ------------------------------------------------------------------------
-  glrender::delete_vao(vao);
-  glrender::delete_vbo(vertex_buffer);
-  glrender::delete_ebo(index_buffer);
-  glrender::delete_program(program);
+  armgl::delete_vao(vao);
+  armgl::delete_vbo(vertex_buffer);
+  armgl::delete_ebo(index_buffer);
+  armgl::delete_program(program);
 
   // glfw: terminate, clearing all previously allocated GLFW resources.
   // ------------------------------------------------------------------

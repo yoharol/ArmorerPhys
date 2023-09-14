@@ -7,7 +7,7 @@
 
 #include "gl_type.h"
 
-namespace glrender {
+namespace armgl {
 
 MatXf get_normals(const MatXf &vertices, const MatXi &indices) {
   assert(indices.cols() == 3);
@@ -31,6 +31,6 @@ MatXf get_normals(const MatXf &vertices, const MatXi &indices) {
   return normals;
 }
 
-}  // namespace glrender
+}  // namespace armgl
 
 #endif  // GL_GEOM_H_

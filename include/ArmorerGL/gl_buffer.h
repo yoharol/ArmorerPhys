@@ -7,7 +7,7 @@
 
 #include "gl_image.h"
 
-namespace glrender {
+namespace armgl {
 
 struct VAO {
   unsigned int id;
@@ -213,6 +213,6 @@ inline void delete_texture(Texture texture) {
   glDeleteTextures(1, &texture.id);
 }
 
-}  // namespace glrender
+}  // namespace armgl
 
 #endif  // BUFFER_DATA_H_

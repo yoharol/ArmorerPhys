@@ -5,13 +5,13 @@ My own head-only c++ interactive rendering toolset as part of my research framew
 For example, here is how to create a scene with lighting and camera:
 
 ```c++
-  glrender::Scene scene = glrender::create_scene(
-      glrender::Light{
+  armgl::Scene scene = armgl::create_scene(
+      armgl::Light{
           {242, 76, 61},       // light color
           {9, 5, 128},         // ambient color
           {0.0f, 0.35f, 5.0f}  // light position
       },
-      glrender::create_camera(
+      armgl::create_camera(
           {2.0f, 0.0f, -2.0f},                  // camera position
           {0.0f, 0.35f, 0.0f},                  // camera target
           {0.0f, 1.0f, 0.0f},                   // camera up axis
@@ -22,16 +22,16 @@ For example, here is how to create a scene with lighting and camera:
 And then add a mesh to render pipeline:
 
 ```c++
-  glrender::DiffuseMaterial material{
+  armgl::DiffuseMaterial material{
       {255, 255, 255},  // diffuse color
       {255, 255, 255},  // specular color
       0.5f              // specular strength
   };
-  glrender::DiffuseMesh mesh = glrender::create_diffuse_mesh(material);
+  armgl::DiffuseMesh mesh = armgl::create_diffuse_mesh(material);
   // ... Get V and F
-  glrender::set_mesh_data(mesh, V, F);
+  armgl::set_mesh_data(mesh, V, F);
   // add the render function of mesh to render pipeline
-  glrender::add_render_func(scene, glrender::get_render_func(mesh));
+  armgl::add_render_func(scene, armgl::get_render_func(mesh));
 ```
 
 In each step the scene is built by iterating through all render funcs:
