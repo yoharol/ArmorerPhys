@@ -40,13 +40,13 @@ int main() {
     ImGui::ColorEdit3("#c1", diffuse_color.data());
   });
 
-  armgl::MatXf V;
-  armgl::MatXi F;
+  armgl::MatxXf V;
+  armgl::MatxXi F;
   igl::readOBJ(std::string(ASSETS_PATH) + "/spot.obj", V, F);
   int n_vertices = V.rows();
   int n_faces = F.rows();
 
-  armgl::MatXf v_p(4, 3);
+  armgl::MatxXf v_p(4, 3);
   // select 289, 577, 572, 284 vertex from V to v_p
   v_p.row(0) = V.row(289);
   v_p.row(1) = V.row(577);
@@ -60,17 +60,17 @@ int main() {
   lines.color = {0, 155, 155};
   lines.mode = GL_LINE_LOOP;
 
-  armgl::set_points_data(points, v_p, armgl::MatXf());
-  armgl::set_lines_data(lines, v_p, armgl::MatXf());
+  armgl::set_points_data(points, v_p, armgl::MatxXf());
+  armgl::set_lines_data(lines, v_p, armgl::MatxXf());
 
   armgl::DiffuseMesh mesh = armgl::create_diffuse_mesh(material);
   armgl::set_mesh_data(mesh, V, F);
 
   armgl::add_render_func(scene, armgl::get_render_func(mesh));
   armgl::add_render_func(scene, armgl::get_render_func(lines),
-                            false);  // disable depth test
+                         false);  // disable depth test
   armgl::add_render_func(scene, armgl::get_render_func(points),
-                            false);  // disable depth test
+                         false);  // disable depth test
 
   armgl::set_wireframe_mode(false);
 
@@ -82,11 +82,11 @@ int main() {
 
     float curr_time = glfwGetTime();
     armgl::orbit_camera_control(window, scene.camera, 10.0,
-                                   curr_time - prev_time);
+                                curr_time - prev_time);
     prev_time = curr_time;
     scene.light.position =
         armgl::Vec3f(5.0f * sin((curr_time - start_time) * 1.0f), 0.35f,
-                        5.0f * cos((curr_time - start_time) * 1.0f));
+                     5.0f * cos((curr_time - start_time) * 1.0f));
 
     armgl::render_scene(scene);
     armgl::render_gui(gui);

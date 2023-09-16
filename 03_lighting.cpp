@@ -32,8 +32,8 @@ int main() {
   armgl::delete_shader(vertex_shader);
   armgl::delete_shader(fragment_shader);
 
-  armgl::MatXf V;
-  armgl::MatXi F;
+  armgl::MatxXf V;
+  armgl::MatxXi F;
 
   igl::readOBJ(std::string(ASSETS_PATH) + "/spot.obj", V, F);
 
@@ -56,7 +56,7 @@ int main() {
 
   armgl::VBO normal_buffer = armgl::create_vbo();
   armgl::bind_vbo(normal_buffer);
-  armgl::MatXf normals = armgl::get_normals(V, F);
+  armgl::MatxXf normals = armgl::get_normals(V, F);
   armgl::set_vbo_static_data(normals.data(), normals.size() * sizeof(float));
   glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void *)0);
   glEnableVertexAttribArray(1);

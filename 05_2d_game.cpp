@@ -34,17 +34,17 @@ int main() {
   armgl::Points points = armgl::create_points();
   armgl::Lines lines = armgl::create_lines();
 
-  armgl::Mat2f v_p;
+  armgl::Matx2f v_p;
   v_p.resize(2, 2);
   v_p << 1.0f, 1.0f,  //
       1.0f, 0.5f;     //
-  armgl::Mat3f v_color;
+  armgl::Matx3f v_color;
   v_color.resize(2, 3);
   v_color << 0.0f, 0.0f, 0.0f,  //
       1.0f, 0.2f, 0.0f;         //
-  armgl::Mat2f v_p_ref = v_p;
+  armgl::Matx2f v_p_ref = v_p;
   float l0 = (v_p.row(0) - v_p.row(1)).norm();
-  armgl::Mat2f v_vel;
+  armgl::Matx2f v_vel;
   v_vel.resize(2, 2);
   v_vel << 0.0f, 0.0f,  //
       0.0f, 0.0f;       //

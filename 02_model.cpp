@@ -32,8 +32,8 @@ int main() {
   armgl::delete_shader(vertex_shader);
   armgl::delete_shader(fragment_shader);
 
-  armgl::MatXf V;
-  armgl::MatXi F;
+  armgl::MatxXf V;
+  armgl::MatxXi F;
 
   igl::readOBJ(std::string(ASSETS_PATH) + "/spot.obj", V, F);
 

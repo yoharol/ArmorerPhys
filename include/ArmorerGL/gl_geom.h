@@ -9,13 +9,13 @@
 
 namespace armgl {
 
-MatXf get_normals(const MatXf &vertices, const MatXi &indices) {
+MatxXf get_normals(const MatxXf &vertices, const MatxXi &indices) {
   assert(indices.cols() == 3);
   assert(indices.rows() > 0);
   assert(vertices.cols() == 3);
   assert(vertices.rows() > 0);
 
-  MatXf normals = MatXf::Zero(vertices.rows(), 3);
+  MatxXf normals = MatxXf::Zero(vertices.rows(), 3);
   for (int i = 0; i < indices.rows(); ++i) {
     Vec3f v0 = vertices.row(indices(i, 0));
     Vec3f v1 = vertices.row(indices(i, 1));

@@ -102,7 +102,7 @@ DiffuseMesh create_diffuse_mesh(DiffuseMaterial &material) {
   return mesh;
 }
 
-void set_mesh_data(DiffuseMesh &mesh, MatXf &V, MatXi &F) {
+void set_mesh_data(DiffuseMesh &mesh, MatxXf &V, MatxXi &F) {
   mesh.n_vertices = V.rows();
   mesh.n_faces = F.rows();
 
@@ -121,7 +121,7 @@ void set_mesh_data(DiffuseMesh &mesh, MatXf &V, MatXi &F) {
   unbind_vbo();
 
   bind_vbo(mesh.normal_buffer);
-  MatXf normals = armgl::get_normals(V, F);
+  MatxXf normals = armgl::get_normals(V, F);
   set_vbo_dynamic_data(normals.data(), normals.size() * sizeof(float));
   glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void *)0);
   glEnableVertexAttribArray(1);
@@ -189,8 +189,8 @@ Points create_points() {
       1.0f};
 }
 
-void set_points_data(Points &points, const MatXf &points_data,
-                     const MatXf &per_point_color) {
+void set_points_data(Points &points, const MatxXf &points_data,
+                     const MatxXf &per_point_color) {
   points.n_points = points_data.rows();
 
   use_program(points.program);
@@ -199,8 +199,8 @@ void set_points_data(Points &points, const MatXf &points_data,
   bind_vbo(points.vertex_buffer);
 
   if (points_data.cols() == 2) {
-    MatXf points_data_3d(points_data.rows(), 3);
-    points_data_3d << points_data, MatXf::Zero(points_data.rows(), 1);
+    MatxXf points_data_3d(points_data.rows(), 3);
+    points_data_3d << points_data, MatxXf::Zero(points_data.rows(), 1);
     set_vbo_dynamic_data(points_data_3d.data(),
                          points_data_3d.size() * sizeof(float));
   } else
@@ -269,8 +269,8 @@ Lines create_lines() {
       GL_LINE_STRIP};
 }
 
-void set_lines_data(Lines &lines, const MatXf &points_data,
-                    const MatXf &per_line_color) {
+void set_lines_data(Lines &lines, const MatxXf &points_data,
+                    const MatxXf &per_line_color) {
   lines.n_points = points_data.rows();
 
   use_program(lines.program);
@@ -278,8 +278,8 @@ void set_lines_data(Lines &lines, const MatXf &points_data,
   bind_vao(lines.vertex_array);
   bind_vbo(lines.vertex_buffer);
   if (points_data.cols() == 2) {
-    MatXf points_data_3d(points_data.rows(), 3);
-    points_data_3d << points_data, MatXf::Zero(points_data.rows(), 1);
+    MatxXf points_data_3d(points_data.rows(), 3);
+    points_data_3d << points_data, MatxXf::Zero(points_data.rows(), 1);
     set_vbo_dynamic_data(points_data_3d.data(),
                          points_data_3d.size() * sizeof(float));
   } else
