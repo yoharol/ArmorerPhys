@@ -227,7 +227,7 @@ void set_points_data(Points &points, const MatxXf &points_data,
 }
 
 RenderFunc get_render_func(Points &points) {
-  RenderFunc render_func = [&](Scene scene) {
+  RenderFunc render_func = [&points](Scene scene) {
     use_program(points.program);
     set_uniform_mat4(points.program, "projection", scene.camera.projection);
     set_uniform_RGB(points.program, "color", points.color);
@@ -306,7 +306,7 @@ void set_lines_data(Lines &lines, const MatxXf &points_data,
 }
 
 RenderFunc get_render_func(Lines &lines) {
-  RenderFunc render_func = [&](Scene scene) {
+  RenderFunc render_func = [&lines](Scene scene) {
     use_program(lines.program);
     set_uniform_mat4(lines.program, "projection", scene.camera.projection);
     set_uniform_RGB(lines.program, "color", lines.color);

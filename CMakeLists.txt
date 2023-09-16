@@ -65,5 +65,6 @@ if(PROJECT_IS_TOP_LEVEL)
   add_gl_target(03_lighting)
   add_gl_target(04_pipeline)
   add_gl_target(05_2d_game)
+  add_gl_target(06_handle_input)
 endif()
 

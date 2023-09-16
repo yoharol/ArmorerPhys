@@ -12,7 +12,11 @@
 namespace armgl {
 
 struct Scene;
+struct InputHandler;
 typedef std::function<void(Scene)> RenderFunc;
+typedef std::function<void(InputHandler&, int, int)> MouseInputFunc;
+typedef std::function<void(InputHandler&)> MouseMoveFunc;
+typedef std::function<void(InputHandler&, int, int)> KeyInputFunc;
 
 struct Scene {
   Light light;
@@ -44,6 +48,69 @@ void render_scene(Scene scene) {
     }
     scene.render_funcs[i](scene);
   }
+}
+
+struct InputHandler {
+  std::vector<MouseMoveFunc> mouse_move_funcs;
+  std::vector<MouseInputFunc> mouse_input_funcs;
+  std::vector<KeyInputFunc> key_input_funcs;
+  float xpos;
+  float ypos;
+  bool left_pressing = false;
+};
+
+InputHandler create_input_handler(GLFWwindow* window) {
+  InputHandler handler{std::vector<MouseMoveFunc>(),   //
+                       std::vector<MouseInputFunc>(),  //
+                       std::vector<KeyInputFunc>(),    //
+                       0.0f,
+                       0.0f,  //
+                       false};
+  glfwSetWindowUserPointer(window, &handler);
+  glfwSetCursorPosCallback(
+      window, [](GLFWwindow* window, double xpos, double ypos) {
+        InputHandler* handler = (InputHandler*)glfwGetWindowUserPointer(window);
+        int width, height;
+        glfwGetWindowSize(window, &width, &height);
+        handler->xpos = static_cast<float>(xpos / width);
+        handler->ypos = static_cast<float>(1.0 - ypos / height);
+        for (auto func : handler->mouse_move_funcs) {
+          func(*handler);
+        }
+      });
+  glfwSetMouseButtonCallback(
+      window, [](GLFWwindow* window, int button, int action, int mods) {
+        InputHandler* handler = (InputHandler*)glfwGetWindowUserPointer(window);
+        if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS) {
+          handler->left_pressing = true;
+        }
+        if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_RELEASE) {
+          handler->left_pressing = false;
+        }
+        for (auto func : handler->mouse_input_funcs) {
+          func(*handler, button, action);
+        }
+      });
+  glfwSetKeyCallback(window, [](GLFWwindow* window, int key, int scancode,
+                                int action, int mods) {
+    InputHandler* handler = (InputHandler*)glfwGetWindowUserPointer(window);
+    for (auto func : handler->key_input_funcs) {
+      func(*handler, key, action);
+    }
+  });
+  return handler;
+}
+
+void add_mouse_move_func(InputHandler& handler, MouseMoveFunc func) {
+  handler.mouse_move_funcs.push_back(func);
+}
+
+void add_mouse_input_func(InputHandler& handler, MouseInputFunc func) {
+  handler.mouse_input_funcs.push_back(func);
+}
+
+void add_key_input_func(InputHandler& handler, KeyInputFunc func) {
+  handler.key_input_funcs.push_back(func);
 }
 
 }  // namespace armgl
