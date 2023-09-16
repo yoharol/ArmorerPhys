@@ -259,6 +259,12 @@ struct Light {
   Vec3f position;
 };
 
+const Light default_light = {
+    {242, 242, 242},     // light color
+    {9, 5, 88},          // ambient color
+    {0.0f, 0.35f, 5.0f}  // light position
+};
+
 }  // namespace armgl
 
 #endif  // GL_SHADER_H_
