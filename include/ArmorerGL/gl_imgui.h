@@ -16,6 +16,8 @@ struct Gui {
   ImGuiIO &io;
   bool open;
   std::vector<GuiFunc> gui_func;
+  int width;
+  int height;
 };
 
 void StyleColorsSpectrum();
@@ -33,7 +35,7 @@ Gui create_gui(GLFWwindow *window, std::string name,
   StyleColorsSpectrum();
   ImGui_ImplGlfw_InitForOpenGL(window, true);
   ImGui_ImplOpenGL3_Init(glsl_version);
-  Gui imgui_window{name, io, true, {}};
+  Gui imgui_window{name, io, true, {}, 300, 400};
   imgui_window.io = io;
   imgui_window.open = true;
   return imgui_window;
@@ -48,7 +50,8 @@ void render_gui(Gui &imgui_window) {
   ImGui_ImplGlfw_NewFrame();
   ImGui::NewFrame();
   ImGui::SetNextWindowPos(ImVec2(0, 0), ImGuiCond_Once);
-  ImGui::SetNextWindowSize(ImVec2(300, 400), ImGuiCond_Once);
+  ImGui::SetNextWindowSize(ImVec2(imgui_window.width, imgui_window.height),
+                           ImGuiCond_Once);
   ImGui::Begin(imgui_window.name.c_str(), &imgui_window.open);
   if (imgui_window.open) {
     for (auto &gui_func : imgui_window.gui_func) {

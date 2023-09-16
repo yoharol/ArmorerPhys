@@ -30,6 +30,8 @@ int main() {
           ));
   armgl::set_2d_camera(scene.camera, left, right, bottom, top);
   armgl::Gui gui = armgl::create_gui(window, "gui");
+  gui.width = 300;
+  gui.height = 300;
 
   armgl::Points points = armgl::create_points();
   armgl::Lines lines = armgl::create_lines();
@@ -66,17 +68,16 @@ int main() {
     armgl::set_lines_data(lines, v_p, v_color);
   };
 
-  armgl::add_gui_func(gui,
-                         [&gravity, &stiffness, &mass, &damping, &reset]() {
-                           ImGui::Text("Parameters:");
-                           ImGui::InputFloat2("g", gravity.data());
-                           ImGui::InputFloat("k", &stiffness);
-                           ImGui::InputFloat("m", &mass);
-                           ImGui::InputFloat("beta", &damping);
-                           if (ImGui::Button("Reset")) {
-                             reset();
-                           }
-                         });
+  armgl::add_gui_func(gui, [&gravity, &stiffness, &mass, &damping, &reset]() {
+    ImGui::Text("Parameters:");
+    ImGui::InputFloat2("g", gravity.data());
+    ImGui::InputFloat("k", &stiffness);
+    ImGui::InputFloat("m", &mass);
+    ImGui::InputFloat("beta", &damping);
+    if (ImGui::Button("Reset")) {
+      reset();
+    }
+  });
   armgl::add_render_func(scene, armgl::get_render_func(points));
   armgl::add_render_func(scene, armgl::get_render_func(lines));
 
@@ -94,8 +95,7 @@ int main() {
 
     for (int _ = 0; _ < 10; _++) {
       armgl::Vec2f dx = v_p.row(0) - v_p.row(1);
-      armgl::Vec2f force =
-          gravity * mass + stiffness * (dx.norm() - l0) * dx;
+      armgl::Vec2f force = gravity * mass + stiffness * (dx.norm() - l0) * dx;
       armgl::Vec2f acc = force / mass;
       v_vel.row(1).transpose() += acc * dt;
       v_vel *= exp(-damping * dt);
