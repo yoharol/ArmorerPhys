@@ -10,12 +10,16 @@
 namespace armgl {
 
 typedef std::function<void()> GuiFunc;
+typedef std::function<void()> GuiMouseInputFunc;
+typedef std::function<void()> GuiKeyInputFunc;
 
 struct Gui {
   std::string name;
   ImGuiIO &io;
   bool open;
   std::vector<GuiFunc> gui_func;
+  std::vector<GuiMouseInputFunc> gui_mouse_input_func;
+  std::vector<GuiKeyInputFunc> gui_key_input_func;
   int width;
   int height;
 };
@@ -35,7 +39,7 @@ Gui create_gui(GLFWwindow *window, std::string name,
   StyleColorsSpectrum();
   ImGui_ImplGlfw_InitForOpenGL(window, true);
   ImGui_ImplOpenGL3_Init(glsl_version);
-  Gui imgui_window{name, io, true, {}, 300, 400};
+  Gui imgui_window{name, io, true, {}, {}, {}, 300, 400};
   imgui_window.io = io;
   imgui_window.open = true;
   return imgui_window;
@@ -44,6 +48,31 @@ Gui create_gui(GLFWwindow *window, std::string name,
 void add_gui_func(Gui &imgui_window, GuiFunc gui_func) {
   imgui_window.gui_func.push_back(gui_func);
 }
+
+void add_gui_mouse_input_func(Gui &imgui_window, GuiMouseInputFunc func) {
+  imgui_window.gui_mouse_input_func.push_back(func);
+}
+
+void add_gui_key_input_func(Gui &imgui_window, GuiKeyInputFunc func) {
+  imgui_window.gui_key_input_func.push_back(func);
+}
+
+void handle_gui_input(Gui &imgui_window) {
+  bool imguiCapturingMouse = ImGui::GetIO().WantCaptureMouse;
+  if (!imguiCapturingMouse) {
+    for (auto &func : imgui_window.gui_mouse_input_func) {
+      func();
+    }
+  }
+  bool imguiCapturingKeyboard = ImGui::GetIO().WantCaptureKeyboard;
+  if (!imguiCapturingKeyboard) {
+    for (auto &func : imgui_window.gui_key_input_func) {
+      func();
+    }
+  }
+}
+
+void input_process_gui(Gui &imgui_window) { handle_gui_input(imgui_window); }
 
 void render_gui(Gui &imgui_window) {
   ImGui_ImplOpenGL3_NewFrame();

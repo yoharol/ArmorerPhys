@@ -10,7 +10,7 @@ const unsigned int SCR_HEIGHT = 700;
 
 int main() {
   GLFWwindow* window =
-      armgl::create_window(SCR_WIDTH, SCR_HEIGHT, "Example6: handle input");
+      armgl::create_window(SCR_WIDTH, SCR_HEIGHT, "Example6: imgui input");
   float bottom = 0.0f;
   float top = 2.0f;
   float left = 0.0f;
@@ -38,27 +38,26 @@ int main() {
 
   armgl::add_render_func(scene, armgl::get_render_func(points));
 
-  armgl::InputHandler handler = armgl::create_input_handler(window);
-  armgl::add_mouse_move_func(handler, [&](armgl::InputHandler& input_handler) {
-    if (input_handler.left_pressing) {
-      float xpos, ypos;
-      xpos = left + (right - left) * handler.xpos;
-      ypos = bottom + (top - bottom) * handler.ypos;
-      v_p.row(0) = armgl::Vec2f(xpos, ypos);
+  armgl::add_gui_mouse_input_func(gui, [&]() {
+    if (ImGui::IsMouseClicked(ImGuiMouseButton_Left)) {
+      ImVec2 pos = ImGui::GetMousePos();
+      float x = left + (right - left) * pos.x / SCR_WIDTH;
+      float y = bottom + (top - bottom) * (1.0 - pos.y / SCR_HEIGHT);
+      v_p.row(0) = armgl::Vec2f(x, y);
     }
   });
-  armgl::add_mouse_input_func(handler, [](armgl::InputHandler& input_handler,
-                                          int button, int action) {
-    std::cout << "mouse button event: " << button << " " << action << std::endl;
+
+  armgl::add_gui_key_input_func(gui, []() {
+    if (ImGui::IsKeyPressed(ImGuiKey_W))
+      std::cout << "W is pressed" << std::endl;
   });
-  armgl::add_key_input_func(
-      handler, [](armgl::InputHandler& input_handler, int key, int action) {
-        std::cout << "key event: " << key << " " << action << std::endl;
-      });
 
   glfwSwapInterval(1);
 
   while (!glfwWindowShouldClose(window)) {
+    glfwPollEvents();
+    armgl::handle_gui_input(gui);
+
     armgl::set_background_RGB({244, 244, 244});
 
     armgl::set_points_data(points, v_p, v_color);
@@ -67,7 +66,6 @@ int main() {
     armgl::render_gui(gui);
 
     glfwSwapBuffers(window);
-    glfwPollEvents();
   }
   armgl::destroy_gui(gui);
   glfwTerminate();
