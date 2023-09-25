@@ -9,6 +9,8 @@ using MatxXf =
     Eigen::Matrix<float, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor>;
 using MatxXi =
     Eigen::Matrix<int, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor>;
+using Vecxf = Eigen::VectorXf;
+using Vecxi = Eigen::VectorXi;
 using Vec4f = Eigen::Vector4f;
 using Vec3f = Eigen::Vector3f;
 using Vec2f = Eigen::Vector2f;
