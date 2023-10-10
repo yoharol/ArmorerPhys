@@ -11,7 +11,6 @@ add_definitions(-DCMAKE_EXPORT_COMPILE_COMMANDS=ON)
 get_filename_component(ABS_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR} ABSOLUTE)
 add_definitions(-DASSETS_PATH="${ABS_SOURCE_DIR}/assets")
 
-
 function(find_package_with_targets package)
 	get_property(importTargets DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}" PROPERTY IMPORTED_TARGETS)
 	find_package(${package} REQUIRED)
@@ -22,9 +21,11 @@ endfunction()
 
 # find opengl and glfw
 find_package_with_targets(OpenGL)
-find_package_with_targets(Eigen3)
-find_package_with_targets(glfw3)
-find_package_with_targets(glm)
+# find_package_with_targets(Eigen3)
+# find_package_with_targets(glfw3)
+# find_package_with_targets(glm)
+
+add_subdirectory(external)
 
 include(FetchContent)
 FetchContent_Declare(
@@ -34,7 +35,7 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(libigl)
 
-# add glad
+# add glad and imgui
 include("${CMAKE_CURRENT_SOURCE_DIR}/cmake/glad.cmake")
 include ("${CMAKE_CURRENT_SOURCE_DIR}/cmake/imgui.cmake")
 
