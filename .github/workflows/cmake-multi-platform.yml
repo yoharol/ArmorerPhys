@@ -58,7 +58,12 @@ jobs:
       if: matrix.os == 'ubuntu-latest'
       run: |
         sudo apt-get update
-        sudo apt-get install -y libgl1-mesa-dev libxrandr-dev
+        sudo apt-get install \
+          libblas-dev \
+          libglu1-mesa-dev \
+          liblapack-dev \
+          xorg-dev \
+          ccache
 
     - name: Git Sumbodule Update
       run: |
