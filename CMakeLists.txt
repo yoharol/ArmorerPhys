@@ -13,7 +13,8 @@ add_definitions(-DASSETS_PATH="${ABS_SOURCE_DIR}/assets")
 
 function(find_package_with_targets package)
 	get_property(importTargets DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}" PROPERTY IMPORTED_TARGETS)
-	find_package(${package} REQUIRED)
+	find_package(${package} QUIET)
+  message("Package ${package} found: ${${package}_FOUND}")
   get_property(importTargetsAfter DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}" PROPERTY IMPORTED_TARGETS)
   list(REMOVE_ITEM importTargetsAfter ${importTargets})
 	message("Targets from ${package}: ${importTargetsAfter}")
@@ -21,9 +22,9 @@ endfunction()
 
 # find opengl and glfw
 find_package_with_targets(OpenGL)
-# find_package_with_targets(Eigen3)
-# find_package_with_targets(glfw3)
-# find_package_with_targets(glm)
+find_package_with_targets(Eigen3)
+find_package_with_targets(glfw3)
+find_package_with_targets(glm)
 
 add_subdirectory(external)
 
@@ -68,5 +69,6 @@ if(PROJECT_IS_TOP_LEVEL)
   add_gl_target(05_2d_game)
   add_gl_target(06_handle_input)
   add_gl_target(07_imgui_input)
+  add_gl_target(08_Affine2d)
 endif()
 
