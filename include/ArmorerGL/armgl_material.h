@@ -3,8 +3,8 @@
 
 #include <Eigen/Core>
 
-#include "gl_shader.h"
-#include "gl_buffer.h"
+#include "armgl_shader.h"
+#include "armgl_buffer.h"
 
 namespace armgl {
 

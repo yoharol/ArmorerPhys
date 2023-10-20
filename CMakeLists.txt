@@ -70,5 +70,6 @@ if(PROJECT_IS_TOP_LEVEL)
   add_gl_target(06_handle_input)
   add_gl_target(07_imgui_input)
   add_gl_target(08_Affine2d)
+  add_gl_target(09_mathplot2d)
 endif()
 

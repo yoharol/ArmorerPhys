@@ -5,7 +5,7 @@
 #include <GLFW/glfw3.h>
 #include <Eigen/Core>
 
-#include "gl_image.h"
+#include "armgl_image.h"
 
 namespace armgl {
 

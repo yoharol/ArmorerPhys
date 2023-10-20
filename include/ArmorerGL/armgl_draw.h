@@ -4,7 +4,7 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
-#include "gl_type.h"
+#include "armgl_type.h"
 
 namespace armgl {
 

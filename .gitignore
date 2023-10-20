@@ -3,3 +3,4 @@ CMakeFiles/
 .DS_Store
 .vscode/
 imgui.ini
+.idea/

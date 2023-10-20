@@ -1,8 +1,8 @@
 #ifndef GL_SHADER_H_
 #define GL_SHADER_H_
 
-#include "gl_type.h"
-#include "gl_buffer.h"
+#include "armgl_type.h"
+#include "armgl_buffer.h"
 
 namespace armgl {
 

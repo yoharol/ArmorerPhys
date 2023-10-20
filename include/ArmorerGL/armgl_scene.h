@@ -3,11 +3,11 @@
 
 #include <functional>
 
-#include "gl_type.h"
-#include "gl_buffer.h"
-#include "gl_shader.h"
-#include "gl_camera.h"
-#include "gl_geom.h"
+#include "armgl_type.h"
+#include "armgl_buffer.h"
+#include "armgl_shader.h"
+#include "armgl_camera.h"
+#include "armgl_geom.h"
 
 namespace armgl {
 

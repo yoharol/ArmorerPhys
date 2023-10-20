@@ -5,7 +5,7 @@
 #include <Eigen/Core>
 #include <Eigen/Geometry>
 
-#include "gl_type.h"
+#include "armgl_type.h"
 
 namespace armgl {
 

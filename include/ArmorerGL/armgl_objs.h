@@ -6,11 +6,11 @@
 #include <Eigen/Geometry>
 #include <vector>
 
-#include "gl_type.h"
-#include "gl_buffer.h"
-#include "gl_shader.h"
-#include "gl_draw.h"
-#include "gl_scene.h"
+#include "armgl_type.h"
+#include "armgl_buffer.h"
+#include "armgl_shader.h"
+#include "armgl_draw.h"
+#include "armgl_scene.h"
 
 namespace armgl {
 
