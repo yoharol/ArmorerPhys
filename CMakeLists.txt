@@ -15,6 +15,7 @@ function(find_package_with_targets package)
 	get_property(importTargets DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}" PROPERTY IMPORTED_TARGETS)
 	find_package(${package} QUIET)
   message("Package ${package} found: ${${package}_FOUND}")
+  set(${package}_PKG_FOUND ${${package}_FOUND} PARENT_SCOPE)
   get_property(importTargetsAfter DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}" PROPERTY IMPORTED_TARGETS)
   list(REMOVE_ITEM importTargetsAfter ${importTargets})
 	message("Targets from ${package}: ${importTargetsAfter}")
@@ -25,6 +26,7 @@ find_package_with_targets(OpenGL)
 find_package_with_targets(Eigen3)
 find_package_with_targets(glfw3)
 find_package_with_targets(glm)
+
 
 add_subdirectory(external)
 
