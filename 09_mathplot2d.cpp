@@ -15,9 +15,6 @@ int main() {
   armgl::Scene scene =
       armgl::create_scene(armgl::default_light, armgl::default_camera);
   armgl::set_2d_camera(scene.camera, -2.0f, 2.0f, -1.0f, 1.0f);
-  armgl::Gui gui = armgl::create_gui(window, "gui");
-  gui.width = 0;
-  gui.height = 0;
 
   armgl::Matx2f v_p(2, 2);
   v_p << 0.0f, 0.0f,  //
@@ -33,15 +30,14 @@ int main() {
   armgl::add_render_func(scene, armgl::get_render_func(ruler));
   armgl::add_render_func(scene, armgl::get_render_func(axis));
 
-  armgl::InputHandler handler = armgl::create_input_handler(window);
-
-  armgl::add_gui_mouse_input_func(gui, [&]() {
-    if (ImGui::IsMouseClicked(ImGuiMouseButton_Left)) {
-      ImVec2 pos = ImGui::GetMousePos();
-      float x = pos.x / SCR_WIDTH;
-      float y = 1.0 - pos.y / SCR_HEIGHT;
-      armgl::camera2d_screen_to_world(scene.camera, x, y);
-      armgl::Vec2f p(x, y);
+  armgl::InputHandler& handler = armgl::create_input_handler(window);
+  armgl::add_mouse_move_func(handler, [&](armgl::InputHandler& input_handler) {
+    if (input_handler.left_pressing) {
+      float xpos, ypos;
+      xpos = handler.xpos;
+      ypos = handler.ypos;
+      armgl::camera2d_screen_to_world(scene.camera, xpos, ypos);
+      armgl::Vec2f p(xpos, ypos);
       if ((v_p.row(0) - p.transpose()).norm() <
           (v_p.row(1) - p.transpose()).norm()) {
         v_p.row(0) = p;
@@ -55,16 +51,14 @@ int main() {
 
   while (!glfwWindowShouldClose(window)) {
     glfwPollEvents();
-    armgl::handle_gui_input(gui);
 
     armgl::set_points_data(points, v_p, armgl::MatxXf());
+    armgl::set_ruler2d_data(ruler, v_p.row(0), v_p.row(1), 4.f);
 
     armgl::set_background_RGB({244, 244, 244});
     armgl::render_scene(scene);
-    armgl::render_gui(gui);
 
     glfwSwapBuffers(window);
   }
-  armgl::destroy_gui(gui);
   glfwTerminate();
 }

@@ -35,7 +35,7 @@ int main() {
 
   armgl::add_render_func(scene, armgl::get_render_func(points));
 
-  armgl::InputHandler handler = armgl::create_input_handler(window);
+  armgl::InputHandler& handler = armgl::create_input_handler(window);
   armgl::add_mouse_move_func(handler, [&](armgl::InputHandler& input_handler) {
     if (input_handler.left_pressing) {
       float xpos, ypos;

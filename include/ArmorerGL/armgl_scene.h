@@ -51,51 +51,55 @@ void render_scene(Scene scene) {
 }
 
 struct InputHandler {
+  static InputHandler& getInstance() {
+    static InputHandler instance;
+    return instance;
+  }
+  InputHandler(InputHandler const&) = delete;
+  InputHandler(InputHandler&&) = delete;
+
   std::vector<MouseMoveFunc> mouse_move_funcs;
   std::vector<MouseInputFunc> mouse_input_funcs;
   std::vector<KeyInputFunc> key_input_funcs;
-  float xpos;
-  float ypos;
+  float xpos = 0.0f;
+  float ypos = 0.0f;
   bool left_pressing = false;
+
+ private:
+  InputHandler() {}
 };
 
-InputHandler create_input_handler(GLFWwindow* window) {
-  InputHandler handler{std::vector<MouseMoveFunc>(),   //
-                       std::vector<MouseInputFunc>(),  //
-                       std::vector<KeyInputFunc>(),    //
-                       0.0f,
-                       0.0f,  //
-                       false};
-  glfwSetWindowUserPointer(window, &handler);
+InputHandler& create_input_handler(GLFWwindow* window) {
+  InputHandler& handler = InputHandler::getInstance();
   glfwSetCursorPosCallback(
       window, [](GLFWwindow* window, double xpos, double ypos) {
-        InputHandler* handler = (InputHandler*)glfwGetWindowUserPointer(window);
+        InputHandler& handler = InputHandler::getInstance();
         int width, height;
         glfwGetWindowSize(window, &width, &height);
-        handler->xpos = static_cast<float>(xpos / width);
-        handler->ypos = static_cast<float>(1.0 - ypos / height);
-        for (auto func : handler->mouse_move_funcs) {
-          func(*handler);
+        handler.xpos = static_cast<float>(xpos / width);
+        handler.ypos = static_cast<float>(1.0 - ypos / height);
+        for (auto func : handler.mouse_move_funcs) {
+          func(handler);
         }
       });
   glfwSetMouseButtonCallback(
       window, [](GLFWwindow* window, int button, int action, int mods) {
-        InputHandler* handler = (InputHandler*)glfwGetWindowUserPointer(window);
+        InputHandler& handler = InputHandler::getInstance();
         if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS) {
-          handler->left_pressing = true;
+          handler.left_pressing = true;
         }
         if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_RELEASE) {
-          handler->left_pressing = false;
+          handler.left_pressing = false;
         }
-        for (auto func : handler->mouse_input_funcs) {
-          func(*handler, button, action);
+        for (auto func : handler.mouse_input_funcs) {
+          func(handler, button, action);
         }
       });
   glfwSetKeyCallback(window, [](GLFWwindow* window, int key, int scancode,
                                 int action, int mods) {
-    InputHandler* handler = (InputHandler*)glfwGetWindowUserPointer(window);
-    for (auto func : handler->key_input_funcs) {
-      func(*handler, key, action);
+    InputHandler& handler = InputHandler::getInstance();
+    for (auto func : handler.key_input_funcs) {
+      func(handler, key, action);
     }
   });
   return handler;
