@@ -19,9 +19,6 @@ int main() {
   armgl::Scene scene =
       armgl::create_scene(armgl::default_light, armgl::default_camera);
   armgl::set_2d_camera(scene.camera, left, right, bottom, top);
-  armgl::Gui gui = armgl::create_gui(window, "gui");
-  gui.width = 300;
-  gui.height = 300;
 
   armgl::Points points = armgl::create_points();
 
@@ -59,16 +56,14 @@ int main() {
   glfwSwapInterval(1);
 
   while (!glfwWindowShouldClose(window)) {
+    glfwPollEvents();
     armgl::set_background_RGB({244, 244, 244});
 
     armgl::set_points_data(points, v_p, v_color);
 
     armgl::render_scene(scene);
-    armgl::render_gui(gui);
 
     glfwSwapBuffers(window);
-    glfwPollEvents();
   }
-  armgl::destroy_gui(gui);
   glfwTerminate();
 }

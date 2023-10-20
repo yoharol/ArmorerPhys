@@ -186,7 +186,7 @@ Points create_points() {
           create_shader(source::point_shader.fragment, GL_FRAGMENT_SHADER)),
       RGB(255, 0, 0),  //
       true,            //
-      1.0f};
+      8.0f};
 }
 
 void set_points_data(Points &points, const MatxXf &points_data,

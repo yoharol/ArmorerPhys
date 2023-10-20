@@ -41,8 +41,9 @@ int main() {
   armgl::add_gui_mouse_input_func(gui, [&]() {
     if (ImGui::IsMouseClicked(ImGuiMouseButton_Left)) {
       ImVec2 pos = ImGui::GetMousePos();
-      float x = left + (right - left) * pos.x / SCR_WIDTH;
-      float y = bottom + (top - bottom) * (1.0 - pos.y / SCR_HEIGHT);
+      float x = pos.x / SCR_WIDTH;
+      float y = 1.0 - pos.y / SCR_HEIGHT;
+      armgl::camera2d_screen_to_world(scene.camera, x, y);
       v_p.row(0) = armgl::Vec2f(x, y);
     }
   });

@@ -5,6 +5,7 @@
 #include <Eigen/Geometry>
 #include <cmath>
 #include <GLFW/glfw3.h>
+#include <cassert>
 
 #include "armgl_type.h"
 
@@ -49,7 +50,7 @@ inline void set_2d_camera(Camera& camera, float left, float right, float bottom,
   float l = left;
   float r = right;
   float b = bottom;
-  float t = bottom + (right - left) / camera.aspect;
+  float t = top;
   Mat4f projection;
   projection <<  //
       2.0f / (r - l),
@@ -59,6 +60,16 @@ inline void set_2d_camera(Camera& camera, float left, float right, float bottom,
       0.0f, 0.0f, 0.0f, 1.0f;                          // w
   camera.projection = projection;
   camera.type = CameraType::View2d;
+}
+
+inline void camera2d_screen_to_world(Camera& camera, float& x, float& y) {
+  Mat4f projection = camera.projection;
+  float r = (1.f - projection(0, 3)) / projection(0, 0);
+  float l = (-1.f - projection(0, 3)) / projection(0, 0);
+  float t = (1.f - projection(1, 3)) / projection(1, 1);
+  float b = (-1.f - projection(1, 3)) / projection(1, 1);
+  x = l + (r - l) * x;
+  y = b + (t - b) * y;
 }
 
 inline void update_camera(Camera& camera) {
