@@ -21,13 +21,16 @@ int main() {
       1.0f, 1.0f;     //
 
   armgl::Points points = armgl::create_points();
+  points.point_size = 10.0f;
   armgl::Lines ruler =
       armgl::create_ruler2d(-2.0f, -2.0f, 2.0f, 2.0f, armgl::RGB(200, 34, 0));
+  ruler.width = 1.5f;
   armgl::Lines grids = armgl::create_grid_axis2d(-2.0f, 2.0f, -1.0f, 1.0f, 20,
                                                  10, armgl::RGB(0, 67, 198));
   grids.alpha = 0.5f;
   armgl::Lines axis =
       armgl::create_axis2d(-2.0f, 2.0f, -1.0f, 1.0f, armgl::RGB(0, 21, 98));
+  axis.width = 2.f;
 
   armgl::add_render_func(scene, armgl::get_render_func(points));
   armgl::add_render_func(scene, armgl::get_render_func(ruler));
@@ -54,6 +57,7 @@ int main() {
   glfwSwapInterval(1);
 
   while (!glfwWindowShouldClose(window)) {
+    glEnable(GL_DEPTH_TEST);
     glfwPollEvents();
 
     armgl::set_points_data(points, v_p, armgl::MatxXf());

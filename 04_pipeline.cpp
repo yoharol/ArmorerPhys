@@ -55,7 +55,7 @@ int main() {
 
   armgl::Points points = armgl::create_points();
   points.color = {255, 0, 0};
-  points.point_size = 20.0f;
+  points.point_size = 1.0f;
   armgl::Lines lines = armgl::create_lines();
   lines.color = {0, 155, 155};
   lines.mode = GL_LINE_LOOP;

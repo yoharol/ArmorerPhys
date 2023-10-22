@@ -122,6 +122,26 @@ Program create_program(Shader vertex_shader, Shader fragment_shader) {
   return program;
 }
 
+Program create_program(Shader vertex_shader, Shader fragment_shader,
+                       Shader geometry_shader) {
+  Program program;
+  program.id = glCreateProgram();
+  glAttachShader(program.id, vertex_shader.id);
+  glAttachShader(program.id, fragment_shader.id);
+  glAttachShader(program.id, geometry_shader.id);
+  glLinkProgram(program.id);
+  // check for linking errors
+  int success;
+  char infoLog[512];
+  glGetProgramiv(program.id, GL_LINK_STATUS, &success);
+  if (!success) {
+    glGetProgramInfoLog(program.id, 512, NULL, infoLog);
+    std::cout << "ERROR::SHADER::PROGRAM::LINKING_FAILED\n"
+              << infoLog << std::endl;
+  }
+  return program;
+}
+
 inline void use_program(Program program) { glUseProgram(program.id); }
 
 inline void unuse_program() { glUseProgram(0); }

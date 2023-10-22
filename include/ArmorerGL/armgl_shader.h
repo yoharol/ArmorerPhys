@@ -11,6 +11,12 @@ struct ShaderSource {
   const char* fragment;
 };
 
+struct ShaderSourceWithGeometry {
+  const char* vertex;
+  const char* fragment;
+  const char* geometry;
+};
+
 namespace source {
 
 const ShaderSource basic_shader = {
@@ -66,7 +72,7 @@ const ShaderSource basic_uv_shader = {
     }
   )"};
 
-const ShaderSource point_shader = {
+const ShaderSourceWithGeometry point_shader = {
     R"(
     #version 330 core
     layout (location = 0) in vec3 aPos;
@@ -75,42 +81,60 @@ const ShaderSource point_shader = {
     uniform vec3 color;
     uniform float choice;
     uniform mat4 projection;
-    uniform float pointSize;
 
     out vec3 vertexColor;
-    out float radius;
     void main() {
       gl_Position = projection * vec4(aPos, 1.0);
       gl_Position = gl_Position / gl_Position.w;
-      gl_PointSize = pointSize;
       vertexColor = aColor * (1.0-choice) + choice * color;
-      radius = pointSize;
     }
   )",
     R"(
     #version 330 core
 
-    in float radius;
-    in vec3 vertexColor;
+    in vec3 fragColor;
     out vec4 FragColor;
 
     void main() {
-      vec2 center = vec2(0.5, 0.5); // Center of the point
-      float dist = distance(center, gl_PointCoord.xy);
-      if (dist > 0.5){
-          FragColor = vec4(0.0, 0.0, 0.0, 0.0);
-      }
-      else
-      {
-          float alpha = smoothstep(0.4, 0.5, dist);
-          alpha = 1.0 - alpha * alpha;
-          FragColor = vec4(vertexColor, alpha);
-      }
+      FragColor = vec4(fragColor, 1.0);
+    }
+  )",
+    R"(
+    #version 330 core
+    
+    layout (points) in;
+    layout (triangle_strip, max_vertices = 48) out;
 
+    uniform float pointSize;
+    uniform float aspectRatio;
+
+    in vec3 vertexColor[];
+    out vec3 fragColor;
+
+    void main(){
+      float tri_num = 16.0;
+      fragColor = vertexColor[0];
+      for (int i=0; i<tri_num; i++){
+        float angle = i * 2.0 * 3.14159265359 / tri_num;
+        float angle_next = (i+1) * 2.0 * 3.14159265359 / tri_num;
+        vec2 offset = vec2(cos(angle), sin(angle)) * pointSize / 2.0;
+        vec2 offset_next = vec2(cos(angle_next), sin(angle_next)) * pointSize / 2.0;
+        offset.x = offset.x / aspectRatio;
+        offset_next.x = offset_next.x / aspectRatio;
+        gl_Position = gl_in[0].gl_Position + vec4(offset, 0.0, 0.0);
+        EmitVertex();
+        gl_Position = gl_in[0].gl_Position + vec4(offset_next, 0.0, 0.0);
+        EmitVertex();
+        gl_Position = gl_in[0].gl_Position;
+        EmitVertex();
+      }
+      // gl_Position = gl_in[0].gl_Position + vec4(pointSize/2.0, 0.0, 0.0, 0.0);
+      // EmitVertex();
+      EndPrimitive();
     }
   )"};
 
-const ShaderSource line_shader = {
+const ShaderSourceWithGeometry line_shader = {
     R"(
     #version 330 core
     layout (location = 0) in vec3 aPos;
@@ -119,23 +143,57 @@ const ShaderSource line_shader = {
     uniform vec3 color;
     uniform float choice;
     uniform mat4 projection;
-    uniform float alpha;
 
-    out vec4 vertexColor;
+    out vec3 vertexColor;
     void main() {
       gl_Position = projection * vec4(aPos, 1.0);
       gl_Position = gl_Position / gl_Position.w;
-      vertexColor = vec4(aColor * (1.0-choice) + choice * color, alpha);
+      vertexColor = aColor * (1.0-choice) + choice * color;
     }
   )",
     R"(
     #version 330 core
 
-    in vec4 vertexColor;
+    in vec3 fragColor;
     out vec4 FragColor;
 
+    uniform float alpha;
+
     void main() {
-      FragColor = vertexColor;
+      FragColor = vec4(fragColor, alpha);
+    }
+  )",
+    R"(
+    #version 330 core
+
+    layout (lines) in;
+    layout (triangle_strip, max_vertices = 4) out;
+
+    uniform float lineWidth;
+    uniform float aspectRatio;
+
+    in vec3 vertexColor[];
+    out vec3 fragColor;
+
+    void main(){
+      vec2 p1 = gl_in[0].gl_Position.xy;
+      vec2 p2 = gl_in[1].gl_Position.xy;
+      vec2 dir = normalize(p2 - p1);
+      vec2 normal = vec2(-dir.y, dir.x);
+      vec2 offset = normal * lineWidth / 2.0;
+      offset.x = offset.x / aspectRatio;
+
+      fragColor = vertexColor[0];
+      gl_Position = vec4(p1 + offset, 0.0, 1.0);
+      EmitVertex();
+      gl_Position = vec4(p1 - offset, 0.0, 1.0);
+      EmitVertex();
+      fragColor = vertexColor[1];
+      gl_Position = vec4(p2 + offset, 0.0, 1.0);
+      EmitVertex();
+      gl_Position = vec4(p2 - offset, 0.0, 1.0);
+      EmitVertex();
+      EndPrimitive();
     }
   )"};
 

@@ -6,6 +6,24 @@
 
 namespace armgl {
 
+struct Window {
+  static Window& get_instance() {
+    static Window instance;
+    return instance;
+  }
+  GLFWwindow* get_window() { return window; }
+  void set_window(GLFWwindow* window) { this->window = window; }
+  int width;
+  int height;
+  Window(Window const&) = delete;
+  void operator=(Window const&) = delete;
+
+ private:
+  GLFWwindow* window;
+
+  Window() : window(nullptr), width(0), height(0) {}
+};
+
 void GLFW_error(int error, const char* description) {
   fputs(description, stderr);
 }
@@ -45,6 +63,9 @@ GLFWwindow* create_window(int width, int height, const char* title) {
   }
   glfwMakeContextCurrent(window);
   init_glad();
+  Window::get_instance().set_window(window);
+  Window::get_instance().width = width;
+  Window::get_instance().height = height;
   return window;
 }
 

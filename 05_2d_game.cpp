@@ -52,9 +52,10 @@ int main() {
       0.0f, 0.0f;       //
   armgl::set_points_data(points, v_p, v_color);
   points.color = armgl::RGB(255, 0, 0);
-  points.point_size = 30.0f;
+  points.point_size = 10.0f;
   armgl::set_lines_data(lines, v_p, v_color);
   lines.color = armgl::RGB(255, 0, 0);
+  lines.width = 1.0f;
 
   armgl::Vec2f gravity(0.0f, -10.0f);
   float mass = 1.0f;

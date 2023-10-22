@@ -183,7 +183,8 @@ Points create_points() {
       create_vbo(),    //
       create_program(  //
           create_shader(source::point_shader.vertex, GL_VERTEX_SHADER),
-          create_shader(source::point_shader.fragment, GL_FRAGMENT_SHADER)),
+          create_shader(source::point_shader.fragment, GL_FRAGMENT_SHADER),
+          create_shader(source::point_shader.geometry, GL_GEOMETRY_SHADER)),
       RGB(255, 0, 0),  //
       true,            //
       8.0f};
@@ -227,11 +228,14 @@ void set_points_data(Points &points, const MatxXf &points_data,
 }
 
 RenderFunc get_render_func(Points &points) {
-  RenderFunc render_func = [&points](Scene scene) {
+  Window &window = Window::get_instance();
+  float asepect_ratio = float(window.width) / float(window.height);
+  RenderFunc render_func = [&points, asepect_ratio](Scene scene) {
     use_program(points.program);
     set_uniform_mat4(points.program, "projection", scene.camera.projection);
     set_uniform_RGB(points.program, "color", points.color);
-    set_uniform_float(points.program, "pointSize", points.point_size);
+    set_uniform_float(points.program, "pointSize", points.point_size / 200.0f);
+    set_uniform_float(points.program, "aspectRatio", asepect_ratio);
     if (points.uniform_color)
       set_uniform_float(points.program, "choice", 1.0f);
     else
@@ -253,6 +257,7 @@ struct Lines {
   RGB color;
   float alpha;
   bool uniform_color;
+  float width;
   GLenum mode;
 };
 
@@ -264,10 +269,12 @@ Lines create_lines() {
       create_vbo(),    //
       create_program(  //
           create_shader(source::line_shader.vertex, GL_VERTEX_SHADER),
-          create_shader(source::line_shader.fragment, GL_FRAGMENT_SHADER)),
+          create_shader(source::line_shader.fragment, GL_FRAGMENT_SHADER),
+          create_shader(source::line_shader.geometry, GL_GEOMETRY_SHADER)),
       RGB(255, 0, 0),  //
       1.0f,
       true,
+      1.0f,
       GL_LINE_STRIP};
 }
 
@@ -308,11 +315,15 @@ void set_lines_data(Lines &lines, const MatxXf &points_data,
 }
 
 RenderFunc get_render_func(Lines &lines) {
-  RenderFunc render_func = [&lines](Scene scene) {
+  Window &window = Window::get_instance();
+  float asepect_ratio = float(window.width) / float(window.height);
+  RenderFunc render_func = [&lines, asepect_ratio](Scene scene) {
     use_program(lines.program);
     set_uniform_mat4(lines.program, "projection", scene.camera.projection);
     set_uniform_RGB(lines.program, "color", lines.color);
     set_uniform_float(lines.program, "alpha", lines.alpha);
+    set_uniform_float(lines.program, "lineWidth", lines.width / 200.0f);
+    set_uniform_float(lines.program, "aspectRatio", asepect_ratio);
     if (lines.uniform_color)
       set_uniform_float(lines.program, "choice", 1.0f);
     else
