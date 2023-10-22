@@ -53,16 +53,16 @@ Lines create_axis2d(float x_min, float x_max, float y_min, float y_max,
 Lines create_grid_axis2d(float x_min, float x_max, float y_min, float y_max,
                          int gridx, int gridy, RGB color) {
   Lines lines = create_lines();
-  Matx2f verts(2 * (gridx + gridy), 2);
-  for (int i = 0; i < gridx; i++) {
-    float x = (x_max - x_min) * i / (gridx - 1) + x_min;
+  Matx2f verts(2 * (gridx + gridy + 2), 2);
+  for (int i = 0; i <= gridx; i++) {
+    float x = (x_max - x_min) * i / gridx + x_min;
     verts.row(2 * i) << x, y_min;
     verts.row(2 * i + 1) << x, y_max;
   }
-  for (int i = 0; i < gridy; i++) {
-    float y = (y_max - y_min) * i / (gridy - 1) + y_min;
-    verts.row(2 * gridx + 2 * i) << x_min, y;
-    verts.row(2 * gridx + 2 * i + 1) << x_max, y;
+  for (int i = 0; i <= gridy; i++) {
+    float y = (y_max - y_min) * i / gridy + y_min;
+    verts.row(2 * (gridx + 1) + 2 * i) << x_min, y;
+    verts.row(2 * (gridx + 1) + 2 * i + 1) << x_max, y;
   }
   set_lines_data(lines, verts, MatxXf());
   lines.color = color;

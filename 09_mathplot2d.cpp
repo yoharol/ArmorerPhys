@@ -23,12 +23,15 @@ int main() {
   armgl::Points points = armgl::create_points();
   armgl::Lines ruler =
       armgl::create_ruler2d(-2.0f, -2.0f, 2.0f, 2.0f, armgl::RGB(200, 34, 0));
+  armgl::Lines grids = armgl::create_grid_axis2d(-2.0f, 2.0f, -1.0f, 1.0f, 20,
+                                                 10, armgl::RGB(0, 67, 198));
   armgl::Lines axis =
-      armgl::create_axis2d(-2.0f, 2.0f, -1.0f, 1.0f, armgl::RGB(0, 34, 167));
+      armgl::create_axis2d(-2.0f, 2.0f, -1.0f, 1.0f, armgl::RGB(0, 21, 98));
 
   armgl::add_render_func(scene, armgl::get_render_func(points));
   armgl::add_render_func(scene, armgl::get_render_func(ruler));
   armgl::add_render_func(scene, armgl::get_render_func(axis));
+  armgl::add_render_func(scene, armgl::get_render_func(grids));
 
   armgl::InputHandler& handler = armgl::create_input_handler(window);
   armgl::add_mouse_move_func(handler, [&](armgl::InputHandler& input_handler) {
