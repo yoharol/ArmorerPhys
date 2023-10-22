@@ -16,18 +16,8 @@ int main() {
   float left = 0.0f;
   float right = 2.0f;
 
-  armgl::Scene scene = armgl::create_scene(
-      armgl::Light{
-          {242, 242, 242},     // light color
-          {9, 5, 88},          // ambient color
-          {0.0f, 0.35f, 5.0f}  // light position
-      },
-      armgl::create_camera(
-          {0.0f, 0.0f, -2.0f},                  // camera position
-          {0.0f, 0.35f, 0.0f},                  // camera target
-          {0.0f, 1.0f, 0.0f},                   // camera up axis
-          float(SCR_WIDTH) / float(SCR_HEIGHT)  // camera aspect
-          ));
+  armgl::Scene scene =
+      armgl::create_scene(armgl::default_light, armgl::default_camera);
   armgl::set_2d_camera(scene.camera, left, right, bottom, top);
   armgl::Gui gui = armgl::create_gui(window, "gui");
   gui.width = 300;

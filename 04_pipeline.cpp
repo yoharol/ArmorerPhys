@@ -33,6 +33,8 @@ int main() {
           float(SCR_WIDTH) / float(SCR_HEIGHT)  // camera aspect
           ));
   armgl::Gui gui = armgl::create_gui(window, "gui");
+  gui.width = 300;
+  gui.height = 100;
 
   armgl::Vec3f diffuse_color(0.0f, 211.f / 255.f, 239.f / 255.f);
   armgl::add_gui_func(gui, [&diffuse_color]() {
@@ -55,7 +57,7 @@ int main() {
 
   armgl::Points points = armgl::create_points();
   points.color = {255, 0, 0};
-  points.point_size = 1.0f;
+  points.point_size = 10.0f;
   armgl::Lines lines = armgl::create_lines();
   lines.color = {0, 155, 155};
   lines.mode = GL_LINE_LOOP;
