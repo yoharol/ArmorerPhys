@@ -251,6 +251,7 @@ struct Lines {
   VBO color_buffer;
   Program program;
   RGB color;
+  float alpha;
   bool uniform_color;
   GLenum mode;
 };
@@ -265,6 +266,7 @@ Lines create_lines() {
           create_shader(source::line_shader.vertex, GL_VERTEX_SHADER),
           create_shader(source::line_shader.fragment, GL_FRAGMENT_SHADER)),
       RGB(255, 0, 0),  //
+      1.0f,
       true,
       GL_LINE_STRIP};
 }
@@ -310,6 +312,7 @@ RenderFunc get_render_func(Lines &lines) {
     use_program(lines.program);
     set_uniform_mat4(lines.program, "projection", scene.camera.projection);
     set_uniform_RGB(lines.program, "color", lines.color);
+    set_uniform_float(lines.program, "alpha", lines.alpha);
     if (lines.uniform_color)
       set_uniform_float(lines.program, "choice", 1.0f);
     else

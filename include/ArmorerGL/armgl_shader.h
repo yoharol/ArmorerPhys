@@ -119,22 +119,23 @@ const ShaderSource line_shader = {
     uniform vec3 color;
     uniform float choice;
     uniform mat4 projection;
+    uniform float alpha;
 
-    out vec3 vertexColor;
+    out vec4 vertexColor;
     void main() {
       gl_Position = projection * vec4(aPos, 1.0);
       gl_Position = gl_Position / gl_Position.w;
-      vertexColor = aColor * (1.0-choice) + choice * color;
+      vertexColor = vec4(aColor * (1.0-choice) + choice * color, alpha);
     }
   )",
     R"(
     #version 330 core
 
-    in vec3 vertexColor;
+    in vec4 vertexColor;
     out vec4 FragColor;
 
     void main() {
-      FragColor = vec4(vertexColor, 1.0);
+      FragColor = vertexColor;
     }
   )"};
 

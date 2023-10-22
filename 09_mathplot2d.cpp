@@ -25,6 +25,7 @@ int main() {
       armgl::create_ruler2d(-2.0f, -2.0f, 2.0f, 2.0f, armgl::RGB(200, 34, 0));
   armgl::Lines grids = armgl::create_grid_axis2d(-2.0f, 2.0f, -1.0f, 1.0f, 20,
                                                  10, armgl::RGB(0, 67, 198));
+  grids.alpha = 0.5f;
   armgl::Lines axis =
       armgl::create_axis2d(-2.0f, 2.0f, -1.0f, 1.0f, armgl::RGB(0, 21, 98));
 
