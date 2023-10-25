@@ -4,7 +4,7 @@
 #include "armgl_type.h"
 #include "armgl_buffer.h"
 
-namespace armgl {
+namespace agl {
 
 struct ShaderSource {
   const char* vertex;
@@ -324,6 +324,6 @@ const Light default_light = {
     {0.0f, 0.35f, 5.0f}  // light position
 };
 
-}  // namespace armgl
+}  // namespace agl
 
 #endif  // GL_SHADER_H_

@@ -9,42 +9,42 @@ const unsigned int SCR_WIDTH = 800;
 const unsigned int SCR_HEIGHT = 400;
 
 int main() {
-  GLFWwindow* window = armgl::create_window(SCR_WIDTH, SCR_HEIGHT,
+  GLFWwindow* window = agl::create_window(SCR_WIDTH, SCR_HEIGHT,
                                             "Example7: Affine2d Visualization");
 
-  armgl::Scene scene =
-      armgl::create_scene(armgl::default_light, armgl::default_camera);
-  armgl::set_2d_camera(scene.camera, -2.0f, 2.0f, -1.0f, 1.0f);
+  agl::Scene scene =
+      agl::create_scene(agl::default_light, agl::default_camera);
+  agl::set_2d_camera(scene.camera, -2.0f, 2.0f, -1.0f, 1.0f);
 
-  armgl::Matx2f v_p(2, 2);
+  agl::Matx2f v_p(2, 2);
   v_p << 0.0f, 0.0f,  //
       1.0f, 1.0f;     //
 
-  armgl::Points points = armgl::create_points();
+  agl::Points points = agl::create_points();
   points.point_size = 10.0f;
-  armgl::Lines ruler =
-      armgl::create_ruler2d(-2.0f, -2.0f, 2.0f, 2.0f, armgl::RGB(200, 34, 0));
+  agl::Lines ruler =
+      agl::create_ruler2d(-2.0f, -2.0f, 2.0f, 2.0f, agl::RGB(200, 34, 0));
   ruler.width = 1.5f;
-  armgl::Lines grids = armgl::create_grid_axis2d(-2.0f, 2.0f, -1.0f, 1.0f, 20,
-                                                 10, armgl::RGB(0, 67, 198));
+  agl::Lines grids = agl::create_grid_axis2d(-2.0f, 2.0f, -1.0f, 1.0f, 20,
+                                                 10, agl::RGB(0, 67, 198));
   grids.alpha = 0.5f;
-  armgl::Lines axis =
-      armgl::create_axis2d(-2.0f, 2.0f, -1.0f, 1.0f, armgl::RGB(0, 21, 98));
+  agl::Lines axis =
+      agl::create_axis2d(-2.0f, 2.0f, -1.0f, 1.0f, agl::RGB(0, 21, 98));
   axis.width = 2.f;
 
-  armgl::add_render_func(scene, armgl::get_render_func(points));
-  armgl::add_render_func(scene, armgl::get_render_func(ruler));
-  armgl::add_render_func(scene, armgl::get_render_func(axis));
-  armgl::add_render_func(scene, armgl::get_render_func(grids));
+  agl::add_render_func(scene, agl::get_render_func(points));
+  agl::add_render_func(scene, agl::get_render_func(ruler));
+  agl::add_render_func(scene, agl::get_render_func(axis));
+  agl::add_render_func(scene, agl::get_render_func(grids));
 
-  armgl::InputHandler& handler = armgl::create_input_handler(window);
-  armgl::add_mouse_move_func(handler, [&](armgl::InputHandler& input_handler) {
+  agl::InputHandler& handler = agl::create_input_handler(window);
+  agl::add_mouse_move_func(handler, [&](agl::InputHandler& input_handler) {
     if (input_handler.left_pressing) {
       float xpos, ypos;
       xpos = handler.xpos;
       ypos = handler.ypos;
-      armgl::camera2d_screen_to_world(scene.camera, xpos, ypos);
-      armgl::Vec2f p(xpos, ypos);
+      agl::camera2d_screen_to_world(scene.camera, xpos, ypos);
+      agl::Vec2f p(xpos, ypos);
       if ((v_p.row(0) - p.transpose()).norm() <
           (v_p.row(1) - p.transpose()).norm()) {
         v_p.row(0) = p;
@@ -60,11 +60,11 @@ int main() {
     glEnable(GL_DEPTH_TEST);
     glfwPollEvents();
 
-    armgl::set_points_data(points, v_p, armgl::MatxXf());
-    armgl::set_ruler2d_data(ruler, v_p.row(0), v_p.row(1), 4.f);
+    agl::set_points_data(points, v_p, agl::MatxXf());
+    agl::set_ruler2d_data(ruler, v_p.row(0), v_p.row(1), 4.f);
 
-    armgl::set_background_RGB({244, 244, 244});
-    armgl::render_scene(scene);
+    agl::set_background_RGB({244, 244, 244});
+    agl::render_scene(scene);
 
     glfwSwapBuffers(window);
   }

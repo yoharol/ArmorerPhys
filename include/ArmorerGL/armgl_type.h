@@ -3,7 +3,7 @@
 
 #include <Eigen/Core>
 
-namespace armgl {
+namespace agl {
 
 using MatxXf =
     Eigen::Matrix<float, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor>;
@@ -24,6 +24,6 @@ using Matx3f = Eigen::Matrix<float, Eigen::Dynamic, 3, Eigen::RowMajor>;
 using Matx2f = Eigen::Matrix<float, Eigen::Dynamic, 2, Eigen::RowMajor>;
 using Matx3i = Eigen::Matrix<float, Eigen::Dynamic, 3, Eigen::RowMajor>;
 
-}  // namespace armgl
+}  // namespace agl
 
 #endif  // GL_TYPE_H_

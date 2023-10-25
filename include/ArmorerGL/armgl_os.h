@@ -4,6 +4,6 @@
 #include <string>
 #include <vector>
 
-namespace armgl {}  // namespace armgl
+namespace agl {}  // namespace agl
 
 #endif  // GL_OS_H_

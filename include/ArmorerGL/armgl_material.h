@@ -6,7 +6,7 @@
 #include "armgl_shader.h"
 #include "armgl_buffer.h"
 
-namespace armgl {
+namespace agl {
 
 struct Material {
   Eigen::Vector3f ambient;
@@ -16,6 +16,6 @@ struct Material {
   float shininess;
 };
 
-}  // namespace armgl
+}  // namespace agl
 
 #endif  // GL_MATERIAL_H_

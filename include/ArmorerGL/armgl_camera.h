@@ -9,7 +9,7 @@
 
 #include "armgl_type.h"
 
-namespace armgl {
+namespace agl {
 
 enum CameraType {
   Perspective,
@@ -172,6 +172,6 @@ inline void set_camera_aspect(Camera& camera, float aspect) {
 const Camera default_camera = create_camera(
     {0.0f, 0.0f, 3.0f}, {0.0f, 0.0f, 0.0f}, {0.0f, 1.0f, 0.0}, 1.0f);
 
-}  // namespace armgl
+}  // namespace agl
 
 #endif  // GL_CAMERA_H_

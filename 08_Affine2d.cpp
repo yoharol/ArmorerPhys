@@ -9,40 +9,40 @@ const unsigned int SCR_WIDTH = 700;
 const unsigned int SCR_HEIGHT = 700;
 
 int main() {
-  GLFWwindow* window = armgl::create_window(SCR_WIDTH, SCR_HEIGHT,
+  GLFWwindow* window = agl::create_window(SCR_WIDTH, SCR_HEIGHT,
                                             "Example7: Affine2d Visualization");
 
-  armgl::Scene scene =
-      armgl::create_scene(armgl::default_light, armgl::default_camera);
-  armgl::set_2d_camera(scene.camera, -1.0f, 2.0f, -1.0f, 2.0f);
-  armgl::Gui gui = armgl::create_gui(window, "gui");
+  agl::Scene scene =
+      agl::create_scene(agl::default_light, agl::default_camera);
+  agl::set_2d_camera(scene.camera, -1.0f, 2.0f, -1.0f, 2.0f);
+  agl::Gui gui = agl::create_gui(window, "gui");
   gui.width = 200;
   gui.height = 200;
 
-  armgl::Points points = armgl::create_points();
-  armgl::Lines lines = armgl::create_lines();
+  agl::Points points = agl::create_points();
+  agl::Lines lines = agl::create_lines();
 
-  armgl::Matx2f v_p;
-  armgl::Matx2f v_p_ref;
+  agl::Matx2f v_p;
+  agl::Matx2f v_p_ref;
   v_p.resize(4, 2);
   v_p << 0.0f, 0.0f,  //
       1.0f, 0.0f,     //
       1.0f, 1.0f,     //
       0.0f, 1.0f;     //
   v_p_ref = v_p;
-  armgl::Mat2f A = armgl::Mat2f::Identity();
+  agl::Mat2f A = agl::Mat2f::Identity();
 
-  armgl::set_points_data(points, v_p, armgl::MatxXf());
-  points.color = armgl::RGB(255, 0, 0);
+  agl::set_points_data(points, v_p, agl::MatxXf());
+  points.color = agl::RGB(255, 0, 0);
   points.point_size = 30.0f;
-  armgl::set_lines_data(lines, v_p, armgl::MatxXf());
+  agl::set_lines_data(lines, v_p, agl::MatxXf());
   lines.mode = GL_LINE_LOOP;
-  lines.color = armgl::RGB(0, 0, 255);
+  lines.color = agl::RGB(0, 0, 255);
 
-  armgl::add_render_func(scene, armgl::get_render_func(points));
-  armgl::add_render_func(scene, armgl::get_render_func(lines));
+  agl::add_render_func(scene, agl::get_render_func(points));
+  agl::add_render_func(scene, agl::get_render_func(lines));
 
-  armgl::add_gui_func(gui, [&A]() {
+  agl::add_gui_func(gui, [&A]() {
     ImGui::Text("Affine Matrix:");
     ImGui::SetNextItemWidth(50);
     ImGui::DragFloat("a11", &A(0, 0), 0.0f, -1.0f, 1.0f);
@@ -61,17 +61,17 @@ int main() {
 
   while (!glfwWindowShouldClose(window)) {
     glfwPollEvents();
-    armgl::handle_gui_input(gui);
+    agl::handle_gui_input(gui);
 
-    armgl::set_background_RGB({244, 244, 244});
+    agl::set_background_RGB({244, 244, 244});
 
-    armgl::set_points_data(points, v_p_ref * A.transpose(), armgl::MatxXf());
+    agl::set_points_data(points, v_p_ref * A.transpose(), agl::MatxXf());
 
-    armgl::render_scene(scene);
-    armgl::render_gui(gui);
+    agl::render_scene(scene);
+    agl::render_gui(gui);
 
     glfwSwapBuffers(window);
   }
-  armgl::destroy_gui(gui);
+  agl::destroy_gui(gui);
   glfwTerminate();
 }

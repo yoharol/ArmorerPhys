@@ -7,7 +7,7 @@
 
 #include "armgl_type.h"
 
-namespace armgl {
+namespace agl {
 
 MatxXf get_normals(const MatxXf &vertices, const MatxXi &indices) {
   assert(indices.cols() == 3);
@@ -31,6 +31,6 @@ MatxXf get_normals(const MatxXf &vertices, const MatxXi &indices) {
   return normals;
 }
 
-}  // namespace armgl
+}  // namespace agl
 
 #endif  // GL_GEOM_H_

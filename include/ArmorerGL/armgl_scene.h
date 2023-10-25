@@ -9,7 +9,7 @@
 #include "armgl_camera.h"
 #include "armgl_geom.h"
 
-namespace armgl {
+namespace agl {
 
 struct Scene;
 struct InputHandler;
@@ -117,6 +117,6 @@ void add_key_input_func(InputHandler& handler, KeyInputFunc func) {
   handler.key_input_funcs.push_back(func);
 }
 
-}  // namespace armgl
+}  // namespace agl
 
 #endif  // GL_WARP_H_

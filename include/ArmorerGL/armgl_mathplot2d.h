@@ -10,7 +10,7 @@
 #include "armgl_type.h"
 #include "armgl_objs.h"
 
-namespace armgl {
+namespace agl {
 
 Lines create_ruler2d(float x1, float y1, float x2, float y2, RGB color) {
   Lines lines = create_lines();
@@ -70,6 +70,6 @@ Lines create_grid_axis2d(float x_min, float x_max, float y_min, float y_max,
   return lines;
 }
 
-}  // namespace armgl
+}  // namespace agl
 
 #endif  // GL_MATHPLOT2D_H
