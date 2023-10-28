@@ -10,6 +10,7 @@ add_definitions(-DCMAKE_EXPORT_COMPILE_COMMANDS=ON)
 
 get_filename_component(ABS_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR} ABSOLUTE)
 add_definitions(-DASSETS_PATH="${ABS_SOURCE_DIR}/assets")
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/external)
 
 find_package(OpenGL REQUIRED)
 
