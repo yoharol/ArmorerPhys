@@ -11,39 +11,13 @@ add_definitions(-DCMAKE_EXPORT_COMPILE_COMMANDS=ON)
 get_filename_component(ABS_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR} ABSOLUTE)
 add_definitions(-DASSETS_PATH="${ABS_SOURCE_DIR}/assets")
 
-function(find_package_with_targets package)
-	get_property(importTargets DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}" PROPERTY IMPORTED_TARGETS)
-	find_package(${package} QUIET)
-  message("Package ${package} found: ${${package}_FOUND}")
-  set(${package}_PKG_FOUND ${${package}_FOUND} PARENT_SCOPE)
-  get_property(importTargetsAfter DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}" PROPERTY IMPORTED_TARGETS)
-  list(REMOVE_ITEM importTargetsAfter ${importTargets})
-	message("Targets from ${package}: ${importTargetsAfter}")
-endfunction()
+find_package(OpenGL REQUIRED)
 
-# find opengl and glfw
-find_package_with_targets(OpenGL)
-find_package_with_targets(Eigen3)
-find_package_with_targets(glfw3)
-find_package_with_targets(glm)
-
-
-add_subdirectory(external)
-
-if (NOT TARGET igl::core)
-  message("[ArmorerGL] Fetching libigl")
-  include(FetchContent)
-  FetchContent_Declare(
-      libigl
-      GIT_REPOSITORY https://github.com/libigl/libigl.git
-      GIT_TAG v2.4.0
-  )
-  FetchContent_MakeAvailable(libigl)
-endif()
-
-# add glad and imgui
+include("${CMAKE_CURRENT_SOURCE_DIR}/cmake/eigen3.cmake")
+include("${CMAKE_CURRENT_SOURCE_DIR}/cmake/glfw.cmake")
 include("${CMAKE_CURRENT_SOURCE_DIR}/cmake/glad.cmake")
 include ("${CMAKE_CURRENT_SOURCE_DIR}/cmake/imgui.cmake")
+include("${CMAKE_CURRENT_SOURCE_DIR}/cmake/libigl.cmake")
 
 # add all header files in /include into a header only library
 set(LIBRARY_NAME ArmorerGL)

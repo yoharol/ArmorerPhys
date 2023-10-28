@@ -1,11 +1,3 @@
-[submodule "external/eigen"]
-	path = external/eigen
-	url = https://gitlab.com/libeigen/eigen.git
-	ignore = all
-[submodule "external/glfw"]
-	path = external/glfw
-	url = https://github.com/glfw/glfw.git
-	ignore = all
 [submodule "external/imgui"]
 	path = external/imgui
 	url = https://github.com/ocornut/imgui.git
