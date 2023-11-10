@@ -20,11 +20,39 @@ include("${CMAKE_CURRENT_SOURCE_DIR}/cmake/glad.cmake")
 include ("${CMAKE_CURRENT_SOURCE_DIR}/cmake/imgui.cmake")
 include("${CMAKE_CURRENT_SOURCE_DIR}/cmake/libigl.cmake")
 
-# add all header files in /include into a header only library
+option(ARMORER_USD "Include USD components" OFF)
+if(PROJECT_IS_TOP_LEVEL)
+  set(ARMORER_USD ON CACHE BOOL "Include USD components" FORCE)
+endif()
+if(ARMORER_USD)
+  include("${CMAKE_CURRENT_SOURCE_DIR}/cmake/pxr.cmake")
+endif()
+
+# set a list of targets
+set(GL_TARGETS
+  OpenGL::GL
+  imgui
+  glfw
+  glad
+  Eigen3::Eigen
+  igl::core
+  )
+
+set(USD_TARGETS
+  usd
+  usdGeom
+  vt
+  usdImaging
+  usdImagingGL
+  )
+
 set(LIBRARY_NAME ArmorerGL)
 add_library(${LIBRARY_NAME} INTERFACE)
 target_include_directories(${LIBRARY_NAME} INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/include)
-target_link_libraries(${LIBRARY_NAME} INTERFACE OpenGL::GL Eigen3::Eigen igl::core imgui glfw glad)
+target_link_libraries(${LIBRARY_NAME} INTERFACE ${GL_TARGETS})
+if (LINK_USD)
+  target_link_libraries(${LIBRARY_NAME} INTERFACE ${USD_TARGETS})
+endif()
 
 # a cmake function that create an executable target with opengl linked
 function(add_gl_target target_name)
@@ -32,7 +60,7 @@ function(add_gl_target target_name)
     target_sources(${target_name}
       PRIVATE
       ${SOURCES}
-      ${target_name}.cpp)
+      ${CMAKE_CURRENT_SOURCE_DIR}/examples/${target_name}.cpp)
     target_include_directories(${target_name}
       PRIVATE
       ${CMAKE_CURRENT_SOURCE_DIR}/include)

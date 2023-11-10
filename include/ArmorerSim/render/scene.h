@@ -3,13 +3,13 @@
 
 #include <functional>
 
-#include "armgl_type.h"
-#include "armgl_buffer.h"
-#include "armgl_shader.h"
-#include "armgl_camera.h"
-#include "armgl_geom.h"
+#include "ArmorerSim/type.h"
+#include "ArmorerSim/render/buffer.h"
+#include "ArmorerSim/render/shader.h"
+#include "ArmorerSim/render/camera.h"
+#include "ArmorerSim/geom.h"
 
-namespace agl {
+namespace asim {
 
 struct Scene;
 struct InputHandler;
@@ -117,6 +117,6 @@ void add_key_input_func(InputHandler& handler, KeyInputFunc func) {
   handler.key_input_funcs.push_back(func);
 }
 
-}  // namespace agl
+}  // namespace asim
 
 #endif  // GL_WARP_H_

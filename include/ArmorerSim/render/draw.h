@@ -4,9 +4,9 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
-#include "armgl_type.h"
+#include "ArmorerSim/type.h"
 
-namespace agl {
+namespace asim {
 
 inline void set_color(const RGB &color) {
   glColor3f(float(color(0)) / 255.0, float(color(1)) / 255.0,
@@ -37,6 +37,6 @@ inline void draw_line(const Vec3f &start, const Vec3f &end, const T &color,
   glEnd();
 }
 
-}  // namespace agl
+}  // namespace asim
 
 #endif  // GL_DRAW_H_

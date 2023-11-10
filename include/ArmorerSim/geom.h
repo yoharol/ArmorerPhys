@@ -5,9 +5,9 @@
 #include <Eigen/Core>
 #include <Eigen/Geometry>
 
-#include "armgl_type.h"
+#include "type.h"
 
-namespace agl {
+namespace asim {
 
 MatxXf get_normals(const MatxXf &vertices, const MatxXi &indices) {
   assert(indices.cols() == 3);
@@ -31,6 +31,6 @@ MatxXf get_normals(const MatxXf &vertices, const MatxXi &indices) {
   return normals;
 }
 
-}  // namespace agl
+}  // namespace asim
 
 #endif  // GL_GEOM_H_

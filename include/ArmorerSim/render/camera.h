@@ -7,9 +7,9 @@
 #include <GLFW/glfw3.h>
 #include <cassert>
 
-#include "armgl_type.h"
+#include "ArmorerSim/type.h"
 
-namespace agl {
+namespace asim {
 
 enum CameraType {
   Perspective,
@@ -172,6 +172,6 @@ inline void set_camera_aspect(Camera& camera, float aspect) {
 const Camera default_camera = create_camera(
     {0.0f, 0.0f, 3.0f}, {0.0f, 0.0f, 0.0f}, {0.0f, 1.0f, 0.0}, 1.0f);
 
-}  // namespace agl
+}  // namespace asim
 
 #endif  // GL_CAMERA_H_

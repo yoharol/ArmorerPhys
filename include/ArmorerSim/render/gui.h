@@ -1,13 +1,11 @@
 #ifndef GL_IMGUI_H_
 #define GL_IMGUI_H_
 
-#include <functional>
-
 #include "imgui.h"
 #include "imgui_impl_glfw.h"
 #include "imgui_impl_opengl3.h"
 
-namespace agl {
+namespace asim {
 
 typedef std::function<void()> GuiFunc;
 typedef std::function<void()> GuiMouseInputFunc;
@@ -154,6 +152,6 @@ void StyleColorsSpectrum() {
   style.Colors[ImGuiCol_TextSelectedBg] = ImVec4(0.26f, 0.59f, 0.98f, 0.35f);
 }
 
-}  // namespace agl
+}  // namespace asim
 
 #endif  // GL_IMGUI_H_

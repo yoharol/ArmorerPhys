@@ -4,7 +4,7 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
-namespace agl {
+namespace asim {
 
 struct Window {
   static Window& get_instance() {
@@ -87,6 +87,6 @@ void set_background_RGB(RGB color) {
   glClearColor(color(0) / 255.0f, color(1) / 255.0f, color(2) / 255.0f, 1.0f);
 }
 
-}  // namespace agl
+}  // namespace asim
 
 #endif  // GL_WINDOW_H_

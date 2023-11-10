@@ -5,9 +5,9 @@
 #include <GLFW/glfw3.h>
 #include <Eigen/Core>
 
-#include "armgl_image.h"
+#include "ArmorerSim/image.h"
 
-namespace agl {
+namespace asim {
 
 struct VAO {
   unsigned int id;
@@ -233,6 +233,6 @@ inline void delete_texture(Texture texture) {
   glDeleteTextures(1, &texture.id);
 }
 
-}  // namespace agl
+}  // namespace asim
 
 #endif  // BUFFER_DATA_H_

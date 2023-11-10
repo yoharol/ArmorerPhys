@@ -9,10 +9,10 @@ The core concept is the data-oriented design for flexibility and adaptability. T
 For example, here is how to add gui component:
 
 ```c++
-  agl::Gui gui = agl::create_gui(window, "gui");
+  asim::Gui gui = asim::create_gui(window, "gui");
 
-  agl::Vec3f diffuse_color(0.0f, 211.f / 255.f, 239.f / 255.f);
-  agl::add_gui_func(gui, [&diffuse_color]() {
+  asim::Vec3f diffuse_color(0.0f, 211.f / 255.f, 239.f / 255.f);
+  asim::add_gui_func(gui, [&diffuse_color]() {
     ImGui::Text("Diffuse Color:");
     ImGui::ColorEdit3("#c1", diffuse_color.data());
   });
@@ -22,22 +22,22 @@ Defining callback functions in GLFW is always annoying. With function based pipe
 
 ```c++
   // Create a singleton input handler 
-  agl::InputHandler& handler = agl::create_input_handler(window);
+  asim::InputHandler& handler = asim::create_input_handler(window);
 
   // Add mouse move input callback function
-  agl::add_mouse_move_func(handler, [&](agl::InputHandler& input_handler) {
+  asim::add_mouse_move_func(handler, [&](asim::InputHandler& input_handler) {
     std::cout << "mouse moving to " << handler.xpos << handler.ypos;
   });
 
   // Add mouse button input callback function 
-  agl::add_mouse_input_func(handler, [](agl::InputHandler& input_handler,
+  asim::add_mouse_input_func(handler, [](asim::InputHandler& input_handler,
                                           int button, int action) {
     std::cout << "mouse button event: " << button << " " << action << std::endl;
   });
 
   // Add keyboard input callback function
-  agl::add_key_input_func(
-      handler, [](agl::InputHandler& input_handler, int key, int action) {
+  asim::add_key_input_func(
+      handler, [](asim::InputHandler& input_handler, int key, int action) {
         std::cout << "key event: " << key << " " << action << std::endl;
       });
 ```
@@ -45,24 +45,24 @@ Defining callback functions in GLFW is always annoying. With function based pipe
 This is how to add points and lines data into render pipeline:
 
 ```c++
-  agl::Matx2f v_p; // vertex position
+  asim::Matx2f v_p; // vertex position
   v_p.resize(2, 2);
   v_p << 1.0f, 1.0f,  //
       1.0f, 0.5f;     //
-  agl::Matx3f v_color; // per-vertex color
+  asim::Matx3f v_color; // per-vertex color
   v_color.resize(2, 3);
   v_color << 0.0f, 0.0f, 0.0f,  //
       1.0f, 0.2f, 0.0f;         //
 
-  agl::Points points = agl::create_points(); // create points object
-  agl::set_points_data(points, v_p, v_color);
+  asim::Points points = asim::create_points(); // create points object
+  asim::set_points_data(points, v_p, v_color);
   // add points to render pipeline
-  agl::add_render_func(scene, agl::get_render_func(points)); 
+  asim::add_render_func(scene, asim::get_render_func(points)); 
   
-  agl::Lines lines = agl::create_lines(); // create lines object
-  agl::set_lines_data(lines, v_p, v_color);
+  asim::Lines lines = asim::create_lines(); // create lines object
+  asim::set_lines_data(lines, v_p, v_color);
   // add lines to render pipeline
-  agl::add_render_func(scene, agl::get_render_func(lines));
+  asim::add_render_func(scene, asim::get_render_func(lines));
 ```
 
 Rendering new objects can be easily added as render functions.

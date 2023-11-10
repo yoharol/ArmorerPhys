@@ -1,10 +1,10 @@
 #ifndef GL_SHADER_H_
 #define GL_SHADER_H_
 
-#include "armgl_type.h"
-#include "armgl_buffer.h"
+#include "ArmorerSim/type.h"
+#include "ArmorerSim/render/buffer.h"
 
-namespace agl {
+namespace asim {
 
 struct ShaderSource {
   const char* vertex;
@@ -324,6 +324,6 @@ const Light default_light = {
     {0.0f, 0.35f, 5.0f}  // light position
 };
 
-}  // namespace agl
+}  // namespace asim
 
 #endif  // GL_SHADER_H_

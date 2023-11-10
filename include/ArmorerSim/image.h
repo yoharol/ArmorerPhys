@@ -5,7 +5,7 @@
 #include "stb_image.h"
 #include <iostream>
 
-namespace agl {
+namespace asim {
 
 struct Image {
   unsigned char* data;
@@ -28,6 +28,6 @@ Image load_image(const std::string path) {
 
 void free_image(Image image) { stbi_image_free(image.data); }
 
-}  // namespace agl
+}  // namespace asim
 
 #endif  // GL_IMAGE_H_

@@ -3,10 +3,10 @@
 
 #include <Eigen/Core>
 
-#include "armgl_shader.h"
-#include "armgl_buffer.h"
+#include "ArmorerSim/render/shader.h"
+#include "ArmorerSim/render/buffer.h"
 
-namespace agl {
+namespace asim {
 
 struct Material {
   Eigen::Vector3f ambient;
@@ -16,6 +16,6 @@ struct Material {
   float shininess;
 };
 
-}  // namespace agl
+}  // namespace asim
 
 #endif  // GL_MATERIAL_H_
