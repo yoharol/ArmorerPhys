@@ -4,9 +4,9 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
-#include "ArmorerSim/type.h"
+#include "ArmorerPhys/type.h"
 
-namespace asim {
+namespace aphys {
 
 inline void set_color(const RGB &color) {
   glColor3f(float(color(0)) / 255.0, float(color(1)) / 255.0,
@@ -18,7 +18,7 @@ inline void set_color(const Vec3f &color) {
 }
 
 template <typename T>
-inline void draw_point(const Vec3f &point, const T &color, float size = 1.0f) {
+inline void draw_point(const Vec3f &point, const T &color, float size) {
   glPointSize(size);
   glBegin(GL_POINTS);
   set_color(color);
@@ -28,7 +28,7 @@ inline void draw_point(const Vec3f &point, const T &color, float size = 1.0f) {
 
 template <typename T>
 inline void draw_line(const Vec3f &start, const Vec3f &end, const T &color,
-                      float width = 1.0f) {
+                      float width) {
   glLineWidth(width);
   glBegin(GL_LINES);
   set_color(color);
@@ -37,6 +37,6 @@ inline void draw_line(const Vec3f &start, const Vec3f &end, const T &color,
   glEnd();
 }
 
-}  // namespace asim
+}  // namespace aphys
 
 #endif  // GL_DRAW_H_

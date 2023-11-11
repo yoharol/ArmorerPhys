@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.21)
 
-project(ArmorerGL
+project(ArmorerPhys
   DESCRIPTION "A simple OpenGL library"
   LANGUAGES CXX C)
 
@@ -20,11 +20,11 @@ include("${CMAKE_CURRENT_SOURCE_DIR}/cmake/glad.cmake")
 include ("${CMAKE_CURRENT_SOURCE_DIR}/cmake/imgui.cmake")
 include("${CMAKE_CURRENT_SOURCE_DIR}/cmake/libigl.cmake")
 
-option(ARMORER_USD "Include USD components" OFF)
+option(LINK_USD "Include USD components" OFF)
 if(PROJECT_IS_TOP_LEVEL)
-  set(ARMORER_USD ON CACHE BOOL "Include USD components" FORCE)
+  set(LINK_USD ON CACHE BOOL "Include USD components" FORCE)
 endif()
-if(ARMORER_USD)
+if(LINK_USD)
   include("${CMAKE_CURRENT_SOURCE_DIR}/cmake/pxr.cmake")
 endif()
 
@@ -46,12 +46,18 @@ set(USD_TARGETS
   usdImagingGL
   )
 
-set(LIBRARY_NAME ArmorerGL)
-add_library(${LIBRARY_NAME} INTERFACE)
-target_include_directories(${LIBRARY_NAME} INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/include)
-target_link_libraries(${LIBRARY_NAME} INTERFACE ${GL_TARGETS})
+file(GLOB CORE_SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/include/ArmorerPhys/*.cpp")
+file(GLOB RENDER_SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/include/ArmorerPhys/render/*.cpp")
+file(GLOB USD_SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/include/ArmorerPhys/USD/*.cpp")
+
+set(LIBRARY_NAME ${PROJECT_NAME})
+add_library(${LIBRARY_NAME} STATIC)
+target_include_directories(${LIBRARY_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
+target_link_libraries(${LIBRARY_NAME} PUBLIC ${GL_TARGETS})
+target_sources(${LIBRARY_NAME} PRIVATE ${CORE_SOURCES} ${RENDER_SOURCES})
 if (LINK_USD)
-  target_link_libraries(${LIBRARY_NAME} INTERFACE ${USD_TARGETS})
+  target_link_libraries(${LIBRARY_NAME} PUBLIC ${USD_TARGETS})
+  target_sources(${LIBRARY_NAME} PRIVATE ${USD_SOURCES})
 endif()
 
 # a cmake function that create an executable target with opengl linked

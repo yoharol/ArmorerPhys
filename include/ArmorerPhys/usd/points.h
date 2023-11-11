@@ -8,7 +8,7 @@
 
 #include "types.h"
 
-namespace asim {
+namespace aphys {
 
 struct Points {
   std::string primPath;
@@ -37,6 +37,6 @@ void read_position_data(Points& points, Eigen::MatrixX3f& position) {
   ReadVtMat3Xf(vt_positions, position);
 }
 
-}  // namespace asim
+}  // namespace aphys
 
 #endif  // ARMORER_USD_POINTS_H

@@ -1,31 +1,14 @@
-#ifndef GL_IMGUI_H_
-#define GL_IMGUI_H_
+#include "ArmorerPhys/render/gui.h"
 
 #include "imgui.h"
 #include "imgui_impl_glfw.h"
 #include "imgui_impl_opengl3.h"
 
-namespace asim {
-
-typedef std::function<void()> GuiFunc;
-typedef std::function<void()> GuiMouseInputFunc;
-typedef std::function<void()> GuiKeyInputFunc;
-
-struct Gui {
-  std::string name;
-  ImGuiIO &io;
-  bool open;
-  std::vector<GuiFunc> gui_func;
-  std::vector<GuiMouseInputFunc> gui_mouse_input_func;
-  std::vector<GuiKeyInputFunc> gui_key_input_func;
-  int width;
-  int height;
-};
+namespace aphys {
 
 void StyleColorsSpectrum();
 
-Gui create_gui(GLFWwindow *window, std::string name,
-               const char *glsl_version = "#version 330") {
+Gui create_gui(GLFWwindow *window, std::string name, const char *glsl_version) {
   IMGUI_CHECKVERSION();
   ImGui::CreateContext();
   ImGuiIO &io = ImGui::GetIO();
@@ -152,6 +135,4 @@ void StyleColorsSpectrum() {
   style.Colors[ImGuiCol_TextSelectedBg] = ImVec4(0.26f, 0.59f, 0.98f, 0.35f);
 }
 
-}  // namespace asim
-
-#endif  // GL_IMGUI_H_
+}  // namespace aphys

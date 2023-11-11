@@ -9,10 +9,10 @@ The core concept is the data-oriented design for flexibility and adaptability. T
 For example, here is how to add gui component:
 
 ```c++
-  asim::Gui gui = asim::create_gui(window, "gui");
+  aphys::Gui gui = aphys::create_gui(window, "gui");
 
-  asim::Vec3f diffuse_color(0.0f, 211.f / 255.f, 239.f / 255.f);
-  asim::add_gui_func(gui, [&diffuse_color]() {
+  aphys::Vec3f diffuse_color(0.0f, 211.f / 255.f, 239.f / 255.f);
+  aphys::add_gui_func(gui, [&diffuse_color]() {
     ImGui::Text("Diffuse Color:");
     ImGui::ColorEdit3("#c1", diffuse_color.data());
   });
@@ -22,22 +22,22 @@ Defining callback functions in GLFW is always annoying. With function based pipe
 
 ```c++
   // Create a singleton input handler 
-  asim::InputHandler& handler = asim::create_input_handler(window);
+  aphys::InputHandler& handler = aphys::create_input_handler(window);
 
   // Add mouse move input callback function
-  asim::add_mouse_move_func(handler, [&](asim::InputHandler& input_handler) {
+  aphys::add_mouse_move_func(handler, [&](aphys::InputHandler& input_handler) {
     std::cout << "mouse moving to " << handler.xpos << handler.ypos;
   });
 
   // Add mouse button input callback function 
-  asim::add_mouse_input_func(handler, [](asim::InputHandler& input_handler,
+  aphys::add_mouse_input_func(handler, [](aphys::InputHandler& input_handler,
                                           int button, int action) {
     std::cout << "mouse button event: " << button << " " << action << std::endl;
   });
 
   // Add keyboard input callback function
-  asim::add_key_input_func(
-      handler, [](asim::InputHandler& input_handler, int key, int action) {
+  aphys::add_key_input_func(
+      handler, [](aphys::InputHandler& input_handler, int key, int action) {
         std::cout << "key event: " << key << " " << action << std::endl;
       });
 ```
@@ -45,24 +45,24 @@ Defining callback functions in GLFW is always annoying. With function based pipe
 This is how to add points and lines data into render pipeline:
 
 ```c++
-  asim::Matx2f v_p; // vertex position
+  aphys::Matx2f v_p; // vertex position
   v_p.resize(2, 2);
   v_p << 1.0f, 1.0f,  //
       1.0f, 0.5f;     //
-  asim::Matx3f v_color; // per-vertex color
+  aphys::Matx3f v_color; // per-vertex color
   v_color.resize(2, 3);
   v_color << 0.0f, 0.0f, 0.0f,  //
       1.0f, 0.2f, 0.0f;         //
 
-  asim::Points points = asim::create_points(); // create points object
-  asim::set_points_data(points, v_p, v_color);
+  aphys::Points points = aphys::create_points(); // create points object
+  aphys::set_points_data(points, v_p, v_color);
   // add points to render pipeline
-  asim::add_render_func(scene, asim::get_render_func(points)); 
+  aphys::add_render_func(scene, aphys::get_render_func(points)); 
   
-  asim::Lines lines = asim::create_lines(); // create lines object
-  asim::set_lines_data(lines, v_p, v_color);
+  aphys::Lines lines = aphys::create_lines(); // create lines object
+  aphys::set_lines_data(lines, v_p, v_color);
   // add lines to render pipeline
-  asim::add_render_func(scene, asim::get_render_func(lines));
+  aphys::add_render_func(scene, aphys::get_render_func(lines));
 ```
 
 Rendering new objects can be easily added as render functions.

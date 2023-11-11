@@ -1,16 +1,12 @@
-// gl_mathplot2d.h --- ArmorerGL 2D Math Plotting Library
-//
-
-#ifndef GL_MATHPLOT2D_H
-#define GL_MATHPLOT2D_H
+#include "ArmorerPhys/render/mathplot2d.h"
 
 #include <Eigen/Geometry>
 #include <vector>
 
-#include "ArmorerSim/type.h"
-#include "ArmorerSim/render/objs.h"
+#include "ArmorerPhys/type.h"
+#include "ArmorerPhys/render/objs.h"
 
-namespace asim {
+namespace aphys {
 
 Lines create_ruler2d(float x1, float y1, float x2, float y2, RGB color) {
   Lines lines = create_lines();
@@ -70,6 +66,4 @@ Lines create_grid_axis2d(float x_min, float x_max, float y_min, float y_max,
   return lines;
 }
 
-}  // namespace asim
-
-#endif  // GL_MATHPLOT2D_H
+}  // namespace aphys

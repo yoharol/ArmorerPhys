@@ -3,48 +3,48 @@
 #include <Eigen/Core>
 #include <iostream>
 
-#include "ArmorerSim/RenderCore.h"
+#include "ArmorerPhys/RenderCore.h"
 
 const unsigned int SCR_WIDTH = 800;
 const unsigned int SCR_HEIGHT = 400;
 
 int main() {
   GLFWwindow* window =
-      asim::create_window(SCR_WIDTH, SCR_HEIGHT, "Example9: 2D Math Plot");
+      aphys::create_window(SCR_WIDTH, SCR_HEIGHT, "Example9: 2D Math Plot");
 
-  asim::Scene scene =
-      asim::create_scene(asim::default_light, asim::default_camera);
-  asim::set_2d_camera(scene.camera, -2.0f, 2.0f, -1.0f, 1.0f);
+  aphys::Scene scene =
+      aphys::create_scene(aphys::default_light, aphys::default_camera);
+  aphys::set_2d_camera(scene.camera, -2.0f, 2.0f, -1.0f, 1.0f);
 
-  asim::Matx2f v_p(2, 2);
+  aphys::Matx2f v_p(2, 2);
   v_p << 0.0f, 0.0f,  //
       1.0f, 1.0f;     //
 
-  asim::Points points = asim::create_points();
+  aphys::Points points = aphys::create_points();
   points.point_size = 10.0f;
-  asim::Lines ruler =
-      asim::create_ruler2d(-2.0f, -2.0f, 2.0f, 2.0f, asim::RGB(200, 34, 0));
+  aphys::Lines ruler =
+      aphys::create_ruler2d(-2.0f, -2.0f, 2.0f, 2.0f, aphys::RGB(200, 34, 0));
   ruler.width = 1.5f;
-  asim::Lines grids = asim::create_grid_axis2d(-2.0f, 2.0f, -1.0f, 1.0f, 20, 10,
-                                               asim::RGB(0, 67, 198));
+  aphys::Lines grids = aphys::create_grid_axis2d(-2.0f, 2.0f, -1.0f, 1.0f, 20,
+                                                 10, aphys::RGB(0, 67, 198));
   grids.alpha = 0.5f;
-  asim::Lines axis =
-      asim::create_axis2d(-2.0f, 2.0f, -1.0f, 1.0f, asim::RGB(0, 21, 98));
+  aphys::Lines axis =
+      aphys::create_axis2d(-2.0f, 2.0f, -1.0f, 1.0f, aphys::RGB(0, 21, 98));
   axis.width = 2.f;
 
-  asim::add_render_func(scene, asim::get_render_func(points));
-  asim::add_render_func(scene, asim::get_render_func(ruler));
-  asim::add_render_func(scene, asim::get_render_func(axis));
-  asim::add_render_func(scene, asim::get_render_func(grids));
+  aphys::add_render_func(scene, aphys::get_render_func(points));
+  aphys::add_render_func(scene, aphys::get_render_func(ruler));
+  aphys::add_render_func(scene, aphys::get_render_func(axis));
+  aphys::add_render_func(scene, aphys::get_render_func(grids));
 
-  asim::InputHandler& handler = asim::create_input_handler(window);
-  asim::add_mouse_move_func(handler, [&](asim::InputHandler& input_handler) {
+  aphys::InputHandler& handler = aphys::create_input_handler(window);
+  aphys::add_mouse_move_func(handler, [&](aphys::InputHandler& input_handler) {
     if (input_handler.left_pressing) {
       float xpos, ypos;
       xpos = handler.xpos;
       ypos = handler.ypos;
-      asim::camera2d_screen_to_world(scene.camera, xpos, ypos);
-      asim::Vec2f p(xpos, ypos);
+      aphys::camera2d_screen_to_world(scene.camera, xpos, ypos);
+      aphys::Vec2f p(xpos, ypos);
       if ((v_p.row(0) - p.transpose()).norm() <
           (v_p.row(1) - p.transpose()).norm()) {
         v_p.row(0) = p;
@@ -60,11 +60,11 @@ int main() {
     glEnable(GL_DEPTH_TEST);
     glfwPollEvents();
 
-    asim::set_points_data(points, v_p, asim::MatxXf());
-    asim::set_ruler2d_data(ruler, v_p.row(0), v_p.row(1), 4.f);
+    aphys::set_points_data(points, v_p, aphys::MatxXf());
+    aphys::set_ruler2d_data(ruler, v_p.row(0), v_p.row(1), 4.f);
 
-    asim::set_background_RGB({244, 244, 244});
-    asim::render_scene(scene);
+    aphys::set_background_RGB({244, 244, 244});
+    aphys::render_scene(scene);
 
     glfwSwapBuffers(window);
   }

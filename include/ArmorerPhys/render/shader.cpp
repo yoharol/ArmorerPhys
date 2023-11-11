@@ -1,21 +1,9 @@
-#ifndef GL_SHADER_H_
-#define GL_SHADER_H_
+#include "ArmorerPhys/render/shader.h"
 
-#include "ArmorerSim/type.h"
-#include "ArmorerSim/render/buffer.h"
+#include "ArmorerPhys/type.h"
+#include "ArmorerPhys/render/buffer.h"
 
-namespace asim {
-
-struct ShaderSource {
-  const char* vertex;
-  const char* fragment;
-};
-
-struct ShaderSourceWithGeometry {
-  const char* vertex;
-  const char* fragment;
-  const char* geometry;
-};
+namespace aphys {
 
 namespace source {
 
@@ -306,24 +294,10 @@ const ShaderSource textured_diffuse_shader = {
 
 }  // namespace source
 
-struct DiffuseMaterial {
-  RGB diffuse_color;
-  RGB specular_color;
-  float specular_strength;
-};
-
-struct Light {
-  RGB light_color;
-  RGB ambient_color;
-  Vec3f position;
-};
-
 const Light default_light = {
     {242, 242, 242},     // light color
     {9, 5, 88},          // ambient color
     {0.0f, 0.35f, 5.0f}  // light position
 };
 
-}  // namespace asim
-
-#endif  // GL_SHADER_H_
+}  // namespace aphys

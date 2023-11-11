@@ -6,89 +6,90 @@
 
 #include <igl/readOBJ.h>
 
-#include "ArmorerSim/RenderCore.h"
+#include "ArmorerPhys/RenderCore.h"
 
 // settings
 const unsigned int SCR_WIDTH = 800;
 const unsigned int SCR_HEIGHT = 600;
 
 int main() {
-  asim::init_glfw();
+  aphys::init_glfw();
   GLFWwindow *window =
-      asim::create_window(SCR_WIDTH, SCR_HEIGHT, "Example2: Load Model");
-  asim::init_glad();
+      aphys::create_window(SCR_WIDTH, SCR_HEIGHT, "Example2: Load Model");
+  aphys::init_glad();
 
   // build and compile our shader program
 
-  asim::Shader vertex_shader =
-      asim::create_shader(asim::source::basic_shader.vertex, GL_VERTEX_SHADER);
-  asim::Shader fragment_shader = asim::create_shader(
-      asim::source::basic_shader.fragment, GL_FRAGMENT_SHADER);
+  aphys::Shader vertex_shader = aphys::create_shader(
+      aphys::source::basic_shader.vertex, GL_VERTEX_SHADER);
+  aphys::Shader fragment_shader = aphys::create_shader(
+      aphys::source::basic_shader.fragment, GL_FRAGMENT_SHADER);
 
-  asim::Program program = asim::create_program(vertex_shader, fragment_shader);
+  aphys::Program program =
+      aphys::create_program(vertex_shader, fragment_shader);
 
   // link shaders
-  asim::delete_shader(vertex_shader);
-  asim::delete_shader(fragment_shader);
+  aphys::delete_shader(vertex_shader);
+  aphys::delete_shader(fragment_shader);
 
-  asim::MatxXf V;
-  asim::MatxXi F;
+  aphys::MatxXf V;
+  aphys::MatxXi F;
 
   igl::readOBJ(std::string(ASSETS_PATH) + "/spot.obj", V, F);
 
   int n_vertices = V.rows();
   int n_faces = F.rows();
 
-  asim::VAO vao = asim::create_vao();
-  asim::bind_vao(vao);
+  aphys::VAO vao = aphys::create_vao();
+  aphys::bind_vao(vao);
 
-  asim::EBO index_buffer = asim::create_ebo();
-  asim::bind_ebo(index_buffer);
-  asim::set_ebo_static_data(F.data(), F.size() * sizeof(int));
+  aphys::EBO index_buffer = aphys::create_ebo();
+  aphys::bind_ebo(index_buffer);
+  aphys::set_ebo_static_data(F.data(), F.size() * sizeof(int));
 
-  asim::VBO vertex_buffer = asim::create_vbo();
-  asim::bind_vbo(vertex_buffer);
-  asim::set_vbo_static_data(V.data(), V.size() * sizeof(float));
+  aphys::VBO vertex_buffer = aphys::create_vbo();
+  aphys::bind_vbo(vertex_buffer);
+  aphys::set_vbo_static_data(V.data(), V.size() * sizeof(float));
 
   glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void *)0);
   glEnableVertexAttribArray(0);
-  asim::unbind_vbo();
+  aphys::unbind_vbo();
 
-  asim::unbind_vao();
+  aphys::unbind_vao();
 
-  // asim::set_wireframe_mode(true);
-  asim::set_wireframe_mode(false);
+  // aphys::set_wireframe_mode(true);
+  aphys::set_wireframe_mode(false);
 
-  asim::Camera camera = asim::create_camera(
+  aphys::Camera camera = aphys::create_camera(
       {0.0f, 0.0f, 3.0f}, {0.0f, 0.35f, 0.0f}, {0.0f, 1.0f, 0.0f},
       float(SCR_WIDTH) / float(SCR_HEIGHT));
   // std::cout << camera.projection << std::endl;
 
-  asim::use_program(program);
-  asim::set_uniform_mat4(program, "projection", camera.projection);
-  asim::unuse_program();
+  aphys::use_program(program);
+  aphys::set_uniform_mat4(program, "projection", camera.projection);
+  aphys::unuse_program();
 
   float prev_time = glfwGetTime();
 
   while (!glfwWindowShouldClose(window)) {
-    asim::set_background_RGB(asim::RGB(30, 50, 50));
+    aphys::set_background_RGB(aphys::RGB(30, 50, 50));
 
-    asim::use_program(program);
-    asim::bind_vao(vao);
+    aphys::use_program(program);
+    aphys::bind_vao(vao);
 
     float curr_time = glfwGetTime();
-    asim::orbit_camera_control(window, camera, 10.0, curr_time - prev_time);
+    aphys::orbit_camera_control(window, camera, 10.0, curr_time - prev_time);
     prev_time = curr_time;
-    asim::set_uniform_mat4(program, "projection", camera.projection);
+    aphys::set_uniform_mat4(program, "projection", camera.projection);
 
     // glDrawArrays(GL_TRIANGLES, 0, 3);
     // glPointSize(15.0f);
     // glDrawArrays(GL_POINTS, 0, n_vertices);
     glDrawElements(GL_TRIANGLES, n_faces * 3, GL_UNSIGNED_INT, 0);
 
-    asim::unbind_texture();
-    asim::unbind_vao();
-    asim::unuse_program();
+    aphys::unbind_texture();
+    aphys::unbind_vao();
+    aphys::unuse_program();
 
     glfwSwapBuffers(window);
     glfwPollEvents();
@@ -96,10 +97,10 @@ int main() {
 
   // optional: de-allocate all resources once they've outlived their purpose:
   // ------------------------------------------------------------------------
-  asim::delete_vao(vao);
-  asim::delete_vbo(vertex_buffer);
-  asim::delete_ebo(index_buffer);
-  asim::delete_program(program);
+  aphys::delete_vao(vao);
+  aphys::delete_vbo(vertex_buffer);
+  aphys::delete_ebo(index_buffer);
+  aphys::delete_program(program);
 
   // glfw: terminate, clearing all previously allocated GLFW resources.
   // ------------------------------------------------------------------

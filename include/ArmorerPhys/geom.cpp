@@ -1,13 +1,10 @@
-#ifndef GL_GEOM_H_
-#define GL_GEOM_H_
-
 #include <cassert>
 #include <Eigen/Core>
 #include <Eigen/Geometry>
 
-#include "type.h"
+#include "ArmorerPhys/geom.h"
 
-namespace asim {
+namespace aphys {
 
 MatxXf get_normals(const MatxXf &vertices, const MatxXi &indices) {
   assert(indices.cols() == 3);
@@ -31,6 +28,4 @@ MatxXf get_normals(const MatxXf &vertices, const MatxXi &indices) {
   return normals;
 }
 
-}  // namespace asim
-
-#endif  // GL_GEOM_H_
+}  // namespace aphys

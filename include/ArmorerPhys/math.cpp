@@ -1,12 +1,11 @@
-#ifndef GL_MATH_H_
-#define GL_MATH_H_
-
 #include <algorithm>
 #include <Eigen/Core>
 #include <vector>
 #include <cassert>
 
-namespace asim {
+#include "ArmorerPhys/math.h"
+
+namespace aphys {
 
 Vec3f heat_rgb(float value, float minv, float maxv) {
   float ratio = 2 * (value - minv) / (maxv - minv);
@@ -53,6 +52,4 @@ void Mat2fToList3f(const Matx2f& mat, Listx3f& vec) {
   }
 }
 
-};  // namespace asim
-
-#endif  // GL_MATH_H_
+};  // namespace aphys

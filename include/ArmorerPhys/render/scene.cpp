@@ -1,29 +1,14 @@
-#ifndef GL_WARP_H_
-#define GL_WARP_H_
+#include "ArmorerPhys/render/scene.h"
 
 #include <functional>
 
-#include "ArmorerSim/type.h"
-#include "ArmorerSim/render/buffer.h"
-#include "ArmorerSim/render/shader.h"
-#include "ArmorerSim/render/camera.h"
-#include "ArmorerSim/geom.h"
+#include "ArmorerPhys/type.h"
+#include "ArmorerPhys/render/buffer.h"
+#include "ArmorerPhys/render/shader.h"
+#include "ArmorerPhys/render/camera.h"
+#include "ArmorerPhys/geom.h"
 
-namespace asim {
-
-struct Scene;
-struct InputHandler;
-typedef std::function<void(Scene)> RenderFunc;
-typedef std::function<void(InputHandler&, int, int)> MouseInputFunc;
-typedef std::function<void(InputHandler&)> MouseMoveFunc;
-typedef std::function<void(InputHandler&, int, int)> KeyInputFunc;
-
-struct Scene {
-  Light light;
-  Camera camera;
-  std::vector<RenderFunc> render_funcs;
-  std::vector<bool> depth_test;
-};
+namespace aphys {
 
 Scene create_scene(Light light, Camera camera) {
   Scene scene;
@@ -34,7 +19,7 @@ Scene create_scene(Light light, Camera camera) {
   return scene;
 }
 
-void add_render_func(Scene& scene, RenderFunc func, bool depth_test = true) {
+void add_render_func(Scene& scene, RenderFunc func, bool depth_test) {
   scene.render_funcs.push_back(func);
   scene.depth_test.push_back(depth_test);
 }
@@ -49,25 +34,6 @@ void render_scene(Scene scene) {
     scene.render_funcs[i](scene);
   }
 }
-
-struct InputHandler {
-  static InputHandler& getInstance() {
-    static InputHandler instance;
-    return instance;
-  }
-  InputHandler(InputHandler const&) = delete;
-  InputHandler(InputHandler&&) = delete;
-
-  std::vector<MouseMoveFunc> mouse_move_funcs;
-  std::vector<MouseInputFunc> mouse_input_funcs;
-  std::vector<KeyInputFunc> key_input_funcs;
-  float xpos = 0.0f;
-  float ypos = 0.0f;
-  bool left_pressing = false;
-
- private:
-  InputHandler() {}
-};
 
 InputHandler& create_input_handler(GLFWwindow* window) {
   InputHandler& handler = InputHandler::getInstance();
@@ -117,6 +83,4 @@ void add_key_input_func(InputHandler& handler, KeyInputFunc func) {
   handler.key_input_funcs.push_back(func);
 }
 
-}  // namespace asim
-
-#endif  // GL_WARP_H_
+}  // namespace aphys

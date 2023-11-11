@@ -1,18 +1,9 @@
-#ifndef GL_IMAGE_H_
-#define GL_IMAGE_H_
+#include "ArmorerPhys/image.h"
 
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
-#include <iostream>
 
-namespace asim {
-
-struct Image {
-  unsigned char* data;
-  int width;
-  int height;
-  int nrChannels;
-};
+namespace aphys {
 
 Image load_image(const std::string path) {
   Image image;
@@ -28,6 +19,4 @@ Image load_image(const std::string path) {
 
 void free_image(Image image) { stbi_image_free(image.data); }
 
-}  // namespace asim
-
-#endif  // GL_IMAGE_H_
+}  // namespace aphys

@@ -8,7 +8,7 @@
 #include "pxr/usd/sdf/layer.h"
 #include "pxr/usd/sdf/reference.h"
 
-namespace asim {
+namespace aphys {
 
 struct Stage {
   std::string path;
@@ -46,6 +46,6 @@ std::string get_stage_usda(Stage& stage) {
   return usda;
 }
 
-}  // namespace asim
+}  // namespace aphys
 
 #endif  // ARMORER_USD_STAGE_H

@@ -1,29 +1,19 @@
-#ifndef GL_OBJS_H_
-#define GL_OBJS_H_
+#include "ArmorerPhys/render/objs.h"
 
 #include <cassert>
 #include <Eigen/Core>
 #include <Eigen/Geometry>
 #include <vector>
 
-#include "ArmorerSim/type.h"
-#include "ArmorerSim/render/buffer.h"
-#include "ArmorerSim/render/shader.h"
-#include "ArmorerSim/render/draw.h"
-#include "ArmorerSim/render/scene.h"
+#include "ArmorerPhys/type.h"
+#include "ArmorerPhys/geom.h"
+#include "ArmorerPhys/render/buffer.h"
+#include "ArmorerPhys/render/shader.h"
+#include "ArmorerPhys/render/draw.h"
+#include "ArmorerPhys/render/scene.h"
+#include "ArmorerPhys/render/window.h"
 
-namespace asim {
-
-struct TexturedMesh {
-  VAO vertex_array;
-  VBO vertex_buffer;
-  VBO uv_buffer;
-  EBO index_buffer;
-  Texture texture;
-  int n_faces;
-  int n_vertices;
-  Program program;
-};
+namespace aphys {
 
 TexturedMesh create_textured_mesh(const Eigen::MatrixXf &vertices,
                                   const Eigen::MatrixXf &texCoords,
@@ -77,17 +67,6 @@ TexturedMesh create_textured_mesh(const Eigen::MatrixXf &vertices,
   return mesh;
 }
 
-struct DiffuseMesh {
-  VAO vertex_array;
-  VBO vertex_buffer;
-  VBO normal_buffer;
-  EBO index_buffer;
-  Program program;
-  DiffuseMaterial material;
-  int n_vertices;
-  int n_faces;
-};
-
 DiffuseMesh create_diffuse_mesh(DiffuseMaterial &material) {
   DiffuseMesh mesh;
   mesh.vertex_array = create_vao();
@@ -121,7 +100,7 @@ void set_mesh_data(DiffuseMesh &mesh, MatxXf &V, MatxXi &F) {
   unbind_vbo();
 
   bind_vbo(mesh.normal_buffer);
-  MatxXf normals = asim::get_normals(V, F);
+  MatxXf normals = aphys::get_normals(V, F);
   set_vbo_dynamic_data(normals.data(), normals.size() * sizeof(float));
   glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void *)0);
   glEnableVertexAttribArray(1);
@@ -162,17 +141,6 @@ void delete_mesh(DiffuseMesh &mesh) {
   delete_vbo(mesh.normal_buffer);
   delete_ebo(mesh.index_buffer);
 }
-
-struct Points {
-  int n_points;
-  VAO vertex_array;
-  VBO vertex_buffer;
-  VBO color_buffer;
-  Program program;
-  RGB color;
-  bool uniform_color;
-  float point_size;
-};
 
 Points create_points() {
   glEnable(GL_PROGRAM_POINT_SIZE);
@@ -247,19 +215,6 @@ RenderFunc get_render_func(Points &points) {
   };
   return render_func;
 }
-
-struct Lines {
-  int n_points;
-  VAO vertex_array;
-  VBO vertex_buffer;
-  VBO color_buffer;
-  Program program;
-  RGB color;
-  float alpha;
-  bool uniform_color;
-  float width;
-  GLenum mode;
-};
 
 Lines create_lines() {
   return Lines{
@@ -336,6 +291,4 @@ RenderFunc get_render_func(Lines &lines) {
   return render_func;
 }
 
-}  // namespace asim
-
-#endif  // GL_OBJS_H_
+}  // namespace aphys

@@ -4,6 +4,6 @@
 #include <string>
 #include <vector>
 
-namespace asim {}  // namespace asim
+namespace aphys {}  // namespace aphys
 
 #endif  // GL_OS_H_

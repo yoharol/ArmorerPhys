@@ -6,7 +6,7 @@
 #include <pxr/base/vt/array.h>
 #include <pxr/base/gf/vec3f.h>
 
-namespace asim {
+namespace aphys {
 
 /*
  * Generate a VtArray from Eigen::VectorXf array
@@ -63,6 +63,6 @@ void ReadVtMat3Xf(pxr::VtArray<pxr::GfVec3f>& vt_arr,
   }
 }
 
-}  // namespace asim
+}  // namespace aphys
 
 #endif  // ARMORER_USD_TYPES_H

@@ -9,7 +9,7 @@
 
 #include "ArmorerGL/armgl_objs.h"
 
-namespace asim {
+namespace aphys {
 
 struct Mesh {
   std::string primPath;
@@ -31,6 +31,6 @@ void set_mesh_data(Mesh& mesh, const Eigen::MatrixX3f& positions,
   mesh.geom.GetFaceVertexIndicesAttr().Set(VtVecXFlatten<int>(faces));
 }
 
-}  // namespace asim
+}  // namespace aphys
 
 #endif  // ARMORER_USD_MESH_H

@@ -1,15 +1,36 @@
 #ifndef BUFFER_DATA_H_
 #define BUFFER_DATA_H_
 
+#include "ArmorerPhys/image.h"
+
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
-#include <Eigen/Core>
 
-#include "ArmorerSim/image.h"
+#include "ArmorerPhys/type.h"
 
-namespace asim {
+namespace aphys {
 
 struct VAO {
+  unsigned int id;
+};
+
+struct VBO {
+  unsigned int id;
+};
+
+struct EBO {
+  unsigned int id;
+};
+
+struct Shader {
+  unsigned int id;
+};
+
+struct Program {
+  unsigned int id;
+};
+
+struct Texture {
   unsigned int id;
 };
 
@@ -24,10 +45,6 @@ inline void bind_vao(VAO vao) { glBindVertexArray(vao.id); }
 inline void unbind_vao() { glBindVertexArray(0); }
 
 inline void delete_vao(VAO vao) { glDeleteVertexArrays(1, &vao.id); }
-
-struct VBO {
-  unsigned int id;
-};
 
 inline VBO create_vbo() {
   VBO vbo;
@@ -51,10 +68,6 @@ inline void set_vbo_dynamic_data(T* vertices, size_t size) {
   glBufferData(GL_ARRAY_BUFFER, size, vertices, GL_DYNAMIC_DRAW);
 }
 
-struct EBO {
-  unsigned int id;
-};
-
 inline EBO create_ebo() {
   EBO ebo;
   glGenBuffers(1, &ebo.id);
@@ -77,70 +90,14 @@ inline void set_ebo_dynamic_data(T* indices, size_t size) {
   glBufferData(GL_ELEMENT_ARRAY_BUFFER, size, indices, GL_DYNAMIC_DRAW);
 }
 
-struct Shader {
-  unsigned int id;
-};
-
-Shader create_shader(const char* shader_source, GLenum shader_type) {
-  Shader shader;
-  shader.id = glCreateShader(shader_type);
-  glShaderSource(shader.id, 1, &shader_source, NULL);
-  glCompileShader(shader.id);
-  // check for shader compile errors
-  int success;
-  char infoLog[512];
-  glGetShaderiv(shader.id, GL_COMPILE_STATUS, &success);
-  if (!success) {
-    glGetShaderInfoLog(shader.id, 512, NULL, infoLog);
-    std::cout << "ERROR::SHADER::VERTEX::COMPILATION_FAILED\n"
-              << infoLog << std::endl;
-  }
-  return shader;
-}
+Shader create_shader(const char* shader_source, GLenum shader_type);
 
 inline void delete_shader(Shader shader) { glDeleteShader(shader.id); }
 
-struct Program {
-  unsigned int id;
-};
-
-Program create_program(Shader vertex_shader, Shader fragment_shader) {
-  Program program;
-  program.id = glCreateProgram();
-  glAttachShader(program.id, vertex_shader.id);
-  glAttachShader(program.id, fragment_shader.id);
-  glLinkProgram(program.id);
-  // check for linking errors
-  int success;
-  char infoLog[512];
-  glGetProgramiv(program.id, GL_LINK_STATUS, &success);
-  if (!success) {
-    glGetProgramInfoLog(program.id, 512, NULL, infoLog);
-    std::cout << "ERROR::SHADER::PROGRAM::LINKING_FAILED\n"
-              << infoLog << std::endl;
-  }
-  return program;
-}
+Program create_program(Shader vertex_shader, Shader fragment_shader);
 
 Program create_program(Shader vertex_shader, Shader fragment_shader,
-                       Shader geometry_shader) {
-  Program program;
-  program.id = glCreateProgram();
-  glAttachShader(program.id, vertex_shader.id);
-  glAttachShader(program.id, fragment_shader.id);
-  glAttachShader(program.id, geometry_shader.id);
-  glLinkProgram(program.id);
-  // check for linking errors
-  int success;
-  char infoLog[512];
-  glGetProgramiv(program.id, GL_LINK_STATUS, &success);
-  if (!success) {
-    glGetProgramInfoLog(program.id, 512, NULL, infoLog);
-    std::cout << "ERROR::SHADER::PROGRAM::LINKING_FAILED\n"
-              << infoLog << std::endl;
-  }
-  return program;
-}
+                       Shader geometry_shader);
 
 inline void use_program(Program program) { glUseProgram(program.id); }
 
@@ -191,10 +148,6 @@ inline void set_uniform_mat4(Program program, const char* name, Mat4f value) {
                      value.data());
 }
 
-struct Texture {
-  unsigned int id;
-};
-
 inline Texture create_texture() {
   Texture texture;
   glGenTextures(1, &texture.id);
@@ -233,6 +186,6 @@ inline void delete_texture(Texture texture) {
   glDeleteTextures(1, &texture.id);
 }
 
-}  // namespace asim
+}  // namespace aphys
 
 #endif  // BUFFER_DATA_H_

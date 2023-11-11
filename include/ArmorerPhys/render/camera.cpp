@@ -1,5 +1,4 @@
-#ifndef GL_CAMERA_H_
-#define GL_CAMERA_H_
+#include "ArmorerPhys/render/camera.h"
 
 #include <Eigen/Core>
 #include <Eigen/Geometry>
@@ -7,30 +6,9 @@
 #include <GLFW/glfw3.h>
 #include <cassert>
 
-#include "ArmorerSim/type.h"
+namespace aphys {
 
-namespace asim {
-
-enum CameraType {
-  Perspective,
-  View2d,
-};
-
-struct Camera {
-  Vec3f position;
-  Vec3f lookat;
-  Vec3f up;
-  Mat4f projection;
-  CameraType type;
-  float aspect;
-  float near;
-  float far;
-  float fov;
-};
-
-inline void update_camera(Camera& camera);
-
-inline Camera create_camera(Vec3f pos, Vec3f lookat, Vec3f up, float aspect) {
+Camera create_camera(Vec3f pos, Vec3f lookat, Vec3f up, float aspect) {
   Camera camera;
   camera.position = pos;
   camera.lookat = lookat;
@@ -45,8 +23,8 @@ inline Camera create_camera(Vec3f pos, Vec3f lookat, Vec3f up, float aspect) {
   return camera;
 }
 
-inline void set_2d_camera(Camera& camera, float left, float right, float bottom,
-                          float top) {
+void set_2d_camera(Camera& camera, float left, float right, float bottom,
+                   float top) {
   float l = left;
   float r = right;
   float b = bottom;
@@ -62,7 +40,7 @@ inline void set_2d_camera(Camera& camera, float left, float right, float bottom,
   camera.type = CameraType::View2d;
 }
 
-inline void camera2d_screen_to_world(Camera& camera, float& x, float& y) {
+void camera2d_screen_to_world(Camera& camera, float& x, float& y) {
   Mat4f projection = camera.projection;
   float r = (1.f - projection(0, 3)) / projection(0, 0);
   float l = (-1.f - projection(0, 3)) / projection(0, 0);
@@ -72,7 +50,7 @@ inline void camera2d_screen_to_world(Camera& camera, float& x, float& y) {
   y = b + (t - b) * y;
 }
 
-inline void update_camera(Camera& camera) {
+void update_camera(Camera& camera) {
   float yscale = tan(camera.fov / 2.0f) * camera.near * 2.0;
   float xscale = yscale * camera.aspect;
 
@@ -103,8 +81,8 @@ inline void update_camera(Camera& camera) {
   camera.projection = orthographic * perspective * to_camera_space;
 }
 
-inline void set_camera(Camera& camera, Vec3f position, Vec3f lookat, Vec3f up,
-                       CameraType type = CameraType::Perspective) {
+void set_camera(Camera& camera, Vec3f position, Vec3f lookat, Vec3f up,
+                CameraType type) {
   camera.position = position;
   camera.lookat = lookat;
   camera.up = up;
@@ -112,9 +90,8 @@ inline void set_camera(Camera& camera, Vec3f position, Vec3f lookat, Vec3f up,
   update_camera(camera);
 }
 
-inline void orbit_camera_control(GLFWwindow* window, Camera& camera,
-                                 float speed = 1.0f,
-                                 float delta_time = 1.0f / 60.0f) {
+void orbit_camera_control(GLFWwindow* window, Camera& camera, float speed,
+                          float delta_time) {
   Vec3f lookat(camera.lookat);
   Vec3f pos(camera.position);
   Vec3f up(camera.up);
@@ -164,14 +141,7 @@ inline void orbit_camera_control(GLFWwindow* window, Camera& camera,
   update_camera(camera);
 }
 
-inline void set_camera_aspect(Camera& camera, float aspect) {
-  camera.aspect = aspect;
-  update_camera(camera);
-}
-
 const Camera default_camera = create_camera(
     {0.0f, 0.0f, 3.0f}, {0.0f, 0.0f, 0.0f}, {0.0f, 1.0f, 0.0}, 1.0f);
 
-}  // namespace asim
-
-#endif  // GL_CAMERA_H_
+}  // namespace aphys

@@ -1,28 +1,12 @@
-#ifndef GL_WINDOW_H_
-#define GL_WINDOW_H_
+#include "ArmorerPhys/render/window.h"
 
+#include <iostream>
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
-namespace asim {
+#include "ArmorerPhys/type.h"
 
-struct Window {
-  static Window& get_instance() {
-    static Window instance;
-    return instance;
-  }
-  GLFWwindow* get_window() { return window; }
-  void set_window(GLFWwindow* window) { this->window = window; }
-  int width;
-  int height;
-  Window(Window const&) = delete;
-  void operator=(Window const&) = delete;
-
- private:
-  GLFWwindow* window;
-
-  Window() : window(nullptr), width(0), height(0) {}
-};
+namespace aphys {
 
 void GLFW_error(int error, const char* description) {
   fputs(description, stderr);
@@ -87,6 +71,4 @@ void set_background_RGB(RGB color) {
   glClearColor(color(0) / 255.0f, color(1) / 255.0f, color(2) / 255.0f, 1.0f);
 }
 
-}  // namespace asim
-
-#endif  // GL_WINDOW_H_
+}  // namespace aphys
