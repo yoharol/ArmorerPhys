@@ -291,4 +291,83 @@ RenderFunc get_render_func(Lines &lines) {
   return render_func;
 }
 
+Edges create_edges() {
+  return Edges{
+      0,
+      create_vao(),    //
+      create_vbo(),    //
+      create_ebo(),    //
+      create_vbo(),    //
+      create_program(  //
+          create_shader(source::line_shader.vertex, GL_VERTEX_SHADER),
+          create_shader(source::line_shader.fragment, GL_FRAGMENT_SHADER),
+          create_shader(source::line_shader.geometry, GL_GEOMETRY_SHADER)),
+      RGB(255, 0, 0),  //
+      1.0f,
+      true,
+      1.0f,
+      GL_LINES};
+}
+
+void set_edges_data(Edges &edges, const MatxXf &points_data,
+                    const Matx2i &indices, const MatxXf &per_line_color) {
+  edges.n_edges = indices.rows();
+
+  use_program(edges.program);
+
+  bind_vao(edges.vertex_array);
+  bind_vbo(edges.vertex_buffer);
+  if (points_data.cols() == 2) {
+    MatxXf points_data_3d(points_data.rows(), 3);
+    points_data_3d << points_data, MatxXf::Zero(points_data.rows(), 1);
+    set_vbo_dynamic_data(points_data_3d.data(),
+                         points_data_3d.size() * sizeof(float));
+  } else
+    set_vbo_dynamic_data(points_data.data(),
+                         points_data.size() * sizeof(float));
+  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void *)0);
+  glEnableVertexAttribArray(0);
+  unbind_vbo();
+
+  bind_ebo(edges.index_buffer);
+  set_ebo_static_data(indices.data(), indices.size() * sizeof(int));
+
+  if (per_line_color.rows() > 0) {
+    bind_vbo(edges.color_buffer);
+    set_vbo_dynamic_data(per_line_color.data(),
+                         per_line_color.size() * sizeof(float));
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float),
+                          (void *)0);
+    glEnableVertexAttribArray(1);
+    unbind_vbo();
+    edges.uniform_color = false;
+  } else {
+    edges.uniform_color = true;
+  }
+  unbind_vao();
+  unuse_program();
+}
+
+RenderFunc get_render_func(Edges &edges) {
+  Window &window = Window::get_instance();
+  float asepect_ratio = float(window.width) / float(window.height);
+  RenderFunc render_func = [&edges, asepect_ratio](Scene scene) {
+    use_program(edges.program);
+    set_uniform_mat4(edges.program, "projection", scene.camera.projection);
+    set_uniform_RGB(edges.program, "color", edges.color);
+    set_uniform_float(edges.program, "alpha", edges.alpha);
+    set_uniform_float(edges.program, "lineWidth", edges.width / 200.0f);
+    set_uniform_float(edges.program, "aspectRatio", asepect_ratio);
+    if (edges.uniform_color)
+      set_uniform_float(edges.program, "choice", 1.0f);
+    else
+      set_uniform_float(edges.program, "choice", 0.0f);
+    bind_vao(edges.vertex_array);
+    glDrawElements(edges.mode, edges.n_edges * 2, GL_UNSIGNED_INT, 0);
+    unbind_vao();
+    unuse_program();
+  };
+  return render_func;
+}
+
 }  // namespace aphys

@@ -1,9 +1,32 @@
 #ifndef GL_MATH_H_
 #define GL_MATH_H_
 
+#include <random>
+
 #include "ArmorerPhys/type.h"
 
 namespace aphys {
+
+struct RandomEngine {
+  std::random_device rd;
+  std::mt19937 gen;
+  std::uniform_real_distribution<float> dis;
+
+  float operator()() { return dis(gen); }
+  float operator()(float minv, float maxv) {
+    return dis(gen) * (maxv - minv) + minv;
+  }
+
+  static RandomEngine& getInstance() {
+    static RandomEngine engine;
+    return engine;
+  }
+  RandomEngine(RandomEngine const&) = delete;
+  RandomEngine(RandomEngine&&) = delete;
+
+ private:
+  RandomEngine() : gen(rd()), dis(0.0, 1.0) {}
+};
 
 Vec3f heat_rgb(float value, float minv, float maxv);
 

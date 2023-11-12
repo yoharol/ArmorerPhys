@@ -7,6 +7,8 @@ namespace aphys {
 
 void collision2d(const Box2d& box, Matx2f& pos, float epsilon = 1e-5);
 
+void collision3d(const Box3d& box, Matx3f& pos, float epsilon = 1e-5);
+
 }  // namespace aphys
 
 #endif  // ARMORER_SIM_COLLISION_H_

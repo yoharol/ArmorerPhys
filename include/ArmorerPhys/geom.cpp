@@ -28,4 +28,31 @@ MatxXf get_normals(const MatxXf &vertices, const MatxXi &indices) {
   return normals;
 }
 
+void create_rectangle(float l, float r, int hori_count, float b, float t,
+                      int vert_count, Matx2f &vertices, Matx3i &indices) {
+  assert(hori_count > 0);
+  assert(vert_count > 0);
+  assert(l < r);
+  assert(b < t);
+  vertices.resize((hori_count + 1) * (vert_count + 1), 2);
+  indices.resize(hori_count * vert_count * 2, 3);
+  float dx = (r - l) / hori_count;
+  float dy = (t - b) / vert_count;
+  for (int i = 0; i < hori_count + 1; ++i) {
+    for (int j = 0; j < vert_count + 1; ++j) {
+      vertices.row(i * (vert_count + 1) + j) << l + i * dx, b + j * dy;
+    }
+  }
+  for (int i = 0; i < hori_count; ++i) {
+    for (int j = 0; j < vert_count; ++j) {
+      int idx1 = (i * vert_count + j) * 2;
+      int idx2 = idx1 + 1;
+      indices.row(idx1) << i * (vert_count + 1) + j,
+          (i + 1) * (vert_count + 1) + j, i * (vert_count + 1) + j + 1;
+      indices.row(idx2) << (i + 1) * (vert_count + 1) + j,
+          (i + 1) * (vert_count + 1) + j + 1, i * (vert_count + 1) + j + 1;
+    }
+  }
+}
+
 }  // namespace aphys

@@ -82,6 +82,27 @@ void set_lines_data(Lines &lines, const MatxXf &points_data,
 
 RenderFunc get_render_func(Lines &lines);
 
+struct Edges {
+  int n_edges;
+  VAO vertex_array;
+  VBO vertex_buffer;
+  EBO index_buffer;
+  VBO color_buffer;
+  Program program;
+  RGB color;
+  float alpha;
+  bool uniform_color;
+  float width;
+  GLenum mode;
+};
+
+Edges create_edges();
+
+void set_edges_data(Edges &edges, const MatxXf &points_data,
+                    const Matx2i &indices, const MatxXf &per_line_color);
+
+RenderFunc get_render_func(Edges &edges);
+
 }  // namespace aphys
 
 #endif  // GL_OBJS_H_

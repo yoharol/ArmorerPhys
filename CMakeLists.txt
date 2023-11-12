@@ -47,14 +47,16 @@ set(USD_TARGETS
   )
 
 file(GLOB CORE_SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/include/ArmorerPhys/*.cpp")
-file(GLOB RENDER_SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/include/ArmorerPhys/render/*.cpp")
-file(GLOB USD_SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/include/ArmorerPhys/USD/*.cpp")
+file(GLOB_RECURSE RENDER_SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/include/ArmorerPhys/render/*.cpp")
+file(GLOB_RECURSE SIM_SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/include/ArmorerPhys/sim/*.cpp")
+file(GLOB_RECURSE USD_SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/include/ArmorerPhys/USD/*.cpp")
+
 
 set(LIBRARY_NAME ${PROJECT_NAME})
 add_library(${LIBRARY_NAME} STATIC)
 target_include_directories(${LIBRARY_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
 target_link_libraries(${LIBRARY_NAME} PUBLIC ${GL_TARGETS})
-target_sources(${LIBRARY_NAME} PRIVATE ${CORE_SOURCES} ${RENDER_SOURCES})
+target_sources(${LIBRARY_NAME} PRIVATE ${CORE_SOURCES} ${RENDER_SOURCES} ${SIM_SOURCES})
 if (LINK_USD)
   target_link_libraries(${LIBRARY_NAME} PUBLIC ${USD_TARGETS})
   target_sources(${LIBRARY_NAME} PRIVATE ${USD_SOURCES})
