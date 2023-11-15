@@ -2,6 +2,7 @@
 #define GL_TYPE_H_
 
 #include <Eigen/Core>
+#include <Eigen/SparseCore>
 
 namespace aphys {
 
@@ -26,6 +27,8 @@ using Mat4f = Eigen::Matrix4f;
 using RGB = Eigen::Vector3i;
 using Listx3f = std::vector<Vec3f>;
 using Listx2f = std::vector<Vec2f>;
+using SparseMatf = Eigen::SparseMatrix<float>;
+using Tripletf = Eigen::Triplet<float>;
 
 }  // namespace aphys
 

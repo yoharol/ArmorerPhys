@@ -24,7 +24,7 @@ struct Box3d {
 MatxXf get_normals(const MatxXf &vertices, const MatxXi &indices);
 
 void create_rectangle(float l, float r, int hori_count, float b, float t,
-                      int vert_count, Matx2f &vertices, Matx3i &indices);
+                      int vert_count, MatxXf &vertices, Matx3i &indices);
 
 }  // namespace aphys
 

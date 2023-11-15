@@ -2,6 +2,8 @@
 #define GL_MATH_H_
 
 #include <random>
+#include <stdexcept>
+#include <Eigen/SVD>
 
 #include "ArmorerPhys/type.h"
 
@@ -40,6 +42,13 @@ void List2fToList3f(const Listx2f& vec2, Listx3f& vec3);
 
 void Mat2fToList3f(const Matx2f& mat, Listx3f& vec);
 
-};  // namespace aphys
+float computeArea(const Vecxf& vec1, const Vecxf& vec2);
+
+template <int dim>
+void ssvd(MatxXf& U, Vecxf& S, MatxXf& V);
+
+Vecxf getMassCenter(const MatxXf& verts, Vecxf& vert_mass);
+
+}  // namespace aphys
 
 #endif  // GL_MATH_H_

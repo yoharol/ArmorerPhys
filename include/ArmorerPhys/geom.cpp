@@ -29,7 +29,7 @@ MatxXf get_normals(const MatxXf &vertices, const MatxXi &indices) {
 }
 
 void create_rectangle(float l, float r, int hori_count, float b, float t,
-                      int vert_count, Matx2f &vertices, Matx3i &indices) {
+                      int vert_count, MatxXf &vertices, Matx3i &indices) {
   assert(hori_count > 0);
   assert(vert_count > 0);
   assert(l < r);
@@ -47,10 +47,17 @@ void create_rectangle(float l, float r, int hori_count, float b, float t,
     for (int j = 0; j < vert_count; ++j) {
       int idx1 = (i * vert_count + j) * 2;
       int idx2 = idx1 + 1;
-      indices.row(idx1) << i * (vert_count + 1) + j,
-          (i + 1) * (vert_count + 1) + j, i * (vert_count + 1) + j + 1;
-      indices.row(idx2) << (i + 1) * (vert_count + 1) + j,
-          (i + 1) * (vert_count + 1) + j + 1, i * (vert_count + 1) + j + 1;
+      if ((i + j) % 2 == 0) {
+        indices.row(idx1) << i * (vert_count + 1) + j,
+            (i + 1) * (vert_count + 1) + j, i * (vert_count + 1) + j + 1;
+        indices.row(idx2) << (i + 1) * (vert_count + 1) + j,
+            (i + 1) * (vert_count + 1) + j + 1, i * (vert_count + 1) + j + 1;
+      } else {
+        indices.row(idx1) << i * (vert_count + 1) + j,
+            (i + 1) * (vert_count + 1) + j, (i + 1) * (vert_count + 1) + j + 1;
+        indices.row(idx2) << i * (vert_count + 1) + j,
+            (i + 1) * (vert_count + 1) + j + 1, i * (vert_count + 1) + j + 1;
+      }
     }
   }
 }

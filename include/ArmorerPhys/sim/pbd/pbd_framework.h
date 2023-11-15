@@ -13,7 +13,6 @@ typedef std::function<void()> ConstraintProjectFunc;
 
 struct PbdConstraint {
   virtual void preProject() = 0;
-  virtual ConstraintProjectFunc getProjectFunc() = 0;
   virtual ~PbdConstraint() {}
   ConstraintProjectFunc project_func;
 };
@@ -24,7 +23,7 @@ struct PbdFramework {
 
   void addConstraint(std::shared_ptr<PbdConstraint> constraint) {
     constraints.push_back(constraint);
-    project_funcs.push_back(constraint->getProjectFunc());
+    project_funcs.push_back(constraint->project_func);
   }
 
   void preProjectConstraints() {
@@ -38,12 +37,13 @@ struct PbdFramework {
       constraint->project_func();
     }
   }
+
+  void pbdPredict(MatxXf& pos, MatxXf& vel, MatxXf& pos_cache, Vecxf& vert_invm,
+                  Vecxf& external_force, float dt);
+
+  void pbdUpdateVelocity(MatxXf& pos, MatxXf& vel, MatxXf& pos_cache, float dt,
+                         float damping = 0.0f);
 };
-
-void pbdPredict(MatxXf pos, MatxXf vel, MatxXf pos_cache, Vecxf external_force,
-                float dt);
-
-void pbdUpdateVelocity(MatxXf pos, MatxXf vel, MatxXf pos_cache, float dt);
 
 }  // namespace aphys
 
