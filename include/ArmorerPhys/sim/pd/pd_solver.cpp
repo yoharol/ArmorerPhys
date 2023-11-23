@@ -16,7 +16,8 @@ template <>
 ProjectiveDynamicsSolver<2>::ProjectiveDynamicsSolver(
     const MatxXf& verts, const MatxXf& verts_ref, const Matx3i& faces,
     const Vecxf& face_mass, const Vecxf& vert_mass,
-    const MatxXf& external_force, float dt, float stiffness) {
+    const MatxXf& external_force, float dt, float stiffness_hydro,
+    float stiffness_devia) {
   n_verts = verts.rows();
   n_faces = faces.rows();
   L.resize(n_verts, n_verts);
@@ -53,9 +54,11 @@ ProjectiveDynamicsSolver<2>::ProjectiveDynamicsSolver(
     SjT.insert(0, 2 * j) = 1.0f;
     SjT.insert(1, 2 * j + 1) = 1.0f;
 
-    L += face_mass(j) * stiffness * Gj * Gj.transpose();
-    J += face_mass(j) * stiffness * Gj * SjT;
+    L += face_mass(j) * (stiffness_hydro + stiffness_devia) * Gj *
+         Gj.transpose();
+    J += face_mass(j) * (stiffness_hydro + stiffness_devia) * Gj * SjT;
   }
+  ratio = stiffness_devia / (stiffness_hydro + stiffness_devia);
 
   for (int i = 0; i < n_verts; i++) {
     M_h2.insert(i, i) = vert_mass(i) / dt / dt;
@@ -87,8 +90,28 @@ void ProjectiveDynamicsSolver<2>::localStep(MatxXf& verts,
     MatxXf U = svd.matrixU();
     MatxXf V = svd.matrixV();
     Vecxf S = svd.singularValues();
+
+    float sig11 = S(0);
+    float sig22 = S(1);
+    float d1, d2;
+    d1 = 1.0 - sig11;
+    d2 = 1.0 - sig22;
+    for (int iter = 0; iter < 20; iter++) {
+      float lambda = -d2 * (d2 + sig22);
+      float d1_new = -lambda * (d2 + sig22);
+      float d2_new = 1.0f / (d1_new + sig11) - sig22;
+      if (fabs(d1_new - d1) < 1e-6 && fabs(d2_new - d2) < 1e-6) {
+        break;
+      }
+      d1 = d1_new;
+      d2 = d2_new;
+    }
+    Vecxf S_new(2);
+    S_new << d1 + sig11, d2 + sig22;
+    MatxXf D = U * S_new.asDiagonal() * V.transpose();
     ssvd<2>(U, S, V);
-    P.block(j * 2, 0, 2, 2) = U * V.transpose();
+    MatxXf R = U * V.transpose();
+    P.block(j * 2, 0, 2, 2) = (1.0f - ratio) * D + ratio * R;
   }
 }
 

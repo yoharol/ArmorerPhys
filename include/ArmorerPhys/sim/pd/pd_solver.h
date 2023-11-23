@@ -36,6 +36,7 @@ struct ProjectiveDynamicsSolver {
   SparseMatf M_h2;
   MatxXf LHS;
   SparseMatf LHS_sparse;
+  float ratio;
   // Eigen::SparseLU<SparseMatf> solver;
   Eigen::PartialPivLU<MatxXf> solver;
   Eigen::SparseLU<SparseMatf> sparse_solver;
@@ -43,7 +44,8 @@ struct ProjectiveDynamicsSolver {
   ProjectiveDynamicsSolver(const MatxXf& verts, const MatxXf& verts_ref,
                            const Matx3i& faces, const Vecxf& face_mass,
                            const Vecxf& vert_mass, const MatxXf& external_force,
-                           float dt, float stiffness);
+                           float dt, float stiffness_hydro,
+                           float stffness_devia);
   void localStep(MatxXf& verts, const Matx3i& faces);
   void globalStep(MatxXf& verts, const MatxXf& verts_pred);
 };

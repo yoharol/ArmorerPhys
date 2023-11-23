@@ -37,7 +37,8 @@ int main() {
   // ===================== prepare simulation data =====================
   int substep = 40;
   float dt = 1.0 / 60.0 / (float)substep;
-  float stiffness = 100.0f;
+  float devia_stiffness = 100.0f;
+  float hydro_stiffness = 100.0f;
   int dim = 2;
   aphys::Vecxf gravity(dim);
   gravity << 0.0f, -3.0f;
@@ -78,9 +79,9 @@ int main() {
   aphys::MatxXf lambda(2, 2);
 
   // ================ prepare projective dynamics solver =====================
-  aphys::ProjectiveDynamicsSolver<2> pd_solver(v_p, v_p_ref, face_indices,
-                                               face_mass, vert_mass,
-                                               external_force, dt, stiffness);
+  aphys::ProjectiveDynamicsSolver<2> pd_solver(
+      v_p, v_p_ref, face_indices, face_mass, vert_mass, external_force, dt,
+      hydro_stiffness, devia_stiffness);
   aphys::ControlledProjDynSolver cpd_solver(&pd_solver, v_comp_weights);
 
   // ===================== prepare render =====================
@@ -129,15 +130,24 @@ int main() {
   });
 
   aphys::add_gui_mouse_input_func(gui, [&]() {
-    if (ImGui::IsMouseClicked(ImGuiMouseButton_Left)) {
+    if (ImGui::IsMouseDown(ImGuiMouseButton_Left)) {
       ImVec2 pos = ImGui::GetMousePos();
       float x = pos.x / SCR_WIDTH;
       float y = 1.0 - pos.y / SCR_HEIGHT;
       aphys::camera2d_screen_to_world(scene.camera, x, y);
-      v_control.row(0) = aphys::Vec2f(x, y);
+
+      aphys::Vecxf v = v_control.row(0);
+      aphys::Vecxf target(2);
+      target << x, y;
+      float interpolate = 0.04f;
+      if ((v - target).norm() < 0.01f) {
+        v_control.row(0) = target;
+      } else {
+        v_control.row(0) = (1 - interpolate) * v + interpolate * target;
+      }
       dragging = true;
     }
-    if (ImGui::IsMouseReleased(ImGuiMouseButton_Left)) {
+    /*if (ImGui::IsMouseReleased(ImGuiMouseButton_Left)) {
       dragging = false;
     }
     if (dragging) {
@@ -146,7 +156,7 @@ int main() {
       float y = 1.0 - pos.y / SCR_HEIGHT;
       aphys::camera2d_screen_to_world(scene.camera, x, y);
       v_control.row(0) = aphys::Vec2f(x, y);
-    }
+    }*/
   });
 
   glfwSwapInterval(1);
