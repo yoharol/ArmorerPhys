@@ -65,8 +65,6 @@ void compute_mesh_mass(const MatxXf& verts, const Matx3i& faces,
   int n_faces = faces.rows();
   int n_verts = verts.rows();
   face_mass.resize(n_faces);
-  Vecxf test;
-  test.resize(n_verts);
   vert_mass.resize(n_verts);
   vert_mass.setZero();
   for (int i = 0; i < n_faces; i++) {

@@ -97,8 +97,9 @@ void ProjectiveDynamicsSolver<2>::localStep(MatxXf& verts,
     d1 = 1.0 - sig11;
     d2 = 1.0 - sig22;
     for (int iter = 0; iter < 20; iter++) {
-      float lambda = -d2 * (d2 + sig22);
-      float d1_new = -lambda * (d2 + sig22);
+      // float lambda = -d2 * (d2 + sig22);
+      // float d1_new = -lambda * (d2 + sig22);
+      float d1_new = d2 * (d2 + sig22) * (d2 + sig22);
       float d2_new = 1.0f / (d1_new + sig11) - sig22;
       if (fabs(d1_new - d1) < 1e-6 && fabs(d2_new - d2) < 1e-6) {
         break;
