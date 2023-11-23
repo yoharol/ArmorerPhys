@@ -27,7 +27,7 @@ int main() {
   aphys::extract_edge(face_indices, edge_indices);
 
   // ===================== prepare simulation data =====================
-  int substep = 10;
+  int substep = 6;
   float dt = 1.0 / 60.0 / (float)substep;
   float devia_stiffness = 10.0f;
   float hydro_stiffness = 10.0f;
@@ -81,14 +81,18 @@ int main() {
 
   glfwSwapInterval(1);
 
+  aphys::MatxXf new_verts(v_p.rows(), v_p.cols());
+
   while (!glfwWindowShouldClose(window)) {
     // ===================== simulation =====================
     v_cache = v_p;
     aphys::ImplicitEuler::predict(v_pred, v_p, v_vel, external_force, vert_mass,
                                   dt);
-    for (int i = 0; i < 10; i++) {
+    for (int i = 0; i < 2; i++) {
       pd_solver.localStep(v_p, face_indices);
-      pd_solver.globalStep(v_p, v_pred);
+      pd_solver.globalStep(new_verts, v_pred);
+      float error = (new_verts - v_p).norm();
+      v_p = new_verts;
       aphys::collision2d(box, v_p);
     }
     aphys::ImplicitEuler::updateVelocity(v_vel, v_p, v_cache, dt);

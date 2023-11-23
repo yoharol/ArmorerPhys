@@ -3,6 +3,7 @@
 
 #include <vector>
 #include <Eigen/SparseLU>
+#include <Eigen/SparseQR>
 #include <Eigen/LU>
 #include <iostream>
 
@@ -39,7 +40,7 @@ struct ProjectiveDynamicsSolver {
   float ratio;
   // Eigen::SparseLU<SparseMatf> solver;
   Eigen::PartialPivLU<MatxXf> solver;
-  Eigen::SparseLU<SparseMatf> sparse_solver;
+  Eigen::SparseLU<SparseMatf, Eigen::COLAMDOrdering<int>> sparse_solver;
 
   ProjectiveDynamicsSolver(const MatxXf& verts, const MatxXf& verts_ref,
                            const Matx3i& faces, const Vecxf& face_mass,

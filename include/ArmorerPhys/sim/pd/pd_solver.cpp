@@ -66,11 +66,11 @@ ProjectiveDynamicsSolver<2>::ProjectiveDynamicsSolver(
 
   LHS_sparse = M_h2 + L;
   LHS = LHS_sparse;
-  solver = LHS.partialPivLu();
-  sparse_solver.analyzePattern(LHS_sparse);
-  sparse_solver.factorize(LHS_sparse);
+  // solver = LHS.partialPivLu();
   // precompute LHS decomposition
   // solver.compute(LHS);
+  sparse_solver.analyzePattern(LHS_sparse);
+  sparse_solver.factorize(LHS_sparse);
 }
 
 template <>
@@ -119,9 +119,9 @@ template <>
 void ProjectiveDynamicsSolver<2>::globalStep(MatxXf& verts,
                                              const MatxXf& verts_pred) {
   Eigen::MatrixXf rhs = M_h2 * verts_pred + J * P;
-  // set rhs column major
-  // verts = solver.solve(rhs);
   Eigen::MatrixXf result = sparse_solver.solve(rhs);
+  // float error = (LHS * result - rhs).norm();
+  // std::cout << "error: " << error << std::endl;
   verts = result;
 }
 
