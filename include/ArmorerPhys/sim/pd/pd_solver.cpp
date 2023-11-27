@@ -95,6 +95,7 @@ void ProjectiveDynamicsSolver<2>::localStep(MatxXf& verts,
     U = svd.matrixU();
     V = svd.matrixV();
     S = svd.singularValues();
+    ssvd<2>(U, S, V);
 
     float sig11 = S(0);
     float sig22 = S(1);
@@ -118,7 +119,6 @@ void ProjectiveDynamicsSolver<2>::localStep(MatxXf& verts,
     Vecxf S_new(2);
     S_new << d1 + sig11, d2 + sig22;
     MatxXf D = U * S_new.asDiagonal() * V.transpose();
-    ssvd<2>(U, S, V);
     MatxXf R = U * V.transpose();
     P.block(j * 2, 0, 2, 2) = (1.0f - ratio) * D + ratio * R;
   }
