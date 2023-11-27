@@ -76,36 +76,44 @@ ProjectiveDynamicsSolver<2>::ProjectiveDynamicsSolver(
 template <>
 void ProjectiveDynamicsSolver<2>::localStep(MatxXf& verts,
                                             const Matx3i& faces) {
+  MatxXf U, V;
+  Vecxf S;
+  MatxXf F(2, 2);
+  MatxXf lhs(3, 3);
+  Vecxf rhs(3);
+  Vecxf delta(3);
   for (int j = 0; j < n_faces; j++) {
     int i0 = faces(j, 0);
     int i1 = faces(j, 1);
     int i2 = faces(j, 2);
     Vecxf dx1 = verts.row(i1) - verts.row(i0);
     Vecxf dx2 = verts.row(i2) - verts.row(i0);
-    MatxXf F(2, 2);
     F << dx1, dx2;
     F = F * dx_ref_inv[j];
 
     Eigen::JacobiSVD<MatxXf> svd(F, Eigen::ComputeFullU | Eigen::ComputeFullV);
-    MatxXf U = svd.matrixU();
-    MatxXf V = svd.matrixV();
-    Vecxf S = svd.singularValues();
+    U = svd.matrixU();
+    V = svd.matrixV();
+    S = svd.singularValues();
 
     float sig11 = S(0);
     float sig22 = S(1);
     float d1, d2;
     d1 = 1.0 - sig11;
     d2 = 1.0 - sig22;
+    float lambda = 0.0f;
     for (int iter = 0; iter < 20; iter++) {
-      // float lambda = -d2 * (d2 + sig22);
-      // float d1_new = -lambda * (d2 + sig22);
-      float d1_new = d2 * (d2 + sig22) * (d2 + sig22);
-      float d2_new = 1.0f / (d1_new + sig11) - sig22;
-      if (fabs(d1_new - d1) < 1e-6 && fabs(d2_new - d2) < 1e-6) {
-        break;
-      }
-      d1 = d1_new;
-      d2 = d2_new;
+      lhs << 1.0f, lambda, d2 + sig22,   //
+          lambda, 1.0f, d1 + sig11,      //
+          d2 + sig22, d1 + sig11, 0.0f;  //
+      rhs << d1 + lambda * (d2 + sig22), d2 + lambda * (d1 + sig11),
+          (d1 + sig11) * (d2 + sig22) - 1.0f;
+      rhs = -rhs;
+      delta = lhs.partialPivLu().solve(rhs);
+      if ((delta(0) * delta(0) + delta(1) * delta(1)) < 1e-6) break;
+      d1 += delta(0);
+      d2 += delta(1);
+      lambda += delta(2);
     }
     Vecxf S_new(2);
     S_new << d1 + sig11, d2 + sig22;
