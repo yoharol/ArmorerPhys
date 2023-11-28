@@ -5,7 +5,7 @@
 
 namespace aphys {
 
-void collision2d(const Box2d& box, MatxXf& pos, float epsilon) {
+void collision2d(const Box2d& box, MatxXd& pos, double epsilon) {
   int N = pos.rows();
   for (int i = 0; i < N; i++) {
     if (pos(i, 0) < box.bound(0, 0))
@@ -19,7 +19,7 @@ void collision2d(const Box2d& box, MatxXf& pos, float epsilon) {
   }
 }
 
-void collision3d(const Box3d& box, MatxXf& pos, float epsilon) {
+void collision3d(const Box3d& box, MatxXd& pos, double epsilon) {
   int N = pos.rows();
   for (int i = 0; i < N; i++) {
     if (pos(i, 0) < box.bound(0, 0))

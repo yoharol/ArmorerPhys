@@ -15,36 +15,36 @@ const unsigned int SCR_HEIGHT = 700;
 int main() {
   GLFWwindow* window = aphys::create_window(
       SCR_WIDTH, SCR_HEIGHT, "Example6: interactive pbd simulator");
-  float bottom = 0.0f;
-  float top = 1.0f;
-  float left = 0.0f;
-  float right = 1.0f;
+  double bottom = 0.0f;
+  double top = 1.0f;
+  double left = 0.0f;
+  double right = 1.0f;
 
   aphys::Scene scene =
       aphys::create_scene(aphys::default_light, aphys::default_camera);
   aphys::set_2d_camera(scene.camera, left, right, bottom, top);
 
   // ===================== create a rectangle =====================
-  aphys::MatxXf v_p;
+  aphys::MatxXd v_p;
   aphys::Matx3i face_indices;
-  aphys::create_rectangle(0.4, 0.6, 5, 0.2, 0.8, 15, v_p, face_indices);
+  aphys::create_rectangle(0.4, 0.6, 10, 0.2, 0.8, 30, v_p, face_indices);
   aphys::Matx2i edge_indices;
   aphys::extract_edge(face_indices, edge_indices);
 
   // ===================== prepare simulation data =====================
-  aphys::MatxXf v_vel, v_cache;
-  aphys::MatxXf v_p_ref = v_p;
+  aphys::MatxXd v_vel, v_cache;
+  aphys::MatxXd v_p_ref = v_p;
   v_vel.resize(v_p.rows(), v_p.cols());
   v_cache.resize(v_p.rows(), v_p.cols());
-  aphys::Vecxf rest_length, vert_mass, face_mass, vert_invm;
+  aphys::Vecxd rest_length, vert_mass, face_mass, vert_invm;
   aphys::compute_edge_length(v_p, edge_indices, rest_length);
   aphys::compute_mesh_mass(v_p, face_indices, face_mass, vert_mass);
   vert_invm = vert_mass.cwiseInverse();
   vert_invm(0) = 0.0f;
 
   // ===================== prepare simulation =====================
-  float dt = 1.0 / 60.0 / 15.0;
-  aphys::Vecxf gravity(2);
+  double dt = 1.0 / 60.0 / 15.0;
+  aphys::Vecxd gravity(2);
   gravity << 0.0f, -0.5f;
   aphys::PbdFramework pbd_framework;
   pbd_framework.addConstraint(std::make_shared<aphys::DeformConstraint<2>>(
@@ -53,11 +53,12 @@ int main() {
 
   // ===================== prepare render =====================
   aphys::Points points = aphys::create_points();
-  aphys::set_points_data(points, v_p, aphys::MatxXf());
+  aphys::set_points_data(points, v_p.cast<float>(), aphys::MatxXf());
   points.color = aphys::RGB(255, 0, 0);
   points.point_size = 2.0f;
   aphys::Edges edges = aphys::create_edges();
-  aphys::set_edges_data(edges, v_p, edge_indices, aphys::MatxXf());
+  aphys::set_edges_data(edges, v_p.cast<float>(), edge_indices,
+                        aphys::MatxXf());
   edges.color = aphys::RGB(0, 0, 0);
   edges.width = 1.0f;
 
@@ -68,10 +69,10 @@ int main() {
   aphys::InputHandler& handler = aphys::create_input_handler(window);
   aphys::add_mouse_move_func(handler, [&](aphys::InputHandler& input_handler) {
     if (input_handler.left_pressing) {
-      float xpos, ypos;
+      double xpos, ypos;
       xpos = left + (right - left) * handler.xpos;
       ypos = bottom + (top - bottom) * handler.ypos;
-      v_p.row(0) = aphys::Vec2f(xpos, ypos);
+      v_p.row(0) = aphys::Vec2d(xpos, ypos);
     }
   });
   aphys::add_mouse_input_func(handler, [](aphys::InputHandler& input_handler,
@@ -99,8 +100,9 @@ int main() {
     glfwPollEvents();
     aphys::set_background_RGB({244, 244, 244});
 
-    aphys::set_points_data(points, v_p, aphys::MatxXf());
-    aphys::set_edges_data(edges, v_p, edge_indices, aphys::MatxXf());
+    aphys::set_points_data(points, v_p.cast<float>(), aphys::MatxXf());
+    aphys::set_edges_data(edges, v_p.cast<float>(), edge_indices,
+                          aphys::MatxXf());
 
     aphys::render_scene(scene);
 

@@ -9,15 +9,15 @@
 
 namespace aphys {
 
-void compute_edge_length(const MatxXf& verts, const Matx2i& edge,
-                         Vecxf& length) {
+void compute_edge_length(const MatxXd& verts, const Matx2i& edge,
+                         Vecxd& length) {
   int n_edges = edge.rows();
   length.resize(n_edges);
   for (int i = 0; i < n_edges; i++) {
     int i1 = edge(i, 0);
     int i2 = edge(i, 1);
-    Vecxf p1 = verts.row(i1);
-    Vecxf p2 = verts.row(i2);
+    Vecxd p1 = verts.row(i1);
+    Vecxd p2 = verts.row(i2);
     length(i) = (p1 - p2).norm();
   }
 }
@@ -60,8 +60,8 @@ void extract_edge(const Matx3i& faces, Matx2i& edge) {
   }
 }
 
-void compute_mesh_mass(const MatxXf& verts, const Matx3i& faces,
-                       Vecxf& face_mass, Vecxf& vert_mass, float rho) {
+void compute_mesh_mass(const MatxXd& verts, const Matx3i& faces,
+                       Vecxd& face_mass, Vecxd& vert_mass, double rho) {
   int n_faces = faces.rows();
   int n_verts = verts.rows();
   face_mass.resize(n_faces);
@@ -71,10 +71,10 @@ void compute_mesh_mass(const MatxXf& verts, const Matx3i& faces,
     int i1 = faces(i, 0);
     int i2 = faces(i, 1);
     int i3 = faces(i, 2);
-    Vecxf v1 = verts.row(i1);
-    Vecxf v2 = verts.row(i2) - v1.transpose();
-    Vecxf v3 = verts.row(i3) - v1.transpose();
-    float area = computeArea(v2, v3) * rho;
+    Vecxd v1 = verts.row(i1);
+    Vecxd v2 = verts.row(i2) - v1.transpose();
+    Vecxd v3 = verts.row(i3) - v1.transpose();
+    double area = computeArea(v2, v3) * rho;
     face_mass(i) = area;
     vert_mass(i1) += area / 3.0f;
     vert_mass(i2) += area / 3.0f;
@@ -82,8 +82,8 @@ void compute_mesh_mass(const MatxXf& verts, const Matx3i& faces,
   }
 }
 
-void generate_gravity_force(const Vecxf& gravity, const Vecxf& vert_mass,
-                            MatxXf& gravity_force) {
+void generate_gravity_force(const Vecxd& gravity, const Vecxd& vert_mass,
+                            MatxXd& gravity_force) {
   int n_verts = vert_mass.size();
   int dim = gravity.size();
   gravity_force.resize(n_verts, dim);
@@ -92,14 +92,14 @@ void generate_gravity_force(const Vecxf& gravity, const Vecxf& vert_mass,
   }
 }
 
-void concatenate_add(Vecxf& A, const MatxXf& B, float scale) {
+void concatenate_add(Vecxd& A, const MatxXd& B, double scale) {
   assert(A.size() == B.rows() * B.cols());
   int dim = B.cols();
   for (int i = 0; i < B.rows(); i++) {
     A.segment(i, dim) += scale * B.row(i).transpose();
   }
 }
-void concatenate_add(MatxXf& A, const Vecxf& B, float scale) {
+void concatenate_add(MatxXd& A, const Vecxd& B, double scale) {
   assert(B.size() == A.rows() * A.cols());
   int dim = A.cols();
   for (int i = 0; i < A.rows(); i++) {
@@ -107,7 +107,7 @@ void concatenate_add(MatxXf& A, const Vecxf& B, float scale) {
   }
 }
 
-void concatenate_set(Vecxf& A, const MatxXf& B, float scale) {
+void concatenate_set(Vecxd& A, const MatxXd& B, double scale) {
   assert(A.size() == B.rows() * B.cols());
   int dim = B.cols();
   for (int i = 0; i < B.rows(); i++) {
@@ -115,7 +115,7 @@ void concatenate_set(Vecxf& A, const MatxXf& B, float scale) {
   }
 }
 
-void concatenate_set(MatxXf& A, const Vecxf& B, float scale) {
+void concatenate_set(MatxXd& A, const Vecxd& B, double scale) {
   assert(B.size() == A.rows() * A.cols());
   int dim = A.cols();
   for (int i = 0; i < A.rows(); i++) {
@@ -123,19 +123,19 @@ void concatenate_set(MatxXf& A, const Vecxf& B, float scale) {
   }
 }
 
-float concatenate_dot(const MatxXf& A, const Vecxf& x, float scale) {
+double concatenate_dot(const MatxXd& A, const Vecxd& x, double scale) {
   assert(x.size() == A.rows() * A.cols());
   int dim = A.cols();
-  float result = 0.0f;
+  double result = 0.0f;
   for (int i = 0; i < A.rows(); i++) {
     result += scale * A.row(i).dot(x.segment(i * dim, dim));
   }
   return result;
 }
 
-void ImplicitEuler::predict(MatxXf& predict, const MatxXf& verts,
-                            const MatxXf& vel, const MatxXf& external_force,
-                            const Vecxf& mass, float dt) {
+void ImplicitEuler::predict(MatxXd& predict, const MatxXd& verts,
+                            const MatxXd& vel, const MatxXd& external_force,
+                            const Vecxd& mass, double dt) {
   int n_verts = verts.rows();
   int dim = verts.cols();
   for (int i = 0; i < n_verts; i++) {
@@ -144,9 +144,9 @@ void ImplicitEuler::predict(MatxXf& predict, const MatxXf& verts,
   }
 }
 
-float ImplicitEuler::modifyEnergy(float energy, const MatxXf& verts,
-                                  const MatxXf& p, const Vecxf& mass,
-                                  float dt) {
+double ImplicitEuler::modifyEnergy(double energy, const MatxXd& verts,
+                                   const MatxXd& p, const Vecxd& mass,
+                                   double dt) {
   int n_verts = verts.rows();
   for (int i = 0; i < n_verts; i++) {
     energy +=
@@ -156,9 +156,9 @@ float ImplicitEuler::modifyEnergy(float energy, const MatxXf& verts,
 }
 
 // J_g = M / h^2 (x - p) + J
-void ImplicitEuler::modifyJacobian(Vecxf& J, const MatxXf& verts,
-                                   const MatxXf& p, const Vecxf& mass,
-                                   float dt) {
+void ImplicitEuler::modifyJacobian(Vecxd& J, const MatxXd& verts,
+                                   const MatxXd& p, const Vecxd& mass,
+                                   double dt) {
   int n_verts = verts.rows();
   int dim = verts.cols();
   for (int i = 0; i < n_verts; i++) {
@@ -167,18 +167,18 @@ void ImplicitEuler::modifyJacobian(Vecxf& J, const MatxXf& verts,
 }
 
 // H_g = M / h^2 I + H
-void ImplicitEuler::modifyHessian(MatxXf& H, const Vecxf& mass, float dt) {
+void ImplicitEuler::modifyHessian(MatxXd& H, const Vecxd& mass, double dt) {
   int n_verts = mass.size();
   int dim = H.cols() / n_verts;
   for (int i = 0; i < n_verts; i++) {
     H.block(i * dim, i * dim, dim, dim) +=
-        mass(i) / dt / dt * MatxXf::Identity(dim, dim);
+        mass(i) / dt / dt * MatxXd::Identity(dim, dim);
   }
 }
 
-void ImplicitEuler::updateVelocity(MatxXf& vel, const MatxXf& verts,
-                                   const MatxXf& verts_cache, float dt,
-                                   float damping) {
+void ImplicitEuler::updateVelocity(MatxXd& vel, const MatxXd& verts,
+                                   const MatxXd& verts_cache, double dt,
+                                   double damping) {
   int n_verts = verts.rows();
   for (int i = 0; i < n_verts; i++) {
     vel.row(i) = (verts.row(i) - verts_cache.row(i)) / dt * exp(-damping * dt);
@@ -186,12 +186,12 @@ void ImplicitEuler::updateVelocity(MatxXf& vel, const MatxXf& verts,
 }
 
 // line search along direction dv to minimize energy_func(v+alpha dv)
-void line_search(MatxXf& v, MatxXf& v_solver, const Vecxf& dv, const Vecxf& J,
-                 EnergyFunc energy_func, float beta, float gamma) {
-  float alpha = 1.0f;
+void line_search(MatxXd& v, MatxXd& v_solver, const Vecxd& dv, const Vecxd& J,
+                 EnergyFunc energy_func, double beta, double gamma) {
+  double alpha = 1.0f;
   v_solver = v;
   concatenate_add(v_solver, alpha * dv);
-  float ddv = dv.transpose() * J;
+  double ddv = dv.transpose() * J;
   int iter = 0;
   while (energy_func(v_solver) > energy_func(v) + gamma * alpha * ddv) {
     alpha *= beta;

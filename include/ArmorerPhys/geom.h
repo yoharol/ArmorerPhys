@@ -6,16 +6,16 @@
 namespace aphys {
 
 struct Box2d {
-  Matx2f bound;
-  Box2d(float l, float r, float y, float b) {
+  Matx2d bound;
+  Box2d(double l, double r, double y, double b) {
     bound.resize(2, 2);
     bound << l, r, y, b;
   }
 };
 
 struct Box3d {
-  Matx2f bound;
-  Box3d(float l, float r, float y, float b) {
+  Matx2d bound;
+  Box3d(double l, double r, double y, double b) {
     bound.resize(2, 2);
     bound << l, r, y, b;
   }
@@ -23,8 +23,8 @@ struct Box3d {
 
 MatxXf get_normals(const MatxXf &vertices, const MatxXi &indices);
 
-void create_rectangle(float l, float r, int hori_count, float b, float t,
-                      int vert_count, MatxXf &vertices, Matx3i &indices);
+void create_rectangle(double l, double r, int hori_count, double b, double t,
+                      int vert_count, MatxXd &vertices, Matx3i &indices);
 
 }  // namespace aphys
 

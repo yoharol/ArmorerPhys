@@ -20,7 +20,7 @@ int main() {
   aphys::set_2d_camera(scene.camera, 0.0f, 1.0f, 0.0f, 1.0f);
 
   // ===================== create a rectangle =====================
-  aphys::MatxXf v_p;
+  aphys::MatxXd v_p;
   aphys::Matx3i face_indices;
   aphys::create_rectangle(0.35, 0.65, 10, 0.55, 0.85, 10, v_p, face_indices);
   aphys::Matx2i edge_indices;
@@ -28,33 +28,34 @@ int main() {
 
   // ===================== prepare simulation data =====================
   int substep = 20;
-  float dt = 1.0 / 60.0 / (float)substep;
-  float stiffness = 40.0f;
+  double dt = 1.0 / 60.0 / (double)substep;
+  double stiffness = 40.0f;
   int dim = 2;
-  aphys::Vecxf gravity(dim);
-  gravity << 0.0f, -3.0f;
-  aphys::MatxXf v_vel, v_pred, v_p_ref, v_cache, v_solver;
+  aphys::Vecxd gravity(dim);
+  gravity << 0.0, -3.0;
+  aphys::MatxXd v_vel, v_pred, v_p_ref, v_cache, v_solver;
   v_p_ref = v_p;
   v_vel.resize(v_p.rows(), v_p.cols());
   v_vel.setZero();
   v_pred.resize(v_p.rows(), v_p.cols());
   v_solver.resize(v_p.rows(), v_p.cols());
-  aphys::Vecxf vert_mass, face_mass;
+  aphys::Vecxd vert_mass, face_mass;
   aphys::compute_mesh_mass(v_p_ref, face_indices, face_mass, vert_mass);
-  aphys::Box2d box(0.0f, 1.0f, 0.0f, 1.0f);
-  aphys::Vecxf J(v_p.rows() * dim);
-  aphys::MatxXf H(v_p.rows() * dim, v_p.rows() * dim);
-  aphys::Vecxf dv(v_p.rows() * dim);
-  aphys::MatxXf external_force;
+  aphys::Box2d box(0.0, 1.0, 0.0, 1.0);
+  aphys::Vecxd J(v_p.rows() * dim);
+  aphys::MatxXd H(v_p.rows() * dim, v_p.rows() * dim);
+  aphys::Vecxd dv(v_p.rows() * dim);
+  aphys::MatxXd external_force;
   aphys::generate_gravity_force(gravity, vert_mass, external_force);
 
   // ===================== prepare render =====================
   aphys::Points points = aphys::create_points();
-  aphys::set_points_data(points, v_p, aphys::MatxXf());
+  aphys::set_points_data(points, v_p.cast<float>(), aphys::MatxXf());
   points.color = aphys::RGB(255, 0, 0);
   points.point_size = 2.0f;
   aphys::Edges edges = aphys::create_edges();
-  aphys::set_edges_data(edges, v_p, edge_indices, aphys::MatxXf());
+  aphys::set_edges_data(edges, v_p.cast<float>(), edge_indices,
+                        aphys::MatxXf());
   edges.color = aphys::RGB(0, 0, 0);
   edges.width = 1.0f;
   aphys::add_render_func(scene, aphys::get_render_func(points));
@@ -80,7 +81,7 @@ int main() {
         aphys::SpringFEM::Hessian(v_p, v_p_ref, edge_indices, H, stiffness);
         aphys::ImplicitEuler::modifyHessian(H, vert_mass, dt);
         dv = -H.colPivHouseholderQr().solve(J);
-        aphys::line_search(v_p, v_solver, dv, J, [&](aphys::MatxXf& v) {
+        aphys::line_search(v_p, v_solver, dv, J, [&](aphys::MatxXd& v) {
           return aphys::ImplicitEuler::modifyEnergy(
               aphys::SpringFEM::Energy(v, v_p_ref, edge_indices, stiffness), v,
               v_pred, vert_mass, dt);
@@ -94,8 +95,9 @@ int main() {
 
     glfwPollEvents();
 
-    aphys::set_points_data(points, v_p, aphys::MatxXf());
-    aphys::set_edges_data(edges, v_p, edge_indices, aphys::MatxXf());
+    aphys::set_points_data(points, v_p.cast<float>(), aphys::MatxXf());
+    aphys::set_edges_data(edges, v_p.cast<float>(), edge_indices,
+                          aphys::MatxXf());
 
     aphys::set_background_RGB({244, 244, 244});
 

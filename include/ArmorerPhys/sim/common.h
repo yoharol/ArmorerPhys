@@ -8,45 +8,45 @@ namespace aphys {
 
 void extract_edge(const Matx3i& faces, Matx2i& edge);
 
-void compute_edge_length(const MatxXf& verts, const Matx2i& edge,
-                         Vecxf& length);
+void compute_edge_length(const MatxXd& verts, const Matx2i& edge,
+                         Vecxd& length);
 
-void compute_mesh_mass(const MatxXf& verts, const Matx3i& faces,
-                       Vecxf& face_mass, Vecxf& vert_mass, float rho = 1.0f);
+void compute_mesh_mass(const MatxXd& verts, const Matx3i& faces,
+                       Vecxd& face_mass, Vecxd& vert_mass, double rho = 1.0f);
 
-void generate_gravity_force(const Vecxf& gravity, const Vecxf& vert_mass,
-                            MatxXf& gravity_force);
+void generate_gravity_force(const Vecxd& gravity, const Vecxd& vert_mass,
+                            MatxXd& gravity_force);
 
-void concatenate_add(Vecxf& A, const MatxXf& B, float scale = 1.0f);
-void concatenate_add(MatxXf& A, const Vecxf& B, float scale = 1.0f);
-void concatenate_set(Vecxf& A, const MatxXf& B, float scale = 1.0f);
-void concatenate_set(MatxXf& A, const Vecxf& B, float scale = 1.0f);
-float concatenate_dot(const MatxXf& A, const Vecxf& x, float scale = 1.0f);
+void concatenate_add(Vecxd& A, const MatxXd& B, double scale = 1.0f);
+void concatenate_add(MatxXd& A, const Vecxd& B, double scale = 1.0f);
+void concatenate_set(Vecxd& A, const MatxXd& B, double scale = 1.0f);
+void concatenate_set(MatxXd& A, const Vecxd& B, double scale = 1.0f);
+double concatenate_dot(const MatxXd& A, const Vecxd& x, double scale = 1.0f);
 
 struct ImplicitEuler {
-  static void predict(MatxXf& predict, const MatxXf& verts, const MatxXf& vel,
-                      const MatxXf& external_force, const Vecxf& mass,
-                      float dt);
-  static float modifyEnergy(float energy, const MatxXf& verts, const MatxXf& p,
-                            const Vecxf& mass, float dt);
+  static void predict(MatxXd& predict, const MatxXd& verts, const MatxXd& vel,
+                      const MatxXd& external_force, const Vecxd& mass,
+                      double dt);
+  static double modifyEnergy(double energy, const MatxXd& verts,
+                             const MatxXd& p, const Vecxd& mass, double dt);
 
   // J_g = M / h^2 (x - p) + J
-  static void modifyJacobian(Vecxf& J, const MatxXf& verts, const MatxXf& p,
-                             const Vecxf& mass, float dt);
+  static void modifyJacobian(Vecxd& J, const MatxXd& verts, const MatxXd& p,
+                             const Vecxd& mass, double dt);
   // H_g = M / h^2 I + H
-  static void modifyHessian(MatxXf& H, const Vecxf& mass, float dt);
-  static void updateVelocity(MatxXf& vel, const MatxXf& verts,
-                             const MatxXf& verts_cache, float dt,
-                             float damping = 0.0f);
+  static void modifyHessian(MatxXd& H, const Vecxd& mass, double dt);
+  static void updateVelocity(MatxXd& vel, const MatxXd& verts,
+                             const MatxXd& verts_cache, double dt,
+                             double damping = 0.0f);
 };
 
 // define the energy computation function type
-typedef std::function<float(MatxXf&)> EnergyFunc;
+typedef std::function<double(MatxXd&)> EnergyFunc;
 
 // line search along direction dv to minimize energy_func(v+alpha dv)
-void line_search(MatxXf& v, MatxXf& v_solver, const Vecxf& dv, const Vecxf& J,
-                 EnergyFunc energy_func, float beta = 0.5f,
-                 float gamma = 0.03f);
+void line_search(MatxXd& v, MatxXd& v_solver, const Vecxd& dv, const Vecxd& J,
+                 EnergyFunc energy_func, double beta = 0.5f,
+                 double gamma = 0.03f);
 
 }  // namespace aphys
 

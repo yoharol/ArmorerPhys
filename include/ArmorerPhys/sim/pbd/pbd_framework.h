@@ -38,11 +38,11 @@ struct PbdFramework {
     }
   }
 
-  void pbdPredict(MatxXf& pos, MatxXf& vel, MatxXf& pos_cache, Vecxf& vert_invm,
-                  Vecxf& external_force, float dt);
+  void pbdPredict(MatxXd& pos, MatxXd& vel, MatxXd& pos_cache, Vecxd& vert_invm,
+                  Vecxd& external_force, double dt);
 
-  void pbdUpdateVelocity(MatxXf& pos, MatxXf& vel, MatxXf& pos_cache, float dt,
-                         float damping = 0.0f);
+  void pbdUpdateVelocity(MatxXd& pos, MatxXd& vel, MatxXd& pos_cache, double dt,
+                         double damping = 0.0f);
 };
 
 }  // namespace aphys

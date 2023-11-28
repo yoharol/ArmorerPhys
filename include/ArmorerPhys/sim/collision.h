@@ -5,9 +5,9 @@
 
 namespace aphys {
 
-void collision2d(const Box2d& box, MatxXf& pos, float epsilon = 1e-5);
+void collision2d(const Box2d& box, MatxXd& pos, double epsilon = 1e-5);
 
-void collision3d(const Box3d& box, MatxXf& pos, float epsilon = 1e-5);
+void collision3d(const Box3d& box, MatxXd& pos, double epsilon = 1e-5);
 
 }  // namespace aphys
 

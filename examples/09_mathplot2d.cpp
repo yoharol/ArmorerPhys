@@ -20,7 +20,7 @@ int main() {
   aphys::set_2d_camera(scene.camera, 0.0f, 1.0f, 0.0f, 1.0f);
 
   // ===================== create a rectangle =====================
-  aphys::MatxXf v_p;
+  aphys::MatxXd v_p;
   aphys::Matx3i face_indices;
   aphys::create_rectangle(0.35, 0.65, 20, 0.35, 0.85, 20, v_p, face_indices);
   aphys::Matx2i edge_indices;
@@ -28,29 +28,29 @@ int main() {
 
   // ===================== prepare simulation data =====================
   int substep = 2;
-  float rho = 1.0f;
-  float dt = 1.0 / 200.0f;
-  float devia_stiffness = 10.0f;
-  float hydro_stiffness = 10.0f;
+  double rho = 100.0;
+  double dt = 1.0 / 200.0;
+  double devia_stiffness = 10.0;
+  double hydro_stiffness = 10.0;
   int dim = 2;
-  aphys::Vecxf gravity(dim);
-  gravity << 0.0f, -3.0f;
-  aphys::MatxXf v_vel, v_pred, v_p_ref, v_cache, v_solver;
-  aphys::MatxXf v_rig;
+  aphys::Vecxd gravity(dim);
+  gravity << 0.0, -3.0;
+  aphys::MatxXd v_vel, v_pred, v_p_ref, v_cache, v_solver;
+  aphys::MatxXd v_rig;
   v_p_ref = v_p;
   v_rig.resize(v_p.rows(), v_p.cols());
   v_vel.resize(v_p.rows(), v_p.cols());
   v_vel.setZero();
   v_pred.resize(v_p.rows(), v_p.cols());
   v_solver.resize(v_p.rows(), v_p.cols());
-  aphys::Vecxf vert_mass, face_mass;
+  aphys::Vecxd vert_mass, face_mass;
   aphys::compute_mesh_mass(v_p_ref, face_indices, face_mass, vert_mass, rho);
   std::cout << vert_mass(0) << std::endl;
-  aphys::Box2d box(0.0f, 1.0f, 0.0f, 1.0f);
-  aphys::Vecxf J(v_p.rows() * dim);
-  aphys::MatxXf H(v_p.rows() * dim, v_p.rows() * dim);
-  aphys::Vecxf dv(v_p.rows() * dim);
-  aphys::MatxXf external_force;
+  aphys::Box2d box(0.0, 1.0, 0.0, 1.0);
+  aphys::Vecxd J(v_p.rows() * dim);
+  aphys::MatxXd H(v_p.rows() * dim, v_p.rows() * dim);
+  aphys::Vecxd dv(v_p.rows() * dim);
+  aphys::MatxXd external_force;
   aphys::generate_gravity_force(gravity, vert_mass, external_force);
 
   // ================ prepare projective dynamics solver =====================
@@ -60,11 +60,12 @@ int main() {
 
   // ===================== prepare render =====================
   aphys::Points points = aphys::create_points();
-  aphys::set_points_data(points, v_p, aphys::MatxXf());
+  aphys::set_points_data(points, v_p.cast<float>(), aphys::MatxXf());
   points.color = aphys::RGB(255, 0, 0);
   points.point_size = 2.0f;
   aphys::Edges edges = aphys::create_edges();
-  aphys::set_edges_data(edges, v_p, edge_indices, aphys::MatxXf());
+  aphys::set_edges_data(edges, v_p.cast<float>(), edge_indices,
+                        aphys::MatxXf());
   edges.color = aphys::RGB(0, 0, 0);
   edges.width = 1.0f;
   aphys::add_render_func(scene, aphys::get_render_func(points));
@@ -83,7 +84,7 @@ int main() {
 
   glfwSwapInterval(1);
 
-  aphys::MatxXf new_verts(v_p.rows(), v_p.cols());
+  aphys::MatxXd new_verts(v_p.rows(), v_p.cols());
 
   while (!glfwWindowShouldClose(window)) {
     // ===================== simulation =====================
@@ -94,14 +95,15 @@ int main() {
       pd_solver.localStep(v_p, face_indices);
       pd_solver.globalStep(new_verts, v_pred);
       aphys::collision2d(box, new_verts);
-      float error = (new_verts - v_p).norm();
+      double error = (new_verts - v_p).norm();
       v_p = new_verts;
       if (error < 1e-4) break;
     }
     aphys::ImplicitEuler::updateVelocity(v_vel, v_p, v_cache, dt);
 
-    aphys::set_points_data(points, v_p, aphys::MatxXf());
-    aphys::set_edges_data(edges, v_p, edge_indices, aphys::MatxXf());
+    aphys::set_points_data(points, v_p.cast<float>(), aphys::MatxXf());
+    aphys::set_edges_data(edges, v_p.cast<float>(), edge_indices,
+                          aphys::MatxXf());
 
     glEnable(GL_DEPTH_TEST);
     glfwPollEvents();

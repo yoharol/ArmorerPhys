@@ -10,18 +10,18 @@ namespace aphys {
 
 template <int dim>
 struct DeformConstraint : public PbdConstraint {
-  Vecxf hydro_lambda;
-  Vecxf devia_lambda;
-  float hydro_tilde_alpha;
-  float devia_tilde_alpha;
+  Vecxd hydro_lambda;
+  Vecxd devia_lambda;
+  double hydro_tilde_alpha;
+  double devia_tilde_alpha;
 
-  DeformConstraint(MatxXf& verts, MatxXf& verts_ref, const Matx3i& faces,
-                   Vecxf& face_mass, Vecxf& verts_invm, float hydro_alpha,
-                   float devia_alpha, float dt);
+  DeformConstraint(MatxXd& verts, MatxXd& verts_ref, const Matx3i& faces,
+                   Vecxd& face_mass, Vecxd& verts_invm, double hydro_alpha,
+                   double devia_alpha, double dt);
 
   void preProject() override;
-  void project(MatxXf& verts, MatxXf& verts_ref, const Matx3i& faces,
-               Vecxf& face_mass, Vecxf& verts_invm, float dt) {
+  void project(MatxXd& verts, MatxXd& verts_ref, const Matx3i& faces,
+               Vecxd& face_mass, Vecxd& verts_invm, double dt) {
     throw std::invalid_argument(
         "DeformConstraint::project() not implemented for dim != 2 or 3");
   }

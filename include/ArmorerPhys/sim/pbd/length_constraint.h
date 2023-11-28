@@ -7,15 +7,15 @@
 namespace aphys {
 
 struct LengthConstraint : public PbdConstraint {
-  Vecxf lambda;
-  float tilde_alpha;
+  Vecxd lambda;
+  double tilde_alpha;
 
-  LengthConstraint(MatxXf& verts, const Matx2i& edges, Vecxf& rest_length,
-                   Vecxf& verts_invm, float alpha, float dt);
+  LengthConstraint(MatxXd& verts, const Matx2i& edges, Vecxd& rest_length,
+                   Vecxd& verts_invm, double alpha, double dt);
 
   void preProject() override;
-  void project(MatxXf& verts, const Matx2i& edges, Vecxf& rest_length,
-               Vecxf& verts_invm, float dt);
+  void project(MatxXd& verts, const Matx2i& edges, Vecxd& rest_length,
+               Vecxd& verts_invm, double dt);
 };
 
 }  // namespace aphys

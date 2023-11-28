@@ -30,36 +30,34 @@ template <int dim>
 struct ProjectiveDynamicsSolver {
   int n_verts;
   int n_faces;
-  std::vector<MatxXf> dx_ref_inv;
-  MatxXf P;
-  SparseMatf L;
-  SparseMatf J;
-  SparseMatf M_h2;
-  MatxXf LHS;
-  SparseMatf LHS_sparse;
-  float ratio;
-  // Eigen::SparseLU<SparseMatf> solver;
-  Eigen::PartialPivLU<MatxXf> solver;
-  Eigen::SparseLU<SparseMatf, Eigen::COLAMDOrdering<int>> sparse_solver;
+  std::vector<MatxXd> dx_ref_inv;
+  MatxXd P;
+  SparseMatd L;
+  SparseMatd J;
+  SparseMatd M_h2;
+  MatxXd LHS;
+  SparseMatd LHS_sparse;
+  double ratio;
+  Eigen::SparseLU<SparseMatd, Eigen::COLAMDOrdering<int>> sparse_solver;
 
-  ProjectiveDynamicsSolver(const MatxXf& verts, const MatxXf& verts_ref,
-                           const Matx3i& faces, const Vecxf& face_mass,
-                           const Vecxf& vert_mass, const MatxXf& external_force,
-                           float dt, float stiffness_hydro,
-                           float stffness_devia);
-  void localStep(MatxXf& verts, const Matx3i& faces);
-  void globalStep(MatxXf& verts, const MatxXf& verts_pred);
+  ProjectiveDynamicsSolver(const MatxXd& verts, const MatxXd& verts_ref,
+                           const Matx3i& faces, const Vecxd& face_mass,
+                           const Vecxd& vert_mass, const MatxXd& external_force,
+                           double dt, double stiffness_hydro,
+                           double stffness_devia);
+  void localStep(MatxXd& verts, const Matx3i& faces);
+  void globalStep(MatxXd& verts, const MatxXd& verts_pred);
 };
 
 struct ControlledProjDynSolver {
   ProjectiveDynamicsSolver<2>* pd_solver;
   int n_controls;
-  Eigen::SparseLU<SparseMatf> sparse_solver;
+  Eigen::SparseLU<SparseMatd> sparse_solver;
 
   ControlledProjDynSolver(ProjectiveDynamicsSolver<2>* proj_solver,
-                          MatxXf control_weights);
-  void globalStep(MatxXf& verts, const MatxXf& verts_pred,
-                  const MatxXf& control_verts, MatxXf& lambda);
+                          MatxXd control_weights);
+  void globalStep(MatxXd& verts, const MatxXd& verts_pred,
+                  const MatxXd& control_verts, MatxXd& lambda);
 };
 
 }  // namespace aphys

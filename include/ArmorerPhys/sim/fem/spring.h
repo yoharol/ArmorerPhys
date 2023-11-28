@@ -3,12 +3,12 @@
 namespace aphys {
 
 struct SpringFEM {
-  static float Energy(MatxXf& verts, const MatxXf& verts_ref,
-                      const Matx2i& edges, float k);
-  static void Jacobian(MatxXf& verts, const MatxXf& verts_ref,
-                       const Matx2i& edges, Vecxf& J, float k);
-  static void Hessian(MatxXf& verts, const MatxXf& verts_ref,
-                      const Matx2i& edges, MatxXf& H, float k);
+  static double Energy(MatxXd& verts, const MatxXd& verts_ref,
+                      const Matx2i& edges, double k);
+  static void Jacobian(MatxXd& verts, const MatxXd& verts_ref,
+                       const Matx2i& edges, Vecxd& J, double k);
+  static void Hessian(MatxXd& verts, const MatxXd& verts_ref,
+                      const Matx2i& edges, MatxXd& H, double k);
 };
 
 }  // namespace aphys

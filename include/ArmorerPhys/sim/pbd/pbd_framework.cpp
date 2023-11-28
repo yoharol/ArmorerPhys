@@ -6,9 +6,9 @@
 
 namespace aphys {
 
-void PbdFramework::pbdPredict(MatxXf& pos, MatxXf& vel, MatxXf& pos_cache,
-                              Vecxf& vert_invm, Vecxf& external_force,
-                              float dt) {
+void PbdFramework::pbdPredict(MatxXd& pos, MatxXd& vel, MatxXd& pos_cache,
+                              Vecxd& vert_invm, Vecxd& external_force,
+                              double dt) {
   int N = pos.rows();
   for (int i = 0; i < N; i++) {
     pos_cache.row(i) = pos.row(i);
@@ -17,9 +17,9 @@ void PbdFramework::pbdPredict(MatxXf& pos, MatxXf& vel, MatxXf& pos_cache,
   }
 }
 
-void PbdFramework::pbdUpdateVelocity(MatxXf& pos, MatxXf& vel,
-                                     MatxXf& pos_cache, float dt,
-                                     float damping) {
+void PbdFramework::pbdUpdateVelocity(MatxXd& pos, MatxXd& vel,
+                                     MatxXd& pos_cache, double dt,
+                                     double damping) {
   int N = pos.rows();
   for (int i = 0; i < N; i++) {
     vel.row(i) = (pos.row(i) - pos_cache.row(i)) * (exp(-damping * dt) / dt);

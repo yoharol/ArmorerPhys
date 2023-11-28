@@ -9,12 +9,12 @@
 
 namespace aphys {
 
-Vec3f heat_rgb(float value, float minv, float maxv) {
-  float ratio = 2 * (value - minv) / (maxv - minv);
-  float b = std::max(0.0f, 1 - ratio);
-  float r = std::max(0.0f, ratio - 1);
-  float g = 1 - b - r;
-  return Vec3f(r, g, b);
+Vec3d heat_rgb(double value, double minv, double maxv) {
+  double ratio = 2 * (value - minv) / (maxv - minv);
+  double b = std::max(0.0, 1 - ratio);
+  double r = std::max(0.0, ratio - 1);
+  double g = 1 - b - r;
+  return Vec3d(r, g, b);
 }
 
 void Mat3fToList3f(const Matx3f& mat, Listx3f& vec) {
@@ -54,17 +54,17 @@ void Mat2fToList3f(const Matx2f& mat, Listx3f& vec) {
   }
 }
 
-float computeArea(const Vecxf& vec1, const Vecxf& vec2) {
+double computeArea(const Vecxd& vec1, const Vecxd& vec2) {
   if (vec1.size() != vec2.size()) {
     throw std::runtime_error("computeArea: vec1.size() != vec2.size()");
   }
-  float area = 0.0f;
+  double area = 0.0;
   if (vec1.size() == 2) {
-    area = 0.5f * (vec1(0) * vec2(1) - vec1(1) * vec2(0));
+    area = 0.5 * (vec1(0) * vec2(1) - vec1(1) * vec2(0));
   } else if (vec1.size() == 3) {
-    Vec3f v1 = vec1;
-    Vec3f v2 = vec2;
-    area = 0.5f * (v1.cross(v2)).norm();
+    Vec3d v1 = vec1;
+    Vec3d v2 = vec2;
+    area = 0.5 * (v1.cross(v2)).norm();
   } else {
     throw std::runtime_error("computeArea: vec1.size() != 2 or 3");
   }
@@ -72,7 +72,7 @@ float computeArea(const Vecxf& vec1, const Vecxf& vec2) {
 }
 
 template <int dim>
-void ssvd(MatxXf& U, Vecxf& S, MatxXf& V) {
+void ssvd(MatxXd& U, Vecxd& S, MatxXd& V) {
   if (U.determinant() < 0) {
     for (int i = 0; i < dim; i++) {
       U(i, dim - 1) *= -1;
@@ -87,12 +87,12 @@ void ssvd(MatxXf& U, Vecxf& S, MatxXf& V) {
   }
 }
 
-template void ssvd<2>(MatxXf& U, Vecxf& S, MatxXf& V);
-template void ssvd<3>(MatxXf& U, Vecxf& S, MatxXf& V);
+template void ssvd<2>(MatxXd& U, Vecxd& S, MatxXd& V);
+template void ssvd<3>(MatxXd& U, Vecxd& S, MatxXd& V);
 
-Vecxf getMassCenter(const MatxXf& verts, Vecxf& vert_mass) {
-  Vecxf center = Vecxf::Zero(verts.cols());
-  float total_mass = vert_mass.sum();
+Vecxd getMassCenter(const MatxXd& verts, Vecxd& vert_mass) {
+  Vecxd center = Vecxd::Zero(verts.cols());
+  double total_mass = vert_mass.sum();
   for (int i = 0; i < verts.rows(); ++i) {
     center += verts.row(i) * vert_mass(i);
   }

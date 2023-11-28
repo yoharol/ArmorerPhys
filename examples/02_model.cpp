@@ -32,7 +32,7 @@ int main() {
   aphys::delete_shader(vertex_shader);
   aphys::delete_shader(fragment_shader);
 
-  aphys::MatxXf V;
+  aphys::MatxXd V;
   aphys::MatxXi F;
 
   igl::readOBJ(std::string(ASSETS_PATH) + "/spot.obj", V, F);
@@ -49,9 +49,9 @@ int main() {
 
   aphys::VBO vertex_buffer = aphys::create_vbo();
   aphys::bind_vbo(vertex_buffer);
-  aphys::set_vbo_static_data(V.data(), V.size() * sizeof(float));
+  aphys::set_vbo_static_data(V.data(), V.size() * sizeof(double));
 
-  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void *)0);
+  glVertexAttribPointer(0, 3, GL_double, GL_FALSE, 3 * sizeof(double), (void *)0);
   glEnableVertexAttribArray(0);
   aphys::unbind_vbo();
 
@@ -62,14 +62,14 @@ int main() {
 
   aphys::Camera camera = aphys::create_camera(
       {0.0f, 0.0f, 3.0f}, {0.0f, 0.35f, 0.0f}, {0.0f, 1.0f, 0.0f},
-      float(SCR_WIDTH) / float(SCR_HEIGHT));
+      double(SCR_WIDTH) / double(SCR_HEIGHT));
   // std::cout << camera.projection << std::endl;
 
   aphys::use_program(program);
   aphys::set_uniform_mat4(program, "projection", camera.projection);
   aphys::unuse_program();
 
-  float prev_time = glfwGetTime();
+  double prev_time = glfwGetTime();
 
   while (!glfwWindowShouldClose(window)) {
     aphys::set_background_RGB(aphys::RGB(30, 50, 50));
@@ -77,7 +77,7 @@ int main() {
     aphys::use_program(program);
     aphys::bind_vao(vao);
 
-    float curr_time = glfwGetTime();
+    double curr_time = glfwGetTime();
     aphys::orbit_camera_control(window, camera, 10.0, curr_time - prev_time);
     prev_time = curr_time;
     aphys::set_uniform_mat4(program, "projection", camera.projection);

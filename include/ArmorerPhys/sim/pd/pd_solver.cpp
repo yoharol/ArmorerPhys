@@ -14,10 +14,10 @@ namespace aphys {
 
 template <>
 ProjectiveDynamicsSolver<2>::ProjectiveDynamicsSolver(
-    const MatxXf& verts, const MatxXf& verts_ref, const Matx3i& faces,
-    const Vecxf& face_mass, const Vecxf& vert_mass,
-    const MatxXf& external_force, float dt, float stiffness_hydro,
-    float stiffness_devia) {
+    const MatxXd& verts, const MatxXd& verts_ref, const Matx3i& faces,
+    const Vecxd& face_mass, const Vecxd& vert_mass,
+    const MatxXd& external_force, double dt, double stiffness_hydro,
+    double stiffness_devia) {
   n_verts = verts.rows();
   n_faces = faces.rows();
   L.resize(n_verts, n_verts);
@@ -32,27 +32,27 @@ ProjectiveDynamicsSolver<2>::ProjectiveDynamicsSolver(
     int i1 = faces(j, 1);
     int i2 = faces(j, 2);
 
-    Vecxf dx1_ref = verts_ref.row(i1) - verts_ref.row(i0);
-    Vecxf dx2_ref = verts_ref.row(i2) - verts_ref.row(i0);
-    MatxXf dx_ref_mat(2, 2);
+    Vecxd dx1_ref = verts_ref.row(i1) - verts_ref.row(i0);
+    Vecxd dx2_ref = verts_ref.row(i2) - verts_ref.row(i0);
+    MatxXd dx_ref_mat(2, 2);
     dx_ref_mat << dx1_ref, dx2_ref;
     dx_ref_mat = dx_ref_mat.inverse();
     dx_ref_inv[j] = dx_ref_mat;
 
-    std ::vector<Tripletf> tripletListGj(4);
-    tripletListGj[0] = Tripletf(i0, 0, -1.0f);
-    tripletListGj[1] = Tripletf(i0, 1, -1.0f);
-    tripletListGj[2] = Tripletf(i1, 0, 1.0f);
-    tripletListGj[3] = Tripletf(i2, 1, 1.0f);
+    std ::vector<Tripletd> tripletListGj(4);
+    tripletListGj[0] = Tripletd(i0, 0, -1.0);
+    tripletListGj[1] = Tripletd(i0, 1, -1.0);
+    tripletListGj[2] = Tripletd(i1, 0, 1.0);
+    tripletListGj[3] = Tripletd(i2, 1, 1.0);
 
-    SparseMatf Gj(n_verts, 2);
+    SparseMatd Gj(n_verts, 2);
     Gj.setFromTriplets(tripletListGj.begin(), tripletListGj.end());
-    SparseMatf dx_ref_sp = Eigen::SparseView(dx_ref_mat);
+    SparseMatd dx_ref_sp = Eigen::SparseView(dx_ref_mat);
     Gj = Gj * dx_ref_sp;
 
-    SparseMatf SjT(2, 2 * n_faces);
-    SjT.insert(0, 2 * j) = 1.0f;
-    SjT.insert(1, 2 * j + 1) = 1.0f;
+    SparseMatd SjT(2, 2 * n_faces);
+    SjT.insert(0, 2 * j) = 1.0;
+    SjT.insert(1, 2 * j + 1) = 1.0;
 
     L += face_mass(j) * (stiffness_hydro + stiffness_devia) * Gj *
          Gj.transpose();
@@ -65,44 +65,40 @@ ProjectiveDynamicsSolver<2>::ProjectiveDynamicsSolver(
   }
 
   LHS_sparse = M_h2 + L;
-  LHS = LHS_sparse;
-  // solver = LHS.partialPivLu();
-  // precompute LHS decomposition
-  // solver.compute(LHS);
   sparse_solver.analyzePattern(LHS_sparse);
   sparse_solver.factorize(LHS_sparse);
 }
 
 template <>
-void ProjectiveDynamicsSolver<2>::localStep(MatxXf& verts,
+void ProjectiveDynamicsSolver<2>::localStep(MatxXd& verts,
                                             const Matx3i& faces) {
-  MatxXf U, V;
-  Vecxf S;
-  MatxXf F(2, 2);
-  MatxXf lhs(3, 3);
-  Vecxf rhs(3);
-  Vecxf delta(3);
+  MatxXd U, V;
+  Vecxd S;
+  MatxXd F(2, 2);
+  MatxXd lhs(3, 3);
+  Vecxd rhs(3);
+  Vecxd delta(3);
   for (int j = 0; j < n_faces; j++) {
     int i0 = faces(j, 0);
     int i1 = faces(j, 1);
     int i2 = faces(j, 2);
-    Vecxf dx1 = verts.row(i1) - verts.row(i0);
-    Vecxf dx2 = verts.row(i2) - verts.row(i0);
+    Vecxd dx1 = verts.row(i1) - verts.row(i0);
+    Vecxd dx2 = verts.row(i2) - verts.row(i0);
     F << dx1, dx2;
     F = F * dx_ref_inv[j];
 
-    Eigen::JacobiSVD<MatxXf> svd(F, Eigen::ComputeFullU | Eigen::ComputeFullV);
+    Eigen::JacobiSVD<MatxXd> svd(F, Eigen::ComputeFullU | Eigen::ComputeFullV);
     U = svd.matrixU();
     V = svd.matrixV();
     S = svd.singularValues();
     ssvd<2>(U, S, V);
 
-    float sig11 = S(0);
-    float sig22 = S(1);
-    float d1, d2;
+    double sig11 = S(0);
+    double sig22 = S(1);
+    double d1, d2;
     d1 = 1.0 - sig11;
     d2 = 1.0 - sig22;
-    float lambda = 0.0f;
+    double lambda = 0.0f;
     for (int iter = 0; iter < 20; iter++) {
       lhs << 1.0f, lambda, d2 + sig22,   //
           lambda, 1.0f, d1 + sig11,      //
@@ -116,39 +112,37 @@ void ProjectiveDynamicsSolver<2>::localStep(MatxXf& verts,
       d2 += delta(1);
       lambda += delta(2);
     }
-    Vecxf S_new(2);
+    Vecxd S_new(2);
     S_new << d1 + sig11, d2 + sig22;
-    MatxXf D = U * S_new.asDiagonal() * V.transpose();
-    MatxXf R = U * V.transpose();
+    MatxXd D = U * S_new.asDiagonal() * V.transpose();
+    MatxXd R = U * V.transpose();
     P.block(j * 2, 0, 2, 2) = (1.0f - ratio) * D + ratio * R;
   }
 }
 
 template <>
-void ProjectiveDynamicsSolver<2>::globalStep(MatxXf& verts,
-                                             const MatxXf& verts_pred) {
-  Eigen::MatrixXf rhs = M_h2 * verts_pred + J * P;
-  Eigen::MatrixXf result = sparse_solver.solve(rhs);
-  // float error = (LHS * result - rhs).norm();
-  // std::cout << "error: " << error << std::endl;
-  verts = result;
+void ProjectiveDynamicsSolver<2>::globalStep(MatxXd& verts,
+                                             const MatxXd& verts_pred) {
+  Eigen::MatrixXd rhs = M_h2 * verts_pred + J * P;
+  Eigen::MatrixXd result = sparse_solver.solve(rhs.cast<double>());
+  verts = result.cast<double>();
 }
 
 ControlledProjDynSolver::ControlledProjDynSolver(
-    ProjectiveDynamicsSolver<2>* proj_solver, MatxXf control_weights) {
+    ProjectiveDynamicsSolver<2>* proj_solver, MatxXd control_weights) {
   pd_solver = proj_solver;
   n_controls = control_weights.rows();
-  SparseMatf LHS;
+  SparseMatd LHS;
   LHS = pd_solver->LHS_sparse;
   int n_verts = LHS.rows();
   assert(control_weights.cols() == n_verts);
   int n_controls = control_weights.rows();
-  SparseMatf combined_LHS(n_verts + n_controls, n_verts + n_controls);
-  SparseMatf control_weights_sparse = control_weights.sparseView();
-  SparseMatf control_weights_sparse_T;
+  SparseMatd combined_LHS(n_verts + n_controls, n_verts + n_controls);
+  SparseMatd control_weights_sparse = control_weights.sparseView();
+  SparseMatd control_weights_sparse_T;
   control_weights_sparse_T = control_weights_sparse.transpose();
   for (int k = 0; k < LHS.outerSize(); ++k)
-    for (SparseMatf::InnerIterator it(LHS, k); it; ++it)
+    for (SparseMatd::InnerIterator it(LHS, k); it; ++it)
       combined_LHS.insert(it.row(), it.col()) = it.value();
   for (int i = 0; i < control_weights.rows(); i++)
     for (int j = 0; j < control_weights.cols(); j++) {
@@ -159,16 +153,16 @@ ControlledProjDynSolver::ControlledProjDynSolver(
   sparse_solver.factorize(combined_LHS);
 }
 
-void ControlledProjDynSolver::globalStep(MatxXf& verts,
-                                         const MatxXf& verts_pred,
-                                         const MatxXf& control_verts,
-                                         MatxXf& lambda) {
-  Eigen::MatrixXf rhs =
+void ControlledProjDynSolver::globalStep(MatxXd& verts,
+                                         const MatxXd& verts_pred,
+                                         const MatxXd& control_verts,
+                                         MatxXd& lambda) {
+  Eigen::MatrixXd rhs =
       pd_solver->M_h2 * verts_pred + pd_solver->J * pd_solver->P;
-  Eigen::MatrixXf control_rhs(n_controls + pd_solver->n_verts, 2);
+  Eigen::MatrixXd control_rhs(n_controls + pd_solver->n_verts, 2);
   control_rhs.topRows(pd_solver->n_verts) = rhs;
   control_rhs.bottomRows(n_controls) = control_verts;
-  Eigen::MatrixXf result = sparse_solver.solve(control_rhs);
+  Eigen::MatrixXd result = sparse_solver.solve(control_rhs);
   verts = result.topRows(pd_solver->n_verts);
   lambda = result.bottomRows(n_controls);
 }
