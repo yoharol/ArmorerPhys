@@ -27,8 +27,9 @@ int main() {
   aphys::extract_edge(face_indices, edge_indices);
 
   // ===================== prepare simulation data =====================
-  int substep = 6;
-  float dt = 1.0 / 60.0 / (float)substep;
+  int substep = 2;
+  float rho = 1.0f;
+  float dt = 1.0 / 200.0f;
   float devia_stiffness = 10.0f;
   float hydro_stiffness = 10.0f;
   int dim = 2;
@@ -43,7 +44,8 @@ int main() {
   v_pred.resize(v_p.rows(), v_p.cols());
   v_solver.resize(v_p.rows(), v_p.cols());
   aphys::Vecxf vert_mass, face_mass;
-  aphys::compute_mesh_mass(v_p_ref, face_indices, face_mass, vert_mass);
+  aphys::compute_mesh_mass(v_p_ref, face_indices, face_mass, vert_mass, rho);
+  std::cout << vert_mass(0) << std::endl;
   aphys::Box2d box(0.0f, 1.0f, 0.0f, 1.0f);
   aphys::Vecxf J(v_p.rows() * dim);
   aphys::MatxXf H(v_p.rows() * dim, v_p.rows() * dim);
@@ -88,12 +90,13 @@ int main() {
     v_cache = v_p;
     aphys::ImplicitEuler::predict(v_pred, v_p, v_vel, external_force, vert_mass,
                                   dt);
-    for (int i = 0; i < 2; i++) {
+    for (int i = 0; i < 100; i++) {
       pd_solver.localStep(v_p, face_indices);
       pd_solver.globalStep(new_verts, v_pred);
+      aphys::collision2d(box, new_verts);
       float error = (new_verts - v_p).norm();
       v_p = new_verts;
-      aphys::collision2d(box, v_p);
+      if (error < 1e-4) break;
     }
     aphys::ImplicitEuler::updateVelocity(v_vel, v_p, v_cache, dt);
 

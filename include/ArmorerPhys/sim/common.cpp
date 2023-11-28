@@ -61,7 +61,7 @@ void extract_edge(const Matx3i& faces, Matx2i& edge) {
 }
 
 void compute_mesh_mass(const MatxXf& verts, const Matx3i& faces,
-                       Vecxf& face_mass, Vecxf& vert_mass) {
+                       Vecxf& face_mass, Vecxf& vert_mass, float rho) {
   int n_faces = faces.rows();
   int n_verts = verts.rows();
   face_mass.resize(n_faces);
@@ -74,7 +74,7 @@ void compute_mesh_mass(const MatxXf& verts, const Matx3i& faces,
     Vecxf v1 = verts.row(i1);
     Vecxf v2 = verts.row(i2) - v1.transpose();
     Vecxf v3 = verts.row(i3) - v1.transpose();
-    float area = computeArea(v2, v3);
+    float area = computeArea(v2, v3) * rho;
     face_mass(i) = area;
     vert_mass(i1) += area / 3.0f;
     vert_mass(i2) += area / 3.0f;

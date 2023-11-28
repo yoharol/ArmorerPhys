@@ -35,10 +35,11 @@ int main() {
   aphys::extract_edge(face_indices, edge_indices);
 
   // ===================== prepare simulation data =====================
-  int substep = 40;
-  float dt = 1.0 / 60.0 / (float)substep;
-  float devia_stiffness = 100.0f;
-  float hydro_stiffness = 100.0f;
+  int substep = 1;
+  float dt = 1.0f / 100.0f;
+  float devia_stiffness = 1.0f;
+  float hydro_stiffness = 1.0f;
+  float rho = 1000.0f;
   int dim = 2;
   aphys::Vecxf gravity(dim);
   gravity << 0.0f, -3.0f;
@@ -51,7 +52,7 @@ int main() {
   v_pred.resize(v_p.rows(), v_p.cols());
   v_solver.resize(v_p.rows(), v_p.cols());
   aphys::Vecxf vert_mass, face_mass;
-  aphys::compute_mesh_mass(v_p_ref, face_indices, face_mass, vert_mass);
+  aphys::compute_mesh_mass(v_p_ref, face_indices, face_mass, vert_mass, rho);
   aphys::Box2d box(0.0f, 1.0f, 0.0f, 1.0f);
   aphys::Vecxf J(v_p.rows() * dim);
   aphys::MatxXf H(v_p.rows() * dim, v_p.rows() * dim);
@@ -126,7 +127,7 @@ int main() {
 
   aphys::add_gui_func(gui, [&]() {
     ImGui::PlotLines("lambda", lambda_norm.data(), lambda_norm.size(), 0,
-                     nullptr, 0.0f, 2000.0f, ImVec2(SCR_WIDTH, 50));
+                     nullptr, 0.0f, 3000.0f, ImVec2(SCR_WIDTH, 50));
   });
 
   aphys::add_gui_mouse_input_func(gui, [&]() {
@@ -139,7 +140,7 @@ int main() {
       aphys::Vecxf v = v_control.row(0);
       aphys::Vecxf target(2);
       target << x, y;
-      float interpolate = 0.04f;
+      float interpolate = 1.0f;
       if ((v - target).norm() < 0.01f) {
         v_control.row(0) = target;
       } else {
@@ -169,9 +170,12 @@ int main() {
     aphys::ImplicitEuler::predict(v_pred, v_p, v_vel, external_force, vert_mass,
                                   dt);
     lbs();
-    for (int i = 0; i < 10; i++) {
+    for (int i = 0; i < 100; i++) {
       pd_solver.localStep(v_p, face_indices);
-      cpd_solver.globalStep(v_p, v_pred, control_vector, lambda);
+      cpd_solver.globalStep(v_solver, v_pred, control_vector, lambda);
+      float error = (v_solver - v_p).norm();
+      v_p = v_solver;
+      if (error < 1e-5) break;
     }
 
     aphys::ImplicitEuler::updateVelocity(v_vel, v_p, v_cache, dt);

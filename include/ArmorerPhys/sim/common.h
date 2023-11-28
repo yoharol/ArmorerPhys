@@ -12,7 +12,7 @@ void compute_edge_length(const MatxXf& verts, const Matx2i& edge,
                          Vecxf& length);
 
 void compute_mesh_mass(const MatxXf& verts, const Matx3i& faces,
-                       Vecxf& face_mass, Vecxf& vert_mass);
+                       Vecxf& face_mass, Vecxf& vert_mass, float rho = 1.0f);
 
 void generate_gravity_force(const Vecxf& gravity, const Vecxf& vert_mass,
                             MatxXf& gravity_force);
