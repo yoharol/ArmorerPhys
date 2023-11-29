@@ -32,6 +32,9 @@ struct RandomEngine {
 
 Vec3d heat_rgb(double value, double minv, double maxv);
 
+void set_sparse_block(SparseMatd& mat, const MatxXd& block, int row, int col,
+                      int n, int m);
+
 void Mat3fToList3f(const Matx3d& mat, Listx3f& vec);
 
 void List3fToMat3f(const Listx3f& vec, Matx3d& mat);

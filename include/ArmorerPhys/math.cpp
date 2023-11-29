@@ -54,6 +54,15 @@ void Mat2fToList3f(const Matx2f& mat, Listx3f& vec) {
   }
 }
 
+void set_sparse_block(SparseMatd& mat, const MatxXd& block, int row, int col,
+                      int n, int m) {
+  for (int i = 0; i < block.rows(); ++i) {
+    for (int j = 0; j < block.cols(); ++j) {
+      mat.insert(row + i, col + j) = block(i, j);
+    }
+  }
+}
+
 double computeArea(const Vecxd& vec1, const Vecxd& vec2) {
   if (vec1.size() != vec2.size()) {
     throw std::runtime_error("computeArea: vec1.size() != vec2.size()");
