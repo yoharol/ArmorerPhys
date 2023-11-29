@@ -58,11 +58,14 @@ ProjectiveDynamicsSolver<2>::ProjectiveDynamicsSolver(
          Gj.transpose();
     J += face_mass(j) * (stiffness_hydro + stiffness_devia) * Gj * SjT;
   }
+  L.makeCompressed();
+  J.makeCompressed();
   ratio = stiffness_devia / (stiffness_hydro + stiffness_devia);
 
   for (int i = 0; i < n_verts; i++) {
     M_h2.insert(i, i) = vert_mass(i) / dt / dt;
   }
+  M_h2.makeCompressed();
 
   LHS_sparse = M_h2 + L;
   sparse_solver.analyzePattern(LHS_sparse);
