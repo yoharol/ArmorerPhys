@@ -41,12 +41,15 @@ struct ImplicitEuler {
 };
 
 // define the energy computation function type
-typedef std::function<double(MatxXd&)> EnergyFunc;
+typedef std::function<double(MatxXd&)> EnergyFuncMatBased;
+typedef std::function<double(Vecxd&)> EnergyFuncVecBased;
 
 // line search along direction dv to minimize energy_func(v+alpha dv)
 void line_search(MatxXd& v, MatxXd& v_solver, const Vecxd& dv, const Vecxd& J,
-                 EnergyFunc energy_func, double beta = 0.5f,
+                 EnergyFuncMatBased energy_func, double beta = 0.5f,
                  double gamma = 0.03f);
+void line_search(MatxXd& v, MatxXd& v_solver, const Vecxd& dv, const Vecxd& J,
+                 EnergyFuncMatBased energy_func, double beta, double gamma);
 
 }  // namespace aphys
 

@@ -188,20 +188,35 @@ void ImplicitEuler::updateVelocity(MatxXd& vel, const MatxXd& verts,
 
 // line search along direction dv to minimize energy_func(v+alpha dv)
 void line_search(MatxXd& v, MatxXd& v_solver, const Vecxd& dv, const Vecxd& J,
-                 EnergyFunc energy_func, double beta, double gamma) {
+                 EnergyFuncMatBased energy_func, double beta, double gamma) {
   double alpha = 1.0f;
   v_solver = v;
-  std::function<void()> add_v;
-  if (v.cols() > 1)
-    add_v = [&]() { concatenate_add(v_solver, alpha * dv); };
-  else
-    add_v = [&]() { v_solver += alpha * dv; };
+  concatenate_add(v_solver, alpha * dv);
   double ddv = dv.transpose() * J;
   int iter = 0;
   while (energy_func(v_solver) > energy_func(v) + gamma * alpha * ddv) {
     alpha *= beta;
     v_solver = v;
-    add_v();
+    concatenate_add(v_solver, alpha * dv);
+    if (iter++ > 100) {
+      std::cout << "line search failed" << std::endl;
+      break;
+    }
+  }
+  v = v_solver;
+}
+
+void line_search(Vecxd& v, Vecxd& v_solver, const Vecxd& dv, const Vecxd& J,
+                 EnergyFuncVecBased energy_func, double beta, double gamma) {
+  double alpha = 1.0f;
+  v_solver = v;
+  v_solver += alpha * dv;
+  double ddv = dv.transpose() * J;
+  int iter = 0;
+  while (energy_func(v_solver) > energy_func(v) + gamma * alpha * ddv) {
+    alpha *= beta;
+    v_solver = v;
+    concatenate_add(v_solver, alpha * dv);
     if (iter++ > 100) {
       std::cout << "line search failed" << std::endl;
       break;
