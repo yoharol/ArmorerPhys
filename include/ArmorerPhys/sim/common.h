@@ -49,7 +49,7 @@ void line_search_mat(MatxXd& v, MatxXd& v_solver, const Vecxd& dv,
                      const Vecxd& J, EnergyFuncMatBased energy_func,
                      double beta = 0.5, double gamma = 0.03);
 void line_search_vec(Vecxd& v, Vecxd& v_solver, const Vecxd& dv, const Vecxd& J,
-                     EnergyFuncMatBased energy_func, double beta = 0.5,
+                     EnergyFuncVecBased energy_func, double beta = 0.5,
                      double gamma = 0.03);
 
 }  // namespace aphys
