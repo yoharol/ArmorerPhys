@@ -187,8 +187,9 @@ void ImplicitEuler::updateVelocity(MatxXd& vel, const MatxXd& verts,
 }
 
 // line search along direction dv to minimize energy_func(v+alpha dv)
-void line_search(MatxXd& v, MatxXd& v_solver, const Vecxd& dv, const Vecxd& J,
-                 EnergyFuncMatBased energy_func, double beta, double gamma) {
+void line_search_mat(MatxXd& v, MatxXd& v_solver, const Vecxd& dv,
+                     const Vecxd& J, EnergyFuncMatBased energy_func,
+                     double beta, double gamma) {
   double alpha = 1.0f;
   v_solver = v;
   concatenate_add(v_solver, alpha * dv);
@@ -206,8 +207,9 @@ void line_search(MatxXd& v, MatxXd& v_solver, const Vecxd& dv, const Vecxd& J,
   v = v_solver;
 }
 
-void line_search(Vecxd& v, Vecxd& v_solver, const Vecxd& dv, const Vecxd& J,
-                 EnergyFuncVecBased energy_func, double beta, double gamma) {
+void line_search_vec(Vecxd& v, Vecxd& v_solver, const Vecxd& dv, const Vecxd& J,
+                     EnergyFuncVecBased energy_func, double beta,
+                     double gamma) {
   double alpha = 1.0f;
   v_solver = v;
   v_solver += alpha * dv;

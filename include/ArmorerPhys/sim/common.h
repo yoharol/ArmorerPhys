@@ -45,11 +45,12 @@ typedef std::function<double(MatxXd&)> EnergyFuncMatBased;
 typedef std::function<double(Vecxd&)> EnergyFuncVecBased;
 
 // line search along direction dv to minimize energy_func(v+alpha dv)
-void line_search(MatxXd& v, MatxXd& v_solver, const Vecxd& dv, const Vecxd& J,
-                 EnergyFuncMatBased energy_func, double beta = 0.5f,
-                 double gamma = 0.03f);
-void line_search(MatxXd& v, MatxXd& v_solver, const Vecxd& dv, const Vecxd& J,
-                 EnergyFuncMatBased energy_func, double beta, double gamma);
+void line_search_mat(MatxXd& v, MatxXd& v_solver, const Vecxd& dv,
+                     const Vecxd& J, EnergyFuncMatBased energy_func,
+                     double beta = 0.5f, double gamma = 0.03f);
+void line_search_vec(MatxXd& v, MatxXd& v_solver, const Vecxd& dv,
+                     const Vecxd& J, EnergyFuncMatBased energy_func,
+                     double beta, double gamma);
 
 }  // namespace aphys
 

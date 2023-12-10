@@ -81,7 +81,7 @@ int main() {
         aphys::SpringFEM::Hessian(v_p, v_p_ref, edge_indices, H, stiffness);
         aphys::ImplicitEuler::modifyHessian(H, vert_mass, dt);
         dv = -H.colPivHouseholderQr().solve(J);
-        aphys::line_search(v_p, v_solver, dv, J, [&](aphys::MatxXd& v) {
+        aphys::line_search_mat(v_p, v_solver, dv, J, [&](aphys::MatxXd& v) {
           return aphys::ImplicitEuler::modifyEnergy(
               aphys::SpringFEM::Energy(v, v_p_ref, edge_indices, stiffness), v,
               v_pred, vert_mass, dt);
