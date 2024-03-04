@@ -88,5 +88,6 @@ if(PROJECT_IS_TOP_LEVEL)
   add_gl_target(08_fem_spring)
   add_gl_target(09_mathplot2d)
   # add_gl_target(10_lbs2d)
+  add_gl_target(11_bezier)
 endif()
 
