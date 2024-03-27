@@ -75,7 +75,7 @@ void compute_mesh_mass(const MatxXd& verts, const Matx3i& faces,
     Vecxd v1 = verts.row(i1);
     Vecxd v2 = verts.row(i2) - v1.transpose();
     Vecxd v3 = verts.row(i3) - v1.transpose();
-    double area = computeArea(v2, v3) * rho;
+    double area = abs(computeArea(v2, v3) * rho);
     face_mass(i) = area;
     vert_mass(i1) += area / 3.0f;
     vert_mass(i2) += area / 3.0f;
