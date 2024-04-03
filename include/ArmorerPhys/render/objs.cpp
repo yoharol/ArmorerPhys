@@ -370,4 +370,19 @@ RenderFunc get_render_func(Edges &edges) {
   return render_func;
 }
 
+Lines create_deriv_lines() { return create_lines(); }
+
+void set_deriv_lines_data(Lines &lines, const MatxXf &points_data,
+                          const MatxXf &deriv_data, const float deriv_scale,
+                          const MatxXf &per_line_color) {
+  MatxXf new_points = points_data + deriv_data * deriv_scale;
+  MatxXf points_pair(points_data.rows() * 2, points_data.cols());
+  for (int i = 0; i < points_data.rows(); i++) {
+    points_pair.row(2 * i) = points_data.row(i);
+    points_pair.row(2 * i + 1) = new_points.row(i);
+  }
+  set_lines_data(lines, points_pair, per_line_color);
+  lines.mode = GL_LINES;
+}
+
 }  // namespace aphys

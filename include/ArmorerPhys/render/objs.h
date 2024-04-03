@@ -103,6 +103,12 @@ void set_edges_data(Edges &edges, const MatxXf &points_data,
 
 RenderFunc get_render_func(Edges &edges);
 
+Lines create_deriv_lines();
+
+void set_deriv_lines_data(Lines &lines, const MatxXf &points_data,
+                          const MatxXf &deriv_data, const float deriv_scale,
+                          const MatxXf &per_line_color);
+
 }  // namespace aphys
 
 #endif  // GL_OBJS_H_
