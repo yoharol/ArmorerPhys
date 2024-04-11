@@ -6,6 +6,21 @@
 
 namespace aphys {
 
+int find_nearest_point(const MatxXd &points, const Vecxd &point) {
+  assert(points.cols() == point.size());
+  int n_points = points.rows();
+  double min_dist = (points.row(0).transpose() - point).norm();
+  int min_idx = 0;
+  for (int i = 1; i < n_points; ++i) {
+    double dist = (points.row(i).transpose() - point).norm();
+    if (dist < min_dist) {
+      min_dist = dist;
+      min_idx = i;
+    }
+  }
+  return min_idx;
+}
+
 MatxXf get_normals(const MatxXf &vertices, const MatxXi &indices) {
   assert(indices.cols() == 3);
   assert(indices.rows() > 0);
@@ -59,6 +74,53 @@ void create_rectangle(double l, double r, int hori_count, double b, double t,
             (i + 1) * (vert_count + 1) + j + 1, i * (vert_count + 1) + j + 1;
       }
     }
+  }
+}
+
+AffineControls create_affine_controls(MatxXd &points_ref_position) {
+  int n_control_points = points_ref_position.rows();
+  int dim = points_ref_position.cols();
+  return AffineControls{n_control_points, dim, points_ref_position,
+                        MatxXd(n_control_points * dim, dim + 1),
+                        Vecxd(n_control_points * dim * (dim + 1))};
+}
+
+void affine_organize_Tvec(AffineControls &controls) {
+  controls.Tvec = Vecxd::Map(controls.T.data(), controls.T.size());
+}
+
+void update_affine_rotation(AffineControls &controls, int idx, double angle) {
+  assert(controls.dim == 2);
+  Eigen::AngleAxisd rot(angle, Eigen::Vector3d::UnitZ());
+  Eigen::Matrix2d R = rot.toRotationMatrix().block(0, 0, 2, 2);
+  controls.T.block(idx * 2, 0, 2, 2) = R;
+}
+
+void update_affine_rotation(AffineControls &controls, Vecxd &angles) {
+  for (int i = 0; i < controls.n_control_points; i++) {
+    update_affine_rotation(controls, i, angles(i));
+  }
+}
+
+void update_affine_translation(AffineControls &controls, int idx,
+                               Vecxd &translation) {
+  int dim = controls.dim;
+  controls.T.block(idx * dim, dim, dim, 1) = translation;
+}
+
+void update_affine_from_world_translation(AffineControls &controls, int idx,
+                                          Vecxd &translation) {
+  int dim = controls.dim;
+  MatxXd rot_i = controls.T.block(idx * dim, 0, dim, dim);
+  Vecxd ref_pos = controls.points_ref_position.row(idx).transpose();
+  controls.T.block(idx * dim, dim, dim, 1) = (translation - rot_i * ref_pos);
+}
+
+void update_affine_from_world_translation(AffineControls &controls,
+                                          MatxXd &translation) {
+  for (int i = 0; i < controls.n_control_points; i++) {
+    Vecxd trans = translation.row(i).transpose();
+    update_affine_from_world_translation(controls, i, trans);
   }
 }
 
