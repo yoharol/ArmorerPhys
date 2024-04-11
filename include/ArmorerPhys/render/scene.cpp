@@ -16,6 +16,8 @@ Scene create_scene(Light light, Camera camera) {
   scene.camera = camera;
   scene.render_funcs = std::vector<RenderFunc>();
   scene.depth_test = std::vector<bool>();
+  scene.delta_time = 0.0;
+  scene.time = glfwGetTime();
   return scene;
 }
 
@@ -24,7 +26,7 @@ void add_render_func(Scene& scene, RenderFunc func, bool depth_test) {
   scene.depth_test.push_back(depth_test);
 }
 
-void render_scene(Scene scene) {
+void render_scene(Scene& scene) {
   for (int i = 0; i < scene.render_funcs.size(); ++i) {
     if (scene.depth_test[i]) {
       glEnable(GL_DEPTH_TEST);
@@ -33,6 +35,8 @@ void render_scene(Scene scene) {
     }
     scene.render_funcs[i](scene);
   }
+  scene.delta_time = glfwGetTime() - scene.time;
+  scene.time = glfwGetTime();
 }
 
 InputHandler& create_input_handler(GLFWwindow* window) {

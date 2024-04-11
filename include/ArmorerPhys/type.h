@@ -41,7 +41,8 @@ using Listx2f = std::vector<Vec2f>;
 using Listx3d = std::vector<Vec3d>;
 using Listx2d = std::vector<Vec2d>;
 using SparseMatf = Eigen::SparseMatrix<float>;
-using SparseMatd = Eigen::SparseMatrix<double>;
+using SparseMatd = Eigen::SparseMatrix<double, Eigen::RowMajor>;
+using SparseVecd = Eigen::SparseVector<double>;
 using Tripletf = Eigen::Triplet<float>;
 using Tripletd = Eigen::Triplet<double>;
 

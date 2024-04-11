@@ -27,7 +27,8 @@ int main() {
   // ===================== create a rectangle =====================
   aphys::MatxXd v_p;
   aphys::Matx3i face_indices;
-  aphys::create_rectangle(0.4, 0.6, 10, 0.2, 0.8, 30, v_p, face_indices);
+  aphys::create_rectangle(0.4, 0.6, 6, 0.2, 0.8, 10, v_p, face_indices);
+  int n_verts = v_p.rows();
   aphys::Matx2i edge_indices;
   aphys::extract_edge(face_indices, edge_indices);
 
@@ -40,15 +41,60 @@ int main() {
   aphys::compute_edge_length(v_p, edge_indices, rest_length);
   aphys::compute_mesh_mass(v_p, face_indices, face_mass, vert_mass);
   vert_invm = vert_mass.cwiseInverse();
-  vert_invm(0) = 0.0f;
 
+  // ===================== prepare control point =====================
+  aphys::MatxXd v_p_rig = v_p;
+  aphys::MatxXd v_control(1, 2);
+  double angle = 0.0;
+  aphys::MatxXd v_control_ref;
+  v_control << 0.5, 0.5;
+  v_control_ref = v_control;
+  double angle_ref = 0.0;
+  aphys::Vecxd Tvec(v_control.rows() * 6);
+
+  auto update_control = [&]() {
+    aphys::MatxXd R(2, 2);
+    double dangle = angle - angle_ref;
+    R << cos(dangle), -sin(dangle), sin(dangle), cos(dangle);
+    aphys::Vecxd t(2);
+    t = v_control.row(0).transpose() - R * v_control_ref.row(0).transpose();
+    aphys::MatxXd affine(2, 3);
+    affine.block(0, 0, 2, 2) = R;
+    affine.block(0, 2, 2, 1) = t;
+    Tvec = Eigen::Map<aphys::Vecxd>(affine.data(), affine.size());
+  };
+
+  aphys::MatxXd v_control_weights(2, v_p.rows());
+  aphys::SparseMatd lbs_W(v_p.rows() * 2, v_control.rows() * 6);
+
+  double mass_sum = vert_mass.sum();
+  for (int i = 0; i < v_p.rows(); i++) {
+    double w = 1.0;
+    lbs_W.insert(2 * i, 0) = w * v_p_ref(i, 0);
+    lbs_W.insert(2 * i, 1) = w * v_p_ref(i, 1);
+    lbs_W.insert(2 * i, 2) = w;
+    lbs_W.insert(2 * i + 1, 3) = w * v_p_ref(i, 0);
+    lbs_W.insert(2 * i + 1, 4) = w * v_p_ref(i, 1);
+    lbs_W.insert(2 * i + 1, 5) = w;
+  }
+  lbs_W.makeCompressed();
+  auto lbs = [&]() {
+    aphys::Vecxd rig_vec = lbs_W * Tvec;
+    v_p_rig = aphys::MatxXd::Map(rig_vec.data(), n_verts, 2);
+  };
+
+  update_control();
+  lbs();
   // ===================== prepare simulation =====================
   double dt = 1.0 / 60.0 / 15.0;
   aphys::Vecxd gravity(2);
-  gravity << 0.0f, -0.5f;
+  gravity << 0.0f, 0.0f;
   aphys::PbdFramework pbd_framework;
   pbd_framework.addConstraint(std::make_shared<aphys::DeformConstraint<2>>(
-      v_p, v_p_ref, face_indices, face_mass, vert_invm, 0.3f, 0.3f, dt));
+      v_p, v_p_ref, face_indices, face_mass, vert_invm, 0.1, 0.1, dt));
+  pbd_framework.addConstraint(std::make_shared<aphys::AffineConstraint2D>(
+      v_p, v_p_ref, v_p_rig, lbs_W, vert_mass, vert_invm, Tvec, 1e-4, 1e-4,
+      dt));
   aphys::Box2d box(0.0f, 1.0f, 0.0f, 1.0f);
 
   // ===================== prepare render =====================
@@ -62,8 +108,15 @@ int main() {
   edges.color = aphys::RGB(0, 0, 0);
   edges.width = 1.0f;
 
+  aphys::Edges rig_edges = aphys::create_edges();
+  aphys::set_edges_data(rig_edges, v_p_rig.cast<float>(), edge_indices,
+                        aphys::MatxXf());
+  rig_edges.color = aphys::RGB(0, 0, 255);
+  rig_edges.alpha = 0.3f;
+
   aphys::add_render_func(scene, aphys::get_render_func(points));
   aphys::add_render_func(scene, aphys::get_render_func(edges));
+  aphys::add_render_func(scene, aphys::get_render_func(rig_edges));
 
   // ===================== handle input =====================
   aphys::InputHandler& handler = aphys::create_input_handler(window);
@@ -72,23 +125,24 @@ int main() {
       double xpos, ypos;
       xpos = left + (right - left) * handler.xpos;
       ypos = bottom + (top - bottom) * handler.ypos;
-      v_p.row(0) = aphys::Vec2d(xpos, ypos);
+      v_control.row(0) = aphys::Vec2d(xpos, ypos);
     }
   });
-  aphys::add_mouse_input_func(handler, [](aphys::InputHandler& input_handler,
-                                          int button, int action) {
-    std::cout << "mouse button event: " << button << " " << action << std::endl;
-  });
   aphys::add_key_input_func(
-      handler, [](aphys::InputHandler& input_handler, int key, int action) {
-        std::cout << "key event: " << key << " " << action << std::endl;
+      handler, [&](aphys::InputHandler& input_handler, int key, int action) {
+        if (key == GLFW_KEY_Q && action == GLFW_REPEAT) {
+          angle -= 2.0 * scene.delta_time;
+        }
+        if (key == GLFW_KEY_E && action == GLFW_REPEAT) {
+          angle += 2.0 * scene.delta_time;
+        }
       });
-
-  std::cout << "Click and drag mouse to move the fixed point" << std::endl;
 
   glfwSwapInterval(1);
 
   while (!glfwWindowShouldClose(window)) {
+    update_control();
+    lbs();
     for (int _ = 0; _ < 15; ++_) {
       pbd_framework.pbdPredict(v_p, v_vel, v_cache, vert_invm, gravity, dt);
       pbd_framework.preProjectConstraints();
@@ -102,6 +156,8 @@ int main() {
 
     aphys::set_points_data(points, v_p.cast<float>(), aphys::MatxXf());
     aphys::set_edges_data(edges, v_p.cast<float>(), edge_indices,
+                          aphys::MatxXf());
+    aphys::set_edges_data(rig_edges, v_p_rig.cast<float>(), edge_indices,
                           aphys::MatxXf());
 
     aphys::render_scene(scene);

@@ -23,13 +23,15 @@ struct Scene {
   Camera camera;
   std::vector<RenderFunc> render_funcs;
   std::vector<bool> depth_test;
+  float delta_time;
+  float time;
 };
 
 Scene create_scene(Light light, Camera camera);
 
 void add_render_func(Scene& scene, RenderFunc func, bool depth_test = true);
 
-void render_scene(Scene scene);
+void render_scene(Scene& scene);
 
 struct InputHandler {
   static InputHandler& getInstance() {

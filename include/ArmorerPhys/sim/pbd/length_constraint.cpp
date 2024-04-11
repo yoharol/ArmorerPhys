@@ -11,11 +11,7 @@ LengthConstraint::LengthConstraint(MatxXd& verts, const Matx2i& edges,
   project_func = [&]() { project(verts, edges, rest_length, verts_invm, dt); };
 }
 
-void LengthConstraint::preProject() {
-  for (int i = 0; i < lambda.size(); i++) {
-    lambda(i) = 0.f;
-  }
-}
+void LengthConstraint::preProject() { lambda.setZero(); }
 
 void LengthConstraint::project(MatxXd& verts, const Matx2i& edges,
                                Vecxd& rest_length, Vecxd& verts_invm,
@@ -31,7 +27,7 @@ void LengthConstraint::project(MatxXd& verts, const Matx2i& edges,
     Vecxd n = delta_p / delta_p_norm;
 
     double delta_lambda = -(C + tilde_alpha * lambda(i)) /
-                         (verts_invm(i1) + verts_invm(i2) + tilde_alpha);
+                          (verts_invm(i1) + verts_invm(i2) + tilde_alpha);
     lambda(i) += delta_lambda;
 
     verts.row(i1) += verts_invm(i1) * delta_lambda * n;

@@ -27,6 +27,11 @@ ProjectiveDynamicsSolver<2>::ProjectiveDynamicsSolver(
   dx_ref_inv.resize(n_faces);
   P.resize(n_faces * 2, 2);
 
+  MatxXd L_mat(n_verts, n_verts);
+  L_mat.setZero();
+  MatxXd J_mat(n_verts, 2 * n_faces);
+  J_mat.setZero();
+
   for (int j = 0; j < n_faces; j++) {
     int i0 = faces(j, 0);
     int i1 = faces(j, 1);
@@ -54,12 +59,12 @@ ProjectiveDynamicsSolver<2>::ProjectiveDynamicsSolver(
     SjT.insert(0, 2 * j) = 1.0;
     SjT.insert(1, 2 * j + 1) = 1.0;
 
-    L += face_mass(j) * (stiffness_hydro + stiffness_devia) * Gj *
-         Gj.transpose();
-    J += face_mass(j) * (stiffness_hydro + stiffness_devia) * Gj * SjT;
+    L_mat += face_mass(j) * (stiffness_hydro + stiffness_devia) * Gj *
+             Gj.transpose();
+    J_mat += face_mass(j) * (stiffness_hydro + stiffness_devia) * Gj * SjT;
   }
-  L.makeCompressed();
-  J.makeCompressed();
+  L = L_mat.sparseView();
+  J = J_mat.sparseView();
   ratio = stiffness_devia / (stiffness_hydro + stiffness_devia);
 
   for (int i = 0; i < n_verts; i++) {
