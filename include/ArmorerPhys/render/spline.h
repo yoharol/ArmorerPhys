@@ -53,6 +53,16 @@ T bezier_interpolate_second_deriv(T& P1, T& P2, T& P3, T& P4, float t) {
   return 6.0f * (1 - t) * (P3 - 2 * P2 + P1) + 6.0f * t * (P4 - 2 * P3 + P2);
 }
 
+Vecxd Sample_BsplineCurve(double t, const MatxXd& poly, int k);
+
+Vecxd Bspline_Basis(double t, int n, int k, int& idx);
+
+Vecxd Sample_BsplineLocalDerivative(double t, const MatxXd& poly, int k);
+Vecxd Bspline_deriv_Basis(double t, int n, int k, int& idx);
+
+Vecxd Sample_BsplineSecondDerivative(double t, const MatxXd& poly, int k);
+Vecxd Bspline_second_deriv_Basis(double t, int n, int k, int& idx);
+
 }  // namespace aphys
 
 #endif  // GL_SPLINE_H_

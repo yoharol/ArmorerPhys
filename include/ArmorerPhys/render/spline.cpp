@@ -130,4 +130,209 @@ RenderFunc get_render_func(BezierSpline& spline) {
   return render_func;
 }
 
+/**
+ * Divide by zero equals to zero
+ */
+double divide(double a, double b) {
+  if (b == 0)
+    return 0;
+  else
+    return a / b;
+}
+
+Vecxd Sample_BsplineCurve(double t, const MatxXd& poly, int k) {
+  // k = degree of curve + 1
+  int dim = poly.cols();
+  Vecxd p(dim);
+  p.setZero();
+  int N = poly.rows() + 1 - k;  // N=max{knot vector}
+  int index = N * t + (t == 1. ? -1 : 0);
+  Vecxd boor(k + 1);
+  Vecxd knot(2 * k);
+
+  const auto knot_generator = [&](int i) -> double {
+    return std::clamp(i - k + 1, 0, N) / static_cast<double>(N);
+  };
+
+  // Calculate the knot vector only for adjacent 2*k values
+  for (int i = 0; i < k * 2; i++) knot(i) = knot_generator(index + i);
+  // Boor-Cox coefficient for k related points
+  for (int i = 0; i <= k; i++) boor(i) = 0.0;
+  boor(k - 1) = 1.0;
+
+  for (int i = 2; i <= k; i++) {
+    for (int j = 0; j < k; j++)
+      boor(j) =
+          divide(t - knot(j), knot(j + i - 1) - knot(j)) * boor(j) +
+          divide(knot(j + i) - t, knot(j + i) - knot(j + 1)) * boor(j + 1);
+  }
+  for (int i = 0; i < k; i++) p += boor(i) * poly.row(index + i).transpose();
+  return p;
+}
+
+Vecxd Bspline_Basis(double t, int n, int k, int& idx) {
+  int N = n + 1 - k;  // N=max{knot vector}
+  int index = N * t + (t == 1. ? -1 : 0);
+  Vecxd boor(k + 1);
+  Vecxd knot(2 * k);
+
+  const auto knot_generator = [&](int i) -> double {
+    return std::clamp(i - k + 1, 0, N) / static_cast<double>(N);
+  };
+
+  for (int i = 0; i < k * 2; i++) knot(i) = knot_generator(index + i);
+  for (int i = 0; i <= k; i++) boor(i) = 0.0;
+  boor(k - 1) = 1.0;
+
+  for (int i = 2; i <= k; i++) {
+    for (int j = 0; j < k; j++)
+      boor(j) =
+          divide(t - knot(j), knot(j + i - 1) - knot(j)) * boor(j) +
+          divide(knot(j + i) - t, knot(j + i) - knot(j + 1)) * boor(j + 1);
+  }
+  idx = index;
+  return boor.segment(0, k);
+}
+
+Vecxd Sample_BsplineLocalDerivative(double t, const MatxXd& poly, int k) {
+  int N = poly.rows() + 1 - k;
+  const auto knot_generator = [&](int i) -> double {
+    return std::clamp(i - k + 1, 0, N) / static_cast<double>(N);
+  };
+
+  MatxXd Q_poly(poly.rows() - 1, poly.cols());
+  int index = N * t + (t == 1. ? -1 : 0);
+  for (int i = index; i < index + k - 1; i++)
+    Q_poly.row(i) = (k - 1) / (knot_generator(i + k) - knot_generator(i + 1)) *
+                    (poly.row(i + 1) - poly.row(i));
+  int idx;
+  Vecxd boor_deriv = Bspline_Basis(t, Q_poly.rows(), k - 1, idx);
+
+  Vecxd boor(k);
+  boor.setZero();
+  for (int i = index; i < index + k - 1; i++) {
+    boor(i + 1 - index) += (k - 1) /
+                           (knot_generator(i + k) - knot_generator(i + 1)) *
+                           boor_deriv(i - index);
+    boor(i - index) -= (k - 1) /
+                       (knot_generator(i + k) - knot_generator(i + 1)) *
+                       boor_deriv(i - index);
+  }
+
+  Vecxd p(poly.cols());
+  p.setZero();
+  // for (int i = 0; i < k - 1; i++)
+  //   p += boor_deriv(i) * Q_poly.row(index + i).transpose();
+  for (int i = 0; i < k; i++) p += boor(i) * poly.row(index + i).transpose();
+  return p;
+  // return Sample_BsplineCurve(t, Q_poly, k - 1);
+}
+
+Vecxd Bspline_deriv_Basis(double t, int n, int k, int& idx) {
+  int N = n + 1 - k;
+  const auto knot_generator = [&](int i) -> double {
+    return std::clamp(i - k + 1, 0, N) / static_cast<double>(N);
+  };
+
+  int index = N * t + (t == 1. ? -1 : 0);
+  Vecxd boor_deriv = Bspline_Basis(t, n - 1, k - 1, idx);
+  Vecxd boor(k);
+  boor.setZero();
+  for (int i = index; i < index + k - 1; i++) {
+    boor(i + 1 - index) += (k - 1) /
+                           (knot_generator(i + k) - knot_generator(i + 1)) *
+                           boor_deriv(i - index);
+    boor(i - index) -= (k - 1) /
+                       (knot_generator(i + k) - knot_generator(i + 1)) *
+                       boor_deriv(i - index);
+  }
+  idx = index;
+  return boor;
+}
+
+Vecxd Sample_BsplineSecondDerivative(double t, const MatxXd& poly, int k) {
+  int N = poly.rows() + 1 - k;
+  const auto knot_generator = [&](int i) -> double {
+    return std::clamp(i - k + 1, 0, N) / static_cast<double>(N);
+  };
+
+  MatxXd Q_poly(poly.rows() - 1, poly.cols());
+  int index = N * t + (t == 1. ? -1 : 0);
+  for (int i = index; i < index + k - 1; i++)
+    Q_poly.row(i) = (k - 1) / (knot_generator(i + k) - knot_generator(i + 1)) *
+                    (poly.row(i + 1) - poly.row(i));
+
+  MatxXd Q2_poly(Q_poly.rows() - 1, Q_poly.cols());
+  for (int i = index; i < index + k - 2; i++)
+    Q2_poly.row(i) = (k - 2) / (knot_generator(i + k) - knot_generator(i + 2)) *
+                     (Q_poly.row(i + 1) - Q_poly.row(i));
+  int idx;
+  Vecxd boor_second_deriv = Bspline_Basis(t, Q2_poly.rows(), k - 2, idx);
+  Vecxd p(poly.cols());
+  p.setZero();
+  for (int i = 0; i < k - 2; i++)
+    p += boor_second_deriv(i) * Q2_poly.row(index + i).transpose();
+
+  Vecxd boor_deriv(k - 1);
+  boor_deriv.setZero();
+  Vecxd boor(k);
+  boor.setZero();
+
+  for (int i = index; i < index + k - 2; i++) {
+    boor_deriv(i + 1 - index) +=
+        (k - 2) / (knot_generator(i + k) - knot_generator(i + 2)) *
+        boor_second_deriv(i - index);
+    boor_deriv(i - index) -= (k - 2) /
+                             (knot_generator(i + k) - knot_generator(i + 2)) *
+                             boor_second_deriv(i - index);
+  }
+  for (int i = index; i < index + k - 1; i++) {
+    boor(i + 1 - index) += (k - 1) /
+                           (knot_generator(i + k) - knot_generator(i + 1)) *
+                           boor_deriv(i - index);
+    boor(i - index) -= (k - 1) /
+                       (knot_generator(i + k) - knot_generator(i + 1)) *
+                       boor_deriv(i - index);
+  }
+
+  p.setZero();
+  for (int i = 0; i < k; i++) p += boor(i) * poly.row(index + i).transpose();
+
+  return p;
+  // return Sample_BsplineCurve(t, Q2_poly, k - 2);
+}
+
+Vecxd Bspline_second_deriv_Basis(double t, int n, int k, int& idx) {
+  int N = n + 1 - k;
+  const auto knot_generator = [&](int i) -> double {
+    return std::clamp(i - k + 1, 0, N) / static_cast<double>(N);
+  };
+  int index = N * t + (t == 1. ? -1 : 0);
+
+  Vecxd boor_second_deriv = Bspline_Basis(t, n - 2, k - 2, idx);
+  Vecxd boor_deriv(k - 1);
+  boor_deriv.setZero();
+  Vecxd boor(k);
+  boor.setZero();
+
+  for (int i = index; i < index + k - 2; i++) {
+    boor_deriv(i + 1 - index) +=
+        (k - 2) / (knot_generator(i + k) - knot_generator(i + 2)) *
+        boor_second_deriv(i - index);
+    boor_deriv(i - index) -= (k - 2) /
+                             (knot_generator(i + k) - knot_generator(i + 2)) *
+                             boor_second_deriv(i - index);
+  }
+  for (int i = index; i < index + k - 1; i++) {
+    boor(i + 1 - index) += (k - 1) /
+                           (knot_generator(i + k) - knot_generator(i + 1)) *
+                           boor_deriv(i - index);
+    boor(i - index) -= (k - 1) /
+                       (knot_generator(i + k) - knot_generator(i + 1)) *
+                       boor_deriv(i - index);
+  }
+  idx = index;
+  return boor;
+}
+
 }  // namespace aphys
