@@ -12,7 +12,9 @@ inline void writeOBJ(const std::string &filename, const MatxXf &V,
                      const MatxXi &F) {
   if (V.cols() == 2) {
     MatxXf V3(V.rows(), 3);
-    V3 << V, MatxXf::Zero(V.rows(), 1);
+    for (int i = 0; i < V.rows(); i++) {
+      V3.row(i) << V.row(i), 0.0;
+    }
     igl::writeOBJ(filename, V3, F);
   } else if (V.cols() == 3) {
     igl::writeOBJ(filename, V, F);
