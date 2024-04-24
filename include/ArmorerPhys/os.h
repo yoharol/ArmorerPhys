@@ -21,7 +21,6 @@ inline void writeOBJ(const std::string &filename, const MatxXf &V,
   } else {
     throw std::runtime_error("writeOBJ: V must have 2 or 3 columns");
   }
-  igl::writeOBJ(filename, V, F);
 }
 }  // namespace aphys
 
