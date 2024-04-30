@@ -1,10 +1,13 @@
+#ifndef ARMORER_SIM_FEM_SPRING_H_
+#define ARMORER_SIM_FEM_SPRING_H_
+
 #include "ArmorerPhys/type.h"
 
 namespace aphys {
 
 struct SpringFEM {
   static double Energy(MatxXd& verts, const MatxXd& verts_ref,
-                      const Matx2i& edges, double k);
+                       const Matx2i& edges, double k);
   static void Jacobian(MatxXd& verts, const MatxXd& verts_ref,
                        const Matx2i& edges, Vecxd& J, double k);
   static void Hessian(MatxXd& verts, const MatxXd& verts_ref,
@@ -12,3 +15,5 @@ struct SpringFEM {
 };
 
 }  // namespace aphys
+
+#endif  // ARMORER_SIM_FEM_SPRING_H_

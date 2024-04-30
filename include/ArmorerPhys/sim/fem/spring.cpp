@@ -1,11 +1,9 @@
 #include "ArmorerPhys/sim/fem/spring.h"
 
-#include <iostream>
-
 namespace aphys {
 
 double SpringFEM::Energy(MatxXd& verts, const MatxXd& verts_ref,
-                        const Matx2i& edges, double k) {
+                         const Matx2i& edges, double k) {
   double energy = 0.0f;
   for (int i = 0; i < edges.rows(); i++) {
     int i1 = edges(i, 0);
