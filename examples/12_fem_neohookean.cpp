@@ -96,12 +96,7 @@ int main() {
                                         lambda);
         aphys::ImplicitEuler::modifyHessian(H, vert_mass, dt);
         dv = -H.colPivHouseholderQr().solve(J);
-        aphys::line_search_mat(v_p, v_solver, dv, J, [&](aphys::MatxXd& v) {
-          aphys::NeoHookeanFEM2D::project_F(v, face_indices, B, F);
-          return aphys::ImplicitEuler::modifyEnergy(
-              aphys::NeoHookeanFEM2D::Energy(F, face_mass, mu, lambda), v,
-              v_pred, vert_mass, dt);
-        });
+        aphys::concatenate_add(v_p, dv);
       }
       // v_p = v_pred;
 

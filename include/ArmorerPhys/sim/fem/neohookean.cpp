@@ -83,7 +83,6 @@ void NeoHookeanFEM2D::Jacobian(const MatxXd& F, const MatxXd& B,
                                Vecxd& J, double mu, double lambda) {
   int n_faces = face_volume.size();
   double alpha = 1.0 + mu / lambda - mu / (4.0 * lambda);
-  J.resize(2 * n_faces);
   J.setZero();
   for (int i = 0; i < n_faces; i++) {
     Mat2d F_i = F.block<2, 2>(0, 2 * i);
@@ -120,7 +119,6 @@ void NeoHookeanFEM2D::Hessian(const MatxXd& F, const MatxXd& B,
                               MatxXd& H, double mu, double lambda) {
   int n_faces = faces.rows();
   double alpha = 1.0 + mu / lambda - mu / (4.0 * lambda);
-  H.resize(2 * n_faces, 2 * n_faces);
   H.setZero();
   for (int i = 0; i < n_faces; i++) {
     Mat2d F_i = F.block<2, 2>(0, 2 * i);
