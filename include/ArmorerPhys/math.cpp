@@ -63,6 +63,17 @@ void set_sparse_block(SparseMatd& mat, const MatxXd& block, int row, int col,
   }
 }
 
+void set_diag_matrix(Vecxd& diag_vec, DiagMatxXd& diag_mat, int expand) {
+  int n = diag_vec.size();
+  Vecxd expanded_vec = Vecxd::Zero(n * expand);
+  for (int i = 0; i < n; ++i) {
+    for (int j = 0; j < expand; ++j) {
+      expanded_vec(i * expand + j) = diag_vec(i);
+    }
+  }
+  diag_mat = expanded_vec.asDiagonal();
+}
+
 double computeArea(const Vecxd& vec1, const Vecxd& vec2) {
   if (vec1.size() != vec2.size()) {
     throw std::runtime_error("computeArea: vec1.size() != vec2.size()");
