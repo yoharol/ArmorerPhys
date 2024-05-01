@@ -6,6 +6,7 @@
 
 namespace aphys {
 
+using DiagMatxXd = Eigen::DiagonalMatrix<double, Eigen::Dynamic>;
 using Matx2f = Eigen::Matrix<float, Eigen::Dynamic, 2, Eigen::RowMajor>;
 using Matx3f = Eigen::Matrix<float, Eigen::Dynamic, 3, Eigen::RowMajor>;
 using MatxXf =
