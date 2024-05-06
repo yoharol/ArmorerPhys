@@ -45,7 +45,7 @@ struct ProjectiveDynamicsSolver {
                            const Vecxd& vert_mass, const MatxXd& external_force,
                            double dt, double stiffness_hydro,
                            double stffness_devia);
-  void localStep(MatxXd& verts, const Matx3i& faces);
+  void localStep(const MatxXd& verts, const Matx3i& faces);
   void globalStep(MatxXd& verts, const MatxXd& verts_pred);
 };
 
