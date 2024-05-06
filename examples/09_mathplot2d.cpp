@@ -54,7 +54,7 @@ int main() {
   aphys::generate_gravity_force(gravity, vert_mass, external_force);
 
   // ================ prepare projective dynamics solver =====================
-  aphys::ProjectiveDynamicsSolver<2> pd_solver(
+  aphys::ProjectiveDynamicsSolver2D<2> pd_solver(
       v_p, v_p_ref, face_indices, face_mass, vert_mass, external_force, dt,
       hydro_stiffness, devia_stiffness);
 

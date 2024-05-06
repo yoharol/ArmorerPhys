@@ -7,6 +7,7 @@
 #include "ArmorerPhys/os.h"
 #include "ArmorerPhys/image.h"
 #include "ArmorerPhys/geom.h"
+#include "ArmorerPhys/tet.h"
 #include "ArmorerPhys/render/draw.h"
 #include "ArmorerPhys/render/buffer.h"
 #include "ArmorerPhys/render/window.h"

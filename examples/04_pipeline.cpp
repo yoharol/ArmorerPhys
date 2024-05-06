@@ -76,19 +76,13 @@ int main() {
 
   aphys::set_wireframe_mode(false);
 
-  float prev_time = glfwGetTime();
-  float start_time = prev_time;
-
   while (!glfwWindowShouldClose(window)) {
     aphys::set_background_RGB(aphys::RGB(250, 240, 228));
 
     float curr_time = glfwGetTime();
-    aphys::orbit_camera_control(window, scene.camera, 10.0,
-                                curr_time - prev_time);
-    prev_time = curr_time;
-    scene.light.position =
-        aphys::Vec3f(5.0f * sin((curr_time - start_time) * 1.0f), 0.35f,
-                     5.0f * cos((curr_time - start_time) * 1.0f));
+    aphys::orbit_camera_control(window, scene.camera, 10.0, scene.delta_time);
+    scene.light.position = aphys::Vec3f(5.0f * sin(scene.time * 1.0f), 0.35f,
+                                        5.0f * cos(scene.time * 1.0f));
 
     aphys::render_scene(scene);
     aphys::render_gui(gui);

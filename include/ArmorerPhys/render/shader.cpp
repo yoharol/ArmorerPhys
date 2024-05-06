@@ -172,14 +172,14 @@ const ShaderSourceWithGeometry line_shader = {
       offset.x = offset.x / aspectRatio;
 
       fragColor = vertexColor[0];
-      gl_Position = vec4(p1 + offset, 0.0, 1.0);
+      gl_Position = gl_in[0].gl_Position + vec4(offset, 0.0, 0.0);
       EmitVertex();
-      gl_Position = vec4(p1 - offset, 0.0, 1.0);
+      gl_Position = gl_in[0].gl_Position - vec4(offset, 0.0, 0.0);
       EmitVertex();
       fragColor = vertexColor[1];
-      gl_Position = vec4(p2 + offset, 0.0, 1.0);
+      gl_Position = gl_in[1].gl_Position + vec4(offset, 0.0, 0.0);
       EmitVertex();
-      gl_Position = vec4(p2 - offset, 0.0, 1.0);
+      gl_Position = gl_in[1].gl_Position - vec4(offset, 0.0, 0.0);
       EmitVertex();
       EndPrimitive();
     }

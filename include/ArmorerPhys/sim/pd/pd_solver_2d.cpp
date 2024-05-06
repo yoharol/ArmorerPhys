@@ -1,19 +1,19 @@
 #include "ArmorerPhys/sim/pd/pd_solver.h"
 
-#include <stdexcept>
-#include <iostream>
 #include <Eigen/Dense>
 #include <Eigen/SparseCore>
 #include <Eigen/SparseCholesky>
 #include <Eigen/SVD>
 #include <Eigen/IterativeLinearSolvers>
 
+#include <stdexcept>
+#include <iostream>
+
 #include "ArmorerPhys/math.h"
 
 namespace aphys {
 
-template <>
-ProjectiveDynamicsSolver<2>::ProjectiveDynamicsSolver(
+ProjectiveDynamicsSolver2D::ProjectiveDynamicsSolver2D(
     const MatxXd& verts, const MatxXd& verts_ref, const Matx3i& faces,
     const Vecxd& face_mass, const Vecxd& vert_mass,
     const MatxXd& external_force, double dt, double stiffness_hydro,
@@ -77,9 +77,8 @@ ProjectiveDynamicsSolver<2>::ProjectiveDynamicsSolver(
   sparse_solver.factorize(LHS_sparse);
 }
 
-template <>
-void ProjectiveDynamicsSolver<2>::localStep(const MatxXd& verts,
-                                            const Matx3i& faces) {
+void ProjectiveDynamicsSolver2D::localStep(const MatxXd& verts,
+                                           const Matx3i& faces) {
   MatxXd U, V;
   Vecxd S;
   MatxXd F(2, 2);
@@ -128,16 +127,15 @@ void ProjectiveDynamicsSolver<2>::localStep(const MatxXd& verts,
   }
 }
 
-template <>
-void ProjectiveDynamicsSolver<2>::globalStep(MatxXd& verts,
-                                             const MatxXd& verts_pred) {
+void ProjectiveDynamicsSolver2D::globalStep(MatxXd& verts,
+                                            const MatxXd& verts_pred) {
   Eigen::MatrixXd rhs = M_h2 * verts_pred + J * P;
   Eigen::MatrixXd result = sparse_solver.solve(rhs.cast<double>());
   verts = result.cast<double>();
 }
 
 ControlledProjDynSolver::ControlledProjDynSolver(
-    ProjectiveDynamicsSolver<2>* proj_solver, MatxXd control_weights) {
+    ProjectiveDynamicsSolver2D* proj_solver, MatxXd control_weights) {
   pd_solver = proj_solver;
   n_controls = control_weights.rows();
   SparseMatd LHS;

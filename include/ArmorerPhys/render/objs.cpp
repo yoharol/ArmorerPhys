@@ -81,7 +81,7 @@ DiffuseMesh create_diffuse_mesh(DiffuseMaterial &material) {
   return mesh;
 }
 
-void set_mesh_data(DiffuseMesh &mesh, MatxXf &V, MatxXi &F) {
+void set_mesh_data(DiffuseMesh &mesh, MatxXf V, MatxXi F) {
   mesh.n_vertices = V.rows();
   mesh.n_faces = F.rows();
 
@@ -383,6 +383,35 @@ void set_deriv_lines_data(Lines &lines, const MatxXf &points_data,
   }
   set_lines_data(lines, points_pair, per_line_color);
   lines.mode = GL_LINES;
+}
+
+Edges create_box_edges() { return create_edges(); }
+
+void set_box_edges_data(Edges &edges, const Box3d &box) {
+  MatxXf points(8, 3);
+  Matx2f b = box.bound.cast<float>();
+  points << b(0, 0), b(1, 0), b(2, 0),  //
+      b(0, 0), b(1, 0), b(2, 1),        //
+      b(0, 0), b(1, 1), b(2, 0),        //
+      b(0, 0), b(1, 1), b(2, 1),        //
+      b(0, 1), b(1, 0), b(2, 0),        //
+      b(0, 1), b(1, 0), b(2, 1),        //
+      b(0, 1), b(1, 1), b(2, 0),        //
+      b(0, 1), b(1, 1), b(2, 1);
+  Matx2i indices(12, 2);
+  indices << 0, 1,  //
+      0, 2,         //
+      0, 4,         //
+      1, 3,         //
+      1, 5,         //
+      2, 3,         //
+      2, 6,         //
+      3, 7,         //
+      4, 5,         //
+      4, 6,         //
+      5, 7,         //
+      6, 7;
+  set_edges_data(edges, points, indices, MatxXf());
 }
 
 }  // namespace aphys

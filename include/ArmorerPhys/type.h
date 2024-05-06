@@ -17,6 +17,7 @@ using MatxXd =
     Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor>;
 using Matx2i = Eigen::Matrix<int, Eigen::Dynamic, 2, Eigen::RowMajor>;
 using Matx3i = Eigen::Matrix<int, Eigen::Dynamic, 3, Eigen::RowMajor>;
+using Matx4i = Eigen::Matrix<int, Eigen::Dynamic, 4, Eigen::RowMajor>;
 using MatxXi =
     Eigen::Matrix<int, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor>;
 using Vecxf = Eigen::VectorXf;
@@ -35,6 +36,7 @@ using RowVec3d = Eigen::RowVector3d;
 using RowVec2d = Eigen::RowVector2d;
 using Vecxi = Eigen::VectorXi;
 using Vec3i = Eigen::Vector3i;
+using Vec4i = Eigen::Vector4i;
 using Vec2i = Eigen::Vector2i;
 using Mat2f = Eigen::Matrix2f;
 using Mat3f = Eigen::Matrix3f;

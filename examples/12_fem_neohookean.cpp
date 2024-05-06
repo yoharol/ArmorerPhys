@@ -22,7 +22,7 @@ int main() {
   // ===================== create a rectangle =====================
   aphys::MatxXd v_p;
   aphys::Matx3i face_indices;
-  aphys::create_rectangle(0.35, 0.65, 10, 0.45, 0.95, 15, v_p, face_indices);
+  aphys::create_rectangle(0.35, 0.65, 8, 0.45, 0.95, 12, v_p, face_indices);
   aphys::Matx2i edge_indices;
   aphys::extract_edge(face_indices, edge_indices);
 

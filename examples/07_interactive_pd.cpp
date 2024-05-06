@@ -80,7 +80,7 @@ int main() {
   aphys::MatxXd lambda(2, 2);
 
   // ================ prepare projective dynamics solver =====================
-  aphys::ProjectiveDynamicsSolver<2> pd_solver(
+  aphys::ProjectiveDynamicsSolver2D pd_solver(
       v_p, v_p_ref, face_indices, face_mass, vert_mass, external_force, dt,
       hydro_stiffness, devia_stiffness);
   aphys::ControlledProjDynSolver cpd_solver(&pd_solver, v_comp_weights);

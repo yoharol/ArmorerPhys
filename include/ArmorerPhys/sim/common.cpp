@@ -10,57 +10,6 @@
 
 namespace aphys {
 
-void compute_edge_length(const MatxXd& verts, const Matx2i& edge,
-                         Vecxd& length) {
-  int n_edges = edge.rows();
-  length.resize(n_edges);
-  for (int i = 0; i < n_edges; i++) {
-    int i1 = edge(i, 0);
-    int i2 = edge(i, 1);
-    Vecxd p1 = verts.row(i1);
-    Vecxd p2 = verts.row(i2);
-    length(i) = (p1 - p2).norm();
-  }
-}
-
-void extract_edge(const Matx3i& faces, Matx2i& edge) {
-  int n_faces = faces.rows();
-  std::vector<Vec3i> raw_edges(n_faces * 3);
-  for (int i = 0; i < n_faces; i++) {
-    for (int k1 = 0; k1 < 3; k1++) {
-      int k2 = (k1 + 1) % 3;
-      int i1 = faces(i, k1);
-      int i2 = faces(i, k2);
-      raw_edges[i * 3 + k1] = Vec3i(std::min(i1, i2), std::max(i1, i2), i);
-    }
-  }
-  std::sort(raw_edges.begin(), raw_edges.end(),
-            [](const Vec3i& a, const Vec3i& b) {
-              if (a(0) < b(0)) return true;
-              if (a(0) > b(0)) return false;
-              if (a(1) < b(1)) return true;
-              return false;
-            });
-
-  int i = 0;
-  std::vector<Vec2i> raw_edge_indices;
-  auto compare = [](Vec3i e1, Vec3i e2) {
-    if (e1(0) == e2(0) && e1(1) == e2(1)) return true;
-    return false;
-  };
-  while (i < raw_edges.size()) {
-    raw_edge_indices.emplace_back(Vec2i(raw_edges[i](0), raw_edges[i](1)));
-    if (i + 1 < raw_edges.size() && compare(raw_edges[i], raw_edges[i + 1]))
-      i += 2;
-    else
-      i += 1;
-  }
-  edge.resize(raw_edge_indices.size(), 2);
-  for (int i = 0; i < raw_edge_indices.size(); i++) {
-    edge.row(i) = raw_edge_indices[i];
-  }
-}
-
 void compute_mesh_mass(const MatxXd& verts, const Matx3i& faces,
                        Vecxd& face_mass, Vecxd& vert_mass, double rho) {
   int n_faces = faces.rows();
@@ -80,6 +29,31 @@ void compute_mesh_mass(const MatxXd& verts, const Matx3i& faces,
     vert_mass(i1) += area / 3.0f;
     vert_mass(i2) += area / 3.0f;
     vert_mass(i3) += area / 3.0f;
+  }
+}
+
+void compute_tet_mass(const MatxXd& verts, const Matx4i& tets, Vecxd& tet_mass,
+                      Vecxd& vert_mass, double rho) {
+  int n_tets = tets.rows();
+  int n_verts = verts.rows();
+  tet_mass.resize(n_tets);
+  vert_mass.resize(n_verts);
+  vert_mass.setZero();
+  for (int i = 0; i < n_tets; i++) {
+    int i0 = tets(i, 0);
+    int i1 = tets(i, 1);
+    int i2 = tets(i, 2);
+    int i3 = tets(i, 3);
+    Vecxd v0 = verts.row(i0);
+    Vecxd v1 = verts.row(i1);
+    Vecxd v2 = verts.row(i2);
+    Vecxd v3 = verts.row(i3);
+    double volume = abs(computeVolume(v1 - v0, v2 - v0, v3 - v0) * rho);
+    tet_mass(i) = volume;
+    vert_mass(i0) += volume / 4.0f;
+    vert_mass(i1) += volume / 4.0f;
+    vert_mass(i2) += volume / 4.0f;
+    vert_mass(i3) += volume / 4.0f;
   }
 }
 
@@ -195,7 +169,8 @@ void line_search_mat(MatxXd& v, MatxXd& v_solver, const Vecxd& dv,
   concatenate_add(v_solver, alpha * dv);
   double ddv = dv.transpose() * J;
   int iter = 0;
-  while (energy_func(v_solver) > energy_func(v) + gamma * alpha * ddv) {
+  double baseline = energy_func(v);
+  while (energy_func(v_solver) > baseline + gamma * alpha * ddv) {
     alpha *= beta;
     v_solver = v;
     concatenate_add(v_solver, alpha * dv);
@@ -215,7 +190,8 @@ void line_search_vec(Vecxd& v, Vecxd& v_solver, const Vecxd& dv, const Vecxd& J,
   v_solver += alpha * dv;
   double ddv = dv.transpose() * J;
   int iter = 0;
-  while (energy_func(v_solver) > energy_func(v) + gamma * alpha * ddv) {
+  double baseline = energy_func(v);
+  while (energy_func(v_solver) > baseline + gamma * alpha * ddv) {
     alpha *= beta;
     v_solver = v;
     concatenate_add(v_solver, alpha * dv);

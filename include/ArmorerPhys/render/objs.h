@@ -5,6 +5,7 @@
 #include "ArmorerPhys/render/buffer.h"
 #include "ArmorerPhys/render/shader.h"
 #include "ArmorerPhys/render/scene.h"
+#include "ArmorerPhys/geom.h"
 
 namespace aphys {
 
@@ -38,7 +39,7 @@ struct DiffuseMesh {
 
 DiffuseMesh create_diffuse_mesh(DiffuseMaterial &material);
 
-void set_mesh_data(DiffuseMesh &mesh, MatxXf &V, MatxXi &F);
+void set_mesh_data(DiffuseMesh &mesh, MatxXf V, MatxXi F);
 
 RenderFunc get_render_func(DiffuseMesh &mesh);
 
@@ -108,6 +109,10 @@ Lines create_deriv_lines();
 void set_deriv_lines_data(Lines &lines, const MatxXf &points_data,
                           const MatxXf &deriv_data, const float deriv_scale,
                           const MatxXf &per_line_color);
+
+Edges create_box_edges();
+
+void set_box_edges_data(Edges &edges, const Box3d &box);
 
 }  // namespace aphys
 

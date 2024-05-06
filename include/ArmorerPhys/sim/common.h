@@ -6,13 +6,11 @@
 
 namespace aphys {
 
-void extract_edge(const Matx3i& faces, Matx2i& edge);
-
-void compute_edge_length(const MatxXd& verts, const Matx2i& edge,
-                         Vecxd& length);
-
 void compute_mesh_mass(const MatxXd& verts, const Matx3i& faces,
                        Vecxd& face_mass, Vecxd& vert_mass, double rho = 1.0f);
+
+void compute_tet_mass(const MatxXd& verts, const Matx4i& tets, Vecxd& tet_mass,
+                      Vecxd& vert_mass, double rho = 1.0f);
 
 void generate_gravity_force(const Vecxd& gravity, const Vecxd& vert_mass,
                             MatxXd& gravity_force);

@@ -91,6 +91,10 @@ double computeArea(const Vecxd& vec1, const Vecxd& vec2) {
   return area;
 }
 
+double computeVolume(const Vec3d vec1, const Vec3d vec2, const Vec3d vec3) {
+  return abs(vec1.dot(vec2.cross(vec3))) / 6.0;
+}
+
 template <int dim>
 void ssvd(MatxXd& U, Vecxd& S, MatxXd& V) {
   if (U.determinant() < 0) {

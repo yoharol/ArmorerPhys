@@ -17,9 +17,9 @@ struct Box2d {
 
 struct Box3d {
   Matx2d bound;
-  Box3d(double l, double r, double y, double b) {
-    bound.resize(2, 2);
-    bound << l, r, y, b;
+  Box3d(double l, double r, double t, double b, double n, double f) {
+    bound.resize(3, 2);
+    bound << l, r, t, b, n, f;
   }
 };
 
@@ -55,6 +55,11 @@ void update_affine_from_world_translation(AffineControls &controls, int idx,
 
 void update_affine_from_world_translation(AffineControls &controls,
                                           MatxXd &translation);
+
+void extract_edge(const Matx3i &faces, Matx2i &edge);
+
+void compute_edge_length(const MatxXd &verts, const Matx2i &edge,
+                         Vecxd &length);
 
 }  // namespace aphys
 

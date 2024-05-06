@@ -49,6 +49,8 @@ void Mat2fToList3f(const Matx2d& mat, Listx3f& vec);
 
 double computeArea(const Vecxd& vec1, const Vecxd& vec2);
 
+double computeVolume(const Vec3d vec1, const Vec3d vec2, const Vec3d vec3);
+
 template <int dim>
 void ssvd(MatxXd& U, Vecxd& S, MatxXd& V);
 
