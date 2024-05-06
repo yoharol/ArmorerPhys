@@ -19,7 +19,7 @@ double SpringFEM::Energy(MatxXd& verts, const MatxXd& verts_ref,
 }
 
 // Jacobian of spring energy
-void SpringFEM::Jacobian(MatxXd& verts, const MatxXd& verts_ref,
+void SpringFEM::Jacobian(const MatxXd& verts, const MatxXd& verts_ref,
                          const Matx2i& edges, Vecxd& J, double k) {
   int dim = verts.cols();
   J.setZero();
@@ -38,7 +38,7 @@ void SpringFEM::Jacobian(MatxXd& verts, const MatxXd& verts_ref,
 }
 
 // Hessian of spring energy
-void SpringFEM::Hessian(MatxXd& verts, const MatxXd& verts_ref,
+void SpringFEM::Hessian(const MatxXd& verts, const MatxXd& verts_ref,
                         const Matx2i& edges, MatxXd& H, double k) {
   int dim = verts.cols();
   // std::cout << edges;

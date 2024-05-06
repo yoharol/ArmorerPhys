@@ -78,7 +78,7 @@ ProjectiveDynamicsSolver<2>::ProjectiveDynamicsSolver(
 }
 
 template <>
-void ProjectiveDynamicsSolver<2>::localStep(MatxXd& verts,
+void ProjectiveDynamicsSolver<2>::localStep(const MatxXd& verts,
                                             const Matx3i& faces) {
   MatxXd U, V;
   Vecxd S;
