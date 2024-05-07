@@ -77,8 +77,8 @@ void create_rectangle(double l, double r, int hori_count, double b, double t,
   }
 }
 
-void get_rectangle_axis_indices(const double value, const int dim,
-                                const MatxXd &vertices, Vecxi &axis_indices) {
+void get_axis_value_indices(const double value, const int dim,
+                            const MatxXd &vertices, Vecxi &axis_indices) {
   std::vector<int> indices;
   for (int i = 0; i < vertices.rows(); i++) {
     if (vertices(i, dim) == value) {

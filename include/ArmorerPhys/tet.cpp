@@ -3,9 +3,6 @@
 #include <vector>
 #include <algorithm>
 
-//! remove later
-#include <iostream>
-
 namespace aphys {
 
 void create_rectangular_prism(double l, double r, int x_count, double b,

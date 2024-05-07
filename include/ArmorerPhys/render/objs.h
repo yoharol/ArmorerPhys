@@ -45,6 +45,26 @@ RenderFunc get_render_func(DiffuseMesh &mesh);
 
 void delete_mesh(DiffuseMesh &mesh);
 
+struct ColorMesh {
+  VAO vertex_array;
+  VBO vertex_buffer;
+  VBO normal_buffer;
+  VBO color_buffer;
+  EBO index_buffer;
+  Program program;
+  DiffuseMaterial material;
+  int n_vertices;
+  int n_faces;
+};
+
+ColorMesh create_color_mesh(DiffuseMaterial &material);
+
+void set_color_mesh_data(ColorMesh &mesh, MatxXf V, MatxXi F, MatxXf C);
+
+RenderFunc get_render_func(ColorMesh &mesh);
+
+void delete_mesh(ColorMesh &mesh);
+
 struct Points {
   int n_points;
   VAO vertex_array;

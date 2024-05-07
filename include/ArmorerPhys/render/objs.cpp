@@ -142,6 +142,86 @@ void delete_mesh(DiffuseMesh &mesh) {
   delete_ebo(mesh.index_buffer);
 }
 
+ColorMesh create_color_mesh(DiffuseMaterial &material) {
+  ColorMesh mesh;
+  mesh.vertex_array = create_vao();
+  mesh.vertex_buffer = create_vbo();
+  mesh.normal_buffer = create_vbo();
+  mesh.color_buffer = create_vbo();
+  mesh.index_buffer = create_ebo();
+  mesh.program = create_program(
+      create_shader(source::color_diffuse_shader.vertex, GL_VERTEX_SHADER),
+      create_shader(source::color_diffuse_shader.fragment, GL_FRAGMENT_SHADER));
+  mesh.material = material;
+  return mesh;
+}
+
+void set_color_mesh_data(ColorMesh &mesh, MatxXf V, MatxXi F, MatxXf C) {
+  mesh.n_vertices = V.rows();
+  mesh.n_faces = F.rows();
+
+  use_program(mesh.program);
+
+  bind_vao(mesh.vertex_array);
+
+  bind_ebo(mesh.index_buffer);
+  set_ebo_static_data(F.data(), F.size() * sizeof(int));
+  unbind_ebo();
+
+  bind_vbo(mesh.vertex_buffer);
+  set_vbo_dynamic_data(V.data(), V.size() * sizeof(float));
+  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void *)0);
+  glEnableVertexAttribArray(0);
+  unbind_vbo();
+
+  bind_vbo(mesh.normal_buffer);
+  MatxXf normals = aphys::get_normals(V, F);
+  set_vbo_dynamic_data(normals.data(), normals.size() * sizeof(float));
+  glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void *)0);
+  glEnableVertexAttribArray(1);
+  unbind_vbo();
+
+  bind_vbo(mesh.color_buffer);
+  set_vbo_dynamic_data(C.data(), C.size() * sizeof(float));
+  glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void *)0);
+  glEnableVertexAttribArray(2);
+  unbind_vbo();
+
+  set_uniform_RGB(mesh.program, "specularColor", mesh.material.specular_color);
+  set_uniform_float(mesh.program, "specularStrength",
+                    mesh.material.specular_strength);
+  unuse_program();
+  unbind_vao();
+}
+
+RenderFunc get_render_func(ColorMesh &mesh) {
+  RenderFunc render_func = [&](Scene scene) {
+    use_program(mesh.program);
+    set_uniform_mat4(mesh.program, "projection", scene.camera.projection);
+    set_uniform_RGB(mesh.program, "lightColor", scene.light.light_color);
+    set_uniform_RGB(mesh.program, "ambientColor", scene.light.ambient_color);
+    set_uniform_float3(mesh.program, "lightPos", scene.light.position);
+    set_uniform_float3(mesh.program, "viewPos", scene.camera.position);
+    set_uniform_mat4(mesh.program, "projection", scene.camera.projection);
+    set_uniform_float3(mesh.program, "viewPos", scene.camera.position);
+    bind_vao(mesh.vertex_array);
+    bind_ebo(mesh.index_buffer);
+    glDrawElements(GL_TRIANGLES, mesh.n_faces * 3, GL_UNSIGNED_INT, 0);
+    unbind_vao();
+    unbind_ebo();
+    unuse_program();
+  };
+  return render_func;
+}
+
+void delete_mesh(ColorMesh &mesh) {
+  delete_program(mesh.program);
+  delete_vao(mesh.vertex_array);
+  delete_vbo(mesh.vertex_buffer);
+  delete_vbo(mesh.normal_buffer);
+  delete_ebo(mesh.index_buffer);
+}
+
 Points create_points() {
   glEnable(GL_PROGRAM_POINT_SIZE);
   return Points{

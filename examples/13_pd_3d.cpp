@@ -50,13 +50,30 @@ int main() {
   aphys::MatxXd verts;
   aphys::Matx4i tet_indices;
   aphys::Matx3i face_indices;
-  aphys::create_rectangular_prism(-0.4, 0.4, 5, 0.0, 3.0, 15, -0.4, 0.4, 5,
+  aphys::create_rectangular_prism(-0.5, 0.5, 5, 0.0, 3.0, 15, -0.3, 0.3, 5,
                                   verts, tet_indices);
   n_verts = verts.rows();
   aphys::extract_surface_from_tets(verts.rows(), tet_indices, face_indices);
   aphys::Matx2i surface_edges;
   aphys::extract_edge(face_indices, surface_edges);
   int n_faces = face_indices.rows();
+
+  aphys::Vecxi top_face_indices;
+  aphys::get_axis_value_indices(3.0, 1, verts, top_face_indices);
+  aphys::Vecxi bottom_face_indices;
+  aphys::get_axis_value_indices(0.0, 1, verts, bottom_face_indices);
+
+  aphys::MatxXf vert_color(n_verts, 3);
+  vert_color.rowwise() =
+      aphys::RowVec3f(90.f / 255.f, 178.f / 255.f, 255.f / 255.f);
+  for (int i = 0; i < top_face_indices.size(); i++) {
+    vert_color.row(top_face_indices(i)) =
+        aphys::RowVec3f(196.f / 255.f, 12.f / 255.f, 12.f / 255.f);
+  }
+  for (int i = 0; i < bottom_face_indices.size(); i++) {
+    vert_color.row(bottom_face_indices(i)) =
+        aphys::RowVec3f(196.f / 255.f, 12.f / 255.f, 12.f / 255.f);
+  }
 
   // ===================== prepare simulation data =====================
 
@@ -100,7 +117,7 @@ int main() {
                         aphys::MatxXf());
   aphys::set_box_edges_data(box_edges, box);
 
-  aphys::DiffuseMesh mesh = aphys::create_diffuse_mesh(material);
+  aphys::ColorMesh mesh = aphys::create_color_mesh(material);
 
   aphys::add_render_func(scene, aphys::get_render_func(mesh));
   aphys::add_render_func(scene, aphys::get_render_func(edges));
@@ -128,7 +145,8 @@ int main() {
 
     aphys::set_edges_data(edges, verts.cast<float>(), surface_edges,
                           aphys::MatxXf());
-    aphys::set_mesh_data(mesh, verts.cast<float>(), face_indices);
+    aphys::set_color_mesh_data(mesh, verts.cast<float>(), face_indices,
+                               vert_color);
 
     aphys::orbit_camera_control(window, scene.camera, 10.0, scene.delta_time);
 

@@ -28,6 +28,8 @@ extern const ShaderSourceWithGeometry line_shader;
 
 extern const ShaderSource basic_diffuse_shader;
 
+extern const ShaderSource color_diffuse_shader;
+
 extern const ShaderSource textured_diffuse_shader;
 
 }  // namespace source
