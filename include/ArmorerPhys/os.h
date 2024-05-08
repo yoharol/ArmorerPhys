@@ -5,6 +5,7 @@
 #include <vector>
 
 #include <igl/writeOBJ.h>
+#include <igl/writeMESH.h>
 
 namespace aphys {
 
@@ -20,6 +21,12 @@ inline void writeOBJ(const std::string &filename, const MatxXd &V,
     throw std::runtime_error("writeOBJ: V must have 2 or 3 columns");
   }
 }
+
+inline void writeMESH(const std::string &filename, const MatxXd &V,
+                      const MatxXi &T, const MatxXi &F) {
+  igl::writeMESH(filename, V, T, F);
+}
+
 }  // namespace aphys
 
 #endif  // GL_OS_H_
