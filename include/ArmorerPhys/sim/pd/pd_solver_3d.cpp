@@ -125,8 +125,8 @@ void ProjectiveDynamicsSolver3D::localStep(const MatxXd& verts,
     double lambda = 0.0f;
     for (int iter = 0; iter < 20; iter++) {
       lhs << 1.0f, lambda * p3, lambda * p2, p2 * p3,  //
-          lambda * p1, 1.0f, lambda * p3, p1 * p3,     //
-          lambda * p1, lambda * p2, 1.0, p1 * p2,      //
+          lambda * p3, 1.0f, lambda * p1, p1 * p3,     //
+          lambda * p2, lambda * p1, 1.0, p1 * p2,      //
           p2 * p3, p1 * p3, p1 * p2, 0.0f;             //
       rhs << d1 + lambda * p2 * p3,                    //
           d2 + lambda * p1 * p3,                       //
