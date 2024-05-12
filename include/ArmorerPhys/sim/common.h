@@ -36,6 +36,13 @@ struct ImplicitEuler {
   static void updateVelocity(MatxXd& vel, const MatxXd& verts,
                              const MatxXd& verts_cache, double dt,
                              double damping = 0.0f);
+
+  static void solveDeltaVelocity(MatxXd& delta_vel,                //
+                                 const MatxXd& verts,              //
+                                 const MatxXd& external_force,     //
+                                 const Vecxd& mass,                //
+                                 const Vecxd& J, const MatxXd& H,  //
+                                 const double dt);
 };
 
 // define the energy computation function type

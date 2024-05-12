@@ -160,6 +160,26 @@ void ImplicitEuler::updateVelocity(MatxXd& vel, const MatxXd& verts,
   }
 }
 
+void ImplicitEuler::solveDeltaVelocity(MatxXd& delta_vel,                //
+                                       const MatxXd& verts,              //
+                                       const MatxXd& external_force,     //
+                                       const Vecxd& mass,                //
+                                       const Vecxd& J, const MatxXd& H,  //
+                                       const double dt) {
+  int n_verts = verts.rows();
+  int dim = verts.cols();
+  Vecxd inv_mass = mass.cwiseInverse();
+  DiagMatxXd inv_M;
+  set_diag_matrix(inv_mass, inv_M, dim);
+  MatxXd LHS =
+      MatxXd::Identity(n_verts * dim, n_verts * dim) - dt * dt * inv_M * H;
+  Vecxd verts_vec = Vecxd::Map(verts.data(), n_verts * dim);
+  Vecxd extf_vec = Vecxd::Map(external_force.data(), n_verts * dim);
+  MatxXd RHS = dt * inv_M * (extf_vec - J + dt * H * verts_vec);
+  Vecxd dv_vec = LHS.colPivHouseholderQr().solve(RHS);
+  delta_vel = MatxXd::Map(dv_vec.data(), n_verts, dim);
+}
+
 // line search along direction dv to minimize energy_func(v+alpha dv)
 void line_search_mat(MatxXd& v, MatxXd& v_solver, const Vecxd& dv,
                      const Vecxd& J, EnergyFuncMatBased energy_func,

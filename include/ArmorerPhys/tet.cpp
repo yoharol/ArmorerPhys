@@ -2,6 +2,9 @@
 
 #include <vector>
 #include <algorithm>
+#include <iostream>
+
+#include "Eigen/Geometry"
 
 namespace aphys {
 
@@ -128,6 +131,69 @@ void extract_surface_from_tets(const int n_verts, const Matx4i& tets,
   faces.resize(surface_face_indices.size(), 3);
   for (int i = 0; i < surface_face_indices.size(); i++) {
     faces.row(i) = surface_face_indices[i].transpose();
+  }
+}
+
+void extract_visual_tets_surfaces(const Matx4i& tets, const MatxXd& verts,
+                                  Matx3i& visual_faces) {
+  visual_faces.resize(tets.rows() * 4, 3);
+  for (int i = 0; i < tets.rows(); i++) {
+    Matx3d tet_verts(4, 3);
+    tet_verts.row(0) = verts.row(tets(i, 0));
+    tet_verts.row(1) = verts.row(tets(i, 1));
+    tet_verts.row(2) = verts.row(tets(i, 2));
+    tet_verts.row(3) = verts.row(tets(i, 3));
+    Vec3d avg_v = tet_verts.colwise().mean();
+
+    for (int j = 0; j < 4; j++) {
+      Vec3i face;
+      for (int k = 0; k < 3; k++) visual_faces(i * 4 + j, k) = (j + k) % 4;
+
+      Vec3d v0 = tet_verts.row(visual_faces(i * 4 + j, 0)).transpose();
+      Vec3d v1 = tet_verts.row(visual_faces(i * 4 + j, 1)).transpose();
+      Vec3d v2 = tet_verts.row(visual_faces(i * 4 + j, 2)).transpose();
+      if ((v1 - v0).cross(v2 - v0).dot(avg_v - v0) > 0) {
+        int tmp = visual_faces(i * 4 + j, 1);
+        visual_faces(i * 4 + j, 1) = visual_faces(i * 4 + j, 2);
+        visual_faces(i * 4 + j, 2) = tmp;
+      }
+
+      for (int k = 0; k < 3; k++) visual_faces(i * 4 + j, k) += i * 4;
+    }
+  }
+}
+
+void construct_visual_tets(MatxXd& visual_verts, const MatxXd& verts,
+                           const Matx4i& tets, const double shrink_ratio) {
+  visual_verts.resize(tets.rows() * 4, 3);
+  for (int i = 0; i < tets.rows(); i++) {
+    int id1 = tets(i, 0);
+    int id2 = tets(i, 1);
+    int id3 = tets(i, 2);
+    int id4 = tets(i, 3);
+
+    Vecxd v1 = verts.row(id1);
+    Vecxd v2 = verts.row(id2);
+    Vecxd v3 = verts.row(id3);
+    Vecxd v4 = verts.row(id4);
+    Vecxd avg_v = (v1 + v2 + v3 + v4) / 4.0;
+
+    visual_verts.row(i * 4) = avg_v + shrink_ratio * (v1 - avg_v);
+    visual_verts.row(i * 4 + 1) = avg_v + shrink_ratio * (v2 - avg_v);
+    visual_verts.row(i * 4 + 2) = avg_v + shrink_ratio * (v3 - avg_v);
+    visual_verts.row(i * 4 + 3) = avg_v + shrink_ratio * (v4 - avg_v);
+  }
+}
+
+void construct_visual_tets_color(Matx3f& visual_verts_color,
+                                 const Matx3f& verts_color,
+                                 const Matx4i& tets) {
+  visual_verts_color.resize(tets.rows() * 4, 3);
+  for (int i = 0; i < tets.rows(); i++) {
+    visual_verts_color.row(i * 4) = verts_color.row(tets(i, 0));
+    visual_verts_color.row(i * 4 + 1) = verts_color.row(tets(i, 1));
+    visual_verts_color.row(i * 4 + 2) = verts_color.row(tets(i, 2));
+    visual_verts_color.row(i * 4 + 3) = verts_color.row(tets(i, 3));
   }
 }
 

@@ -93,6 +93,16 @@ int main() {
       aphys::ImplicitEuler::updateVelocity(v_vel, v_p, v_cache, dt);
     }
 
+    /*v_cache = v_p;
+    aphys::SpringFEM::Jacobian(v_p, v_p_ref, edge_indices, J, stiffness);
+    aphys::SpringFEM::Hessian(v_p, v_p_ref, edge_indices, H, stiffness);
+    aphys::ImplicitEuler::solveDeltaVelocity(v_solver, v_p, external_force,
+                                             vert_mass, J, H, dt);
+    v_vel += v_solver;
+    v_p += v_vel * dt;
+    aphys::collision2d(box, v_p);
+    aphys::ImplicitEuler::updateVelocity(v_vel, v_p, v_cache, dt);*/
+
     glfwPollEvents();
 
     aphys::set_points_data(points, v_p.cast<float>(), aphys::MatxXf());

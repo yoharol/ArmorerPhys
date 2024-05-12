@@ -1,5 +1,5 @@
 if (NOT TARGET igl::core)
-  message("[ArmorerGL] Fetching libigl")
+  message("[ArmorerPhys] Fetching libigl")
   include(FetchContent)
   FetchContent_Declare(
       libigl

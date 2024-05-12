@@ -19,14 +19,18 @@ include("${CMAKE_CURRENT_SOURCE_DIR}/cmake/glfw.cmake")
 include("${CMAKE_CURRENT_SOURCE_DIR}/cmake/glad.cmake")
 include ("${CMAKE_CURRENT_SOURCE_DIR}/cmake/imgui.cmake")
 include("${CMAKE_CURRENT_SOURCE_DIR}/cmake/libigl.cmake")
+# json is already included in tinygltf as header file
+# include("${CMAKE_CURRENT_SOURCE_DIR}/cmake/nlohmann_json.cmake")
+include("${CMAKE_CURRENT_SOURCE_DIR}/cmake/spdlog.cmake")
 
-option(LINK_USD "Include USD components" OFF)
+# give up on USD and use gltf for now
+# option(LINK_USD "Include USD components" OFF)
 # if(PROJECT_IS_TOP_LEVEL)
 #   set(LINK_USD ON CACHE BOOL "Include USD components" FORCE)
 # endif()
-if(LINK_USD)
-  include("${CMAKE_CURRENT_SOURCE_DIR}/cmake/pxr.cmake")
-endif()
+# if(LINK_USD)
+#   include("${CMAKE_CURRENT_SOURCE_DIR}/cmake/pxr.cmake")
+# endif()
 
 # set a list of targets
 set(GL_TARGETS
@@ -36,31 +40,38 @@ set(GL_TARGETS
   glad
   Eigen3::Eigen
   igl::core
-  )
+#  nlohmann_json::nlohmann_json
+  spdlog::spdlog
+)
 
-set(USD_TARGETS
-  usd
-  usdGeom
-  vt
-  usdImaging
-  usdImagingGL
-  )
+# set(USD_TARGETS
+#   usd
+#   usdGeom
+#   vt
+#   usdImaging
+#   usdImagingGL
+#   )
 
 file(GLOB CORE_SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/include/ArmorerPhys/*.cpp")
 file(GLOB_RECURSE RENDER_SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/include/ArmorerPhys/render/*.cpp")
 file(GLOB_RECURSE SIM_SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/include/ArmorerPhys/sim/*.cpp")
-file(GLOB_RECURSE USD_SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/include/ArmorerPhys/USD/*.cpp")
+# file(GLOB_RECURSE USD_SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/include/ArmorerPhys/USD/*.cpp")
+file(
+  GLOB_RECURSE DATA_SOURCES 
+  "${CMAKE_CURRENT_SOURCE_DIR}/include/ArmorerPhys/data/*.cpp"
+  "${CMAKE_CURRENT_SOURCE_DIR}/include/tinygltf/tiny_gltf.cc")
 
 
 set(LIBRARY_NAME ${PROJECT_NAME})
 add_library(${LIBRARY_NAME} STATIC)
 target_include_directories(${LIBRARY_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
 target_link_libraries(${LIBRARY_NAME} PUBLIC ${GL_TARGETS})
-target_sources(${LIBRARY_NAME} PRIVATE ${CORE_SOURCES} ${RENDER_SOURCES} ${SIM_SOURCES})
-if (LINK_USD)
-  target_link_libraries(${LIBRARY_NAME} PUBLIC ${USD_TARGETS})
-  target_sources(${LIBRARY_NAME} PRIVATE ${USD_SOURCES})
-endif()
+target_sources(${LIBRARY_NAME} PRIVATE ${CORE_SOURCES} ${RENDER_SOURCES} ${SIM_SOURCES} ${DATA_SOURCES})
+
+#if (LINK_USD)
+#    target_link_libraries(${LIBRARY_NAME} PUBLIC ${USD_TARGETS})
+#   target_sources(${LIBRARY_NAME} PRIVATE ${USD_SOURCES})
+# endif()
 
 # a cmake function that create an executable target with opengl linked
 function(add_gl_target target_name)

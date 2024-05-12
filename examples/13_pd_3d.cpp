@@ -47,21 +47,21 @@ int main() {
   // ===================== create a rectangular prism =====================
 
   int n_verts;
-  aphys::MatxXd verts;
-  aphys::Matx4i tet_indices;
-  aphys::Matx3i face_indices;
+  aphys::TetMesh tm;
+  aphys::VisualTetMesh vtm;
   aphys::create_rectangular_prism(-0.5, 0.5, 5, 0.0, 3.0, 15, -0.3, 0.3, 5,
-                                  verts, tet_indices);
-  n_verts = verts.rows();
-  aphys::extract_surface_from_tets(verts.rows(), tet_indices, face_indices);
+                                  tm.verts, tm.tets);
+  n_verts = tm.verts.rows();
+  aphys::extract_surface_from_tets(tm.verts.rows(), tm.tets, tm.faces);
+  aphys::extract_visual_tets_surfaces(tm.tets, tm.verts, vtm.visual_faces);
   aphys::Matx2i surface_edges;
-  aphys::extract_edge(face_indices, surface_edges);
-  int n_faces = face_indices.rows();
+  aphys::extract_edge(tm.faces, surface_edges);
+  int n_faces = tm.faces.rows();
 
   aphys::Vecxi top_face_indices;
-  aphys::get_axis_value_indices(3.0, 1, verts, top_face_indices);
+  aphys::get_axis_value_indices(3.0, 1, tm.verts, top_face_indices);
   aphys::Vecxi bottom_face_indices;
-  aphys::get_axis_value_indices(0.0, 1, verts, bottom_face_indices);
+  aphys::get_axis_value_indices(0.0, 1, tm.verts, bottom_face_indices);
 
   aphys::MatxXf vert_color(n_verts, 3);
   vert_color.rowwise() =
@@ -74,12 +74,13 @@ int main() {
     vert_color.row(bottom_face_indices(i)) =
         aphys::RowVec3f(196.f / 255.f, 12.f / 255.f, 12.f / 255.f);
   }
+  aphys::construct_visual_tets_color(vtm.visual_colors, vert_color, tm.tets);
 
   // ===================== prepare simulation data =====================
 
   aphys::Vecxd vert_mass;
   aphys::Vecxd tet_mass;
-  aphys::compute_tet_mass(verts, tet_indices, tet_mass, vert_mass);
+  aphys::compute_tet_mass(tm.verts, tm.tets, tet_mass, vert_mass);
 
   int substep = 2;
   double dt = 1.0f / 60.0f / (double)substep;
@@ -90,7 +91,7 @@ int main() {
   aphys::Vecxd gravity(dim);
   gravity << 0.0f, -4.0f, 0.0f;
   aphys::MatxXd v_vel, v_pred, v_p_ref, v_cache, v_solver;
-  v_p_ref = verts;
+  v_p_ref = tm.verts;
   v_vel.resize(n_verts, dim);
   v_vel.setZero();
   v_pred.resize(n_verts, dim);
@@ -101,7 +102,7 @@ int main() {
 
   // ================== prepare projective dynamics solver ==================
   aphys::ProjectiveDynamicsSolver3D pd_solver(
-      verts, v_p_ref, tet_indices, tet_mass, vert_mass, external_force, dt,
+      tm.verts, v_p_ref, tm.tets, tet_mass, vert_mass, external_force, dt,
       hydro_stiffness, devia_stiffness);
 
   // ===================== prepare render =====================
@@ -113,7 +114,7 @@ int main() {
   box_edges.width = 0.8f;
   box_edges.color = {0, 0, 0};
 
-  aphys::set_edges_data(edges, verts.cast<float>(), surface_edges,
+  aphys::set_edges_data(edges, tm.verts.cast<float>(), surface_edges,
                         aphys::MatxXf());
   aphys::set_box_edges_data(box_edges, box);
 
@@ -128,25 +129,28 @@ int main() {
   while (!glfwWindowShouldClose(window)) {
     aphys::set_background_RGB(aphys::RGB(250, 240, 228));
 
-    v_cache = verts;
-    aphys::ImplicitEuler::predict(v_pred, verts, v_vel, external_force,
+    v_cache = tm.verts;
+    aphys::ImplicitEuler::predict(v_pred, tm.verts, v_vel, external_force,
                                   vert_mass, dt);
     for (int i = 0; i < 20; i++) {
-      pd_solver.localStep(verts, tet_indices);
+      pd_solver.localStep(tm.verts, tm.tets);
       pd_solver.globalStep(v_solver, v_pred);
-      double error = (verts - v_solver).norm();
-      verts = v_solver;
-      if (error < 1e-5) {
+      double error = (tm.verts - v_solver).norm();
+      tm.verts = v_solver;
+      if (error < 1e-4) {
         break;
       }
     }
-    aphys::collision3d(box, verts);
-    aphys::ImplicitEuler::updateVelocity(v_vel, verts, v_cache, dt);
+    aphys::collision3d(box, tm.verts);
+    aphys::ImplicitEuler::updateVelocity(v_vel, tm.verts, v_cache, dt);
 
-    aphys::set_edges_data(edges, verts.cast<float>(), surface_edges,
+    aphys::set_edges_data(edges, tm.verts.cast<float>(), surface_edges,
                           aphys::MatxXf());
-    aphys::set_color_mesh_data(mesh, verts.cast<float>(), face_indices,
-                               vert_color);
+    aphys::construct_visual_tets(vtm.visual_verts, tm.verts, tm.tets);
+    aphys::set_color_mesh_data(mesh, vtm.visual_verts.cast<float>(),
+                               vtm.visual_faces, vtm.visual_colors);
+    // aphys::set_color_mesh_data(mesh, tm.verts.cast<float>(), tm.faces,
+    //                            vert_color);
 
     aphys::orbit_camera_control(window, scene.camera, 10.0, scene.delta_time);
 
