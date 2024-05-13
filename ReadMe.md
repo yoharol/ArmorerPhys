@@ -1,10 +1,23 @@
-# ArmorerGL
+# ArmorerPhys
 
 My own C++ research framework of modern OpenGL, integrating Eigen3, GLFW and libigl.
 
 I aim at building a research framework that is self-contained, flexible and easy-to-use.
 
 The core concept is the data-oriented design for flexibility and adaptability. There are only struct and functions. Based on function based pipeline, any new objects and functionalities can be easily added into the workflow.
+
+## Dependencies
+
+- Eigen3
+- GLFW/GLAD
+- libigl
+- nlohmann_json
+- tinygltf
+- imgui
+
+(All the dependencies will be audomatically downloaded by git submodule and cmake fetch content.)
+
+## Design 
 
 For example, here is how to add gui component:
 
@@ -93,6 +106,12 @@ A mass spring simulation with adjustable physics parameters.
 
 <img src="./images/05_2d_game.png" alt="drawing" width="500"/>
 
+### 06_interactive_pbd
+
+An interactable pbd simulation of 2D deformable objects. 
+
+<img src="./images/06_interactive_pbd.png" alt="drawing" width="500"/>
+
 ### Mathplot2d 
 
 Draw axis, grids, points and lines in 2d space.
@@ -100,3 +119,20 @@ Draw axis, grids, points and lines in 2d space.
 To be added: Triangles, parameter curve, splines
 
 <img src="./images/09_matplot2d.png" alt="drawing" width="500"/>
+
+### 12_fem_neohookean
+
+Implementing 2D deformable simulation from [stable neohookean flesh simulation](https://www.tkim.graphics/NEO/StableNeoHookean2018.pdf).
+
+<img src="./images/12_stable_flesh.png" alt="drawing" width="500"/>
+
+### 13_pd_3d
+
+3D projective dynamics simulation.
+
+<img src="./images/13_pbd_3d.png" alt="drawing" width="500"/>
+
+## TODO
+
+[ ] Export simulated animation to gltf
+[ ] Cloth simulation by projective dynamics

@@ -54,8 +54,6 @@ int main() {
   n_verts = tm.verts.rows();
   aphys::extract_surface_from_tets(tm.verts.rows(), tm.tets, tm.faces);
   aphys::extract_visual_tets_surfaces(tm.tets, tm.verts, vtm.visual_faces);
-  aphys::Matx2i surface_edges;
-  aphys::extract_edge(tm.faces, surface_edges);
   int n_faces = tm.faces.rows();
 
   aphys::Vecxi top_face_indices;
@@ -106,16 +104,11 @@ int main() {
       hydro_stiffness, devia_stiffness);
 
   // ===================== prepare render =====================
-  aphys::Edges edges = aphys::create_edges();
-  edges.color = {0, 0, 0};
-  edges.width = 0.6f;
-  edges.alpha = 0.5f;
+
   aphys::Edges box_edges = aphys::create_box_edges();
   box_edges.width = 0.8f;
   box_edges.color = {0, 0, 0};
 
-  aphys::set_edges_data(edges, tm.verts.cast<float>(), surface_edges,
-                        aphys::MatxXf());
   aphys::set_box_edges_data(box_edges, box);
 
   aphys::ColorMesh mesh = aphys::create_color_mesh(material);
@@ -143,13 +136,9 @@ int main() {
     aphys::collision3d(box, tm.verts);
     aphys::ImplicitEuler::updateVelocity(v_vel, tm.verts, v_cache, dt);
 
-    aphys::set_edges_data(edges, tm.verts.cast<float>(), surface_edges,
-                          aphys::MatxXf());
     aphys::construct_visual_tets(vtm.visual_verts, tm.verts, tm.tets, 0.8);
     aphys::set_color_mesh_data(mesh, vtm.visual_verts.cast<float>(),
                                vtm.visual_faces, vtm.visual_colors);
-    // aphys::set_color_mesh_data(mesh, tm.verts.cast<float>(), tm.faces,
-    //                            vert_color);
 
     aphys::orbit_camera_control(window, scene.camera, 10.0, scene.delta_time);
 
