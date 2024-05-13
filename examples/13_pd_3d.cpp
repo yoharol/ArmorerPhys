@@ -121,7 +121,6 @@ int main() {
   aphys::ColorMesh mesh = aphys::create_color_mesh(material);
 
   aphys::add_render_func(scene, aphys::get_render_func(mesh));
-  aphys::add_render_func(scene, aphys::get_render_func(edges));
   aphys::add_render_func(scene, aphys::get_render_func(box_edges));
 
   aphys::set_wireframe_mode(false);
@@ -146,7 +145,7 @@ int main() {
 
     aphys::set_edges_data(edges, tm.verts.cast<float>(), surface_edges,
                           aphys::MatxXf());
-    aphys::construct_visual_tets(vtm.visual_verts, tm.verts, tm.tets);
+    aphys::construct_visual_tets(vtm.visual_verts, tm.verts, tm.tets, 0.8);
     aphys::set_color_mesh_data(mesh, vtm.visual_verts.cast<float>(),
                                vtm.visual_faces, vtm.visual_colors);
     // aphys::set_color_mesh_data(mesh, tm.verts.cast<float>(), tm.faces,

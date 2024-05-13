@@ -147,25 +147,24 @@ void extract_visual_tets_surfaces(const Matx4i& tets, const MatxXd& verts,
 
     for (int j = 0; j < 4; j++) {
       Vec3i face;
-      for (int k = 0; k < 3; k++) visual_faces(i * 4 + j, k) = (j + k) % 4;
+      for (int k = 0; k < 3; k++)
+        visual_faces(i * 4 + j, k) = i * 12 + j * 3 + k;
 
-      Vec3d v0 = tet_verts.row(visual_faces(i * 4 + j, 0)).transpose();
-      Vec3d v1 = tet_verts.row(visual_faces(i * 4 + j, 1)).transpose();
-      Vec3d v2 = tet_verts.row(visual_faces(i * 4 + j, 2)).transpose();
+      Vec3d v0 = tet_verts.row((j + 0) % 4).transpose();
+      Vec3d v1 = tet_verts.row((j + 1) % 4).transpose();
+      Vec3d v2 = tet_verts.row((j + 2) % 4).transpose();
       if ((v1 - v0).cross(v2 - v0).dot(avg_v - v0) > 0) {
         int tmp = visual_faces(i * 4 + j, 1);
         visual_faces(i * 4 + j, 1) = visual_faces(i * 4 + j, 2);
         visual_faces(i * 4 + j, 2) = tmp;
       }
-
-      for (int k = 0; k < 3; k++) visual_faces(i * 4 + j, k) += i * 4;
     }
   }
 }
 
 void construct_visual_tets(MatxXd& visual_verts, const MatxXd& verts,
                            const Matx4i& tets, const double shrink_ratio) {
-  visual_verts.resize(tets.rows() * 4, 3);
+  visual_verts.resize(tets.rows() * 12, 3);
   for (int i = 0; i < tets.rows(); i++) {
     int id1 = tets(i, 0);
     int id2 = tets(i, 1);
@@ -176,24 +175,24 @@ void construct_visual_tets(MatxXd& visual_verts, const MatxXd& verts,
     Vecxd v2 = verts.row(id2);
     Vecxd v3 = verts.row(id3);
     Vecxd v4 = verts.row(id4);
-    Vecxd avg_v = (v1 + v2 + v3 + v4) / 4.0;
+    RowVecxd avg_v = (v1 + v2 + v3 + v4).transpose() / 4.0;
 
-    visual_verts.row(i * 4) = avg_v + shrink_ratio * (v1 - avg_v);
-    visual_verts.row(i * 4 + 1) = avg_v + shrink_ratio * (v2 - avg_v);
-    visual_verts.row(i * 4 + 2) = avg_v + shrink_ratio * (v3 - avg_v);
-    visual_verts.row(i * 4 + 3) = avg_v + shrink_ratio * (v4 - avg_v);
+    for (int j = 0; j < 4; j++)
+      for (int k = 0; k < 3; k++)
+        visual_verts.row(i * 12 + j * 3 + k) =
+            avg_v + shrink_ratio * (verts.row(tets(i, (j + k) % 4)) - avg_v);
   }
 }
 
 void construct_visual_tets_color(Matx3f& visual_verts_color,
                                  const Matx3f& verts_color,
                                  const Matx4i& tets) {
-  visual_verts_color.resize(tets.rows() * 4, 3);
+  visual_verts_color.resize(tets.rows() * 12, 3);
   for (int i = 0; i < tets.rows(); i++) {
-    visual_verts_color.row(i * 4) = verts_color.row(tets(i, 0));
-    visual_verts_color.row(i * 4 + 1) = verts_color.row(tets(i, 1));
-    visual_verts_color.row(i * 4 + 2) = verts_color.row(tets(i, 2));
-    visual_verts_color.row(i * 4 + 3) = verts_color.row(tets(i, 3));
+    for (int j = 0; j < 4; j++)
+      for (int k = 0; k < 3; k++)
+        visual_verts_color.row(i * 12 + j * 3 + k) =
+            verts_color.row(tets(i, (j + k) % 4));
   }
 }
 
