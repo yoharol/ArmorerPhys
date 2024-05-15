@@ -69,7 +69,8 @@ void DeformConstraint<2>::project(MatxXd& verts, MatxXd& verts_ref,
     par.block(2, 1, 2, 1) = CD_H.col(1);
     par.block(4, 1, 2, 1) = -(CD_H.col(0) + CD_H.col(1));
 
-    Eigen::DiagonalMatrix<double, 6> M(w1, w1, w2, w2, w3, w3);
+    Eigen::DiagonalMatrix<double, 6> M;
+    M.diagonal() << w1, w1, w2, w2, w3, w3;
 
     Mat2d C12 = par.transpose() * M * par;
     C12(0, 0) += hydro_tilde_alpha / face_mass(i);
