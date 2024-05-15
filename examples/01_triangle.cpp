@@ -58,7 +58,8 @@ int main() {
   aphys::bind_vbo(vertex_buffer);
   aphys::set_vbo_static_data(vertices.data(), vertices.size() * sizeof(double));
 
-  glVertexAttribPointer(0, 3, GL_double, GL_FALSE, 3 * sizeof(double), (void *)0);
+  glVertexAttribPointer(0, 3, GL_DOUBLE, GL_FALSE, 3 * sizeof(double),
+                        (void *)0);
   glEnableVertexAttribArray(0);
   aphys::unbind_vbo();
 
@@ -66,7 +67,8 @@ int main() {
   aphys::bind_vbo(uv_buffer);
   aphys::set_vbo_static_data(texCoords.data(),
                              texCoords.size() * sizeof(double));
-  glVertexAttribPointer(1, 2, GL_double, GL_FALSE, 2 * sizeof(double), (void *)0);
+  glVertexAttribPointer(1, 2, GL_DOUBLE, GL_FALSE, 2 * sizeof(double),
+                        (void *)0);
   glEnableVertexAttribArray(1);
   aphys::unbind_vbo();
 

@@ -51,7 +51,8 @@ int main() {
   aphys::bind_vbo(vertex_buffer);
   aphys::set_vbo_static_data(V.data(), V.size() * sizeof(double));
 
-  glVertexAttribPointer(0, 3, GL_double, GL_FALSE, 3 * sizeof(double), (void *)0);
+  glVertexAttribPointer(0, 3, GL_DOUBLE, GL_FALSE, 3 * sizeof(double),
+                        (void *)0);
   glEnableVertexAttribArray(0);
   aphys::unbind_vbo();
 
