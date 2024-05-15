@@ -13,6 +13,38 @@
 
 namespace aphys {
 
+template <>
+Eigen::Vector<double, 3> solve_volume_sig<3>(
+    const Eigen::Vector<double, 3>& sig) {
+  Eigen::Vector<double, 3> d;
+  d << 1.0 - sig(0), 1.0 - sig(1), 1.0 - sig(2);
+  double lambda = 0.0;
+  MatxXd lhs(4, 4);
+  Vecxd rhs(4);
+  for (int iter = 0; iter < 20; iter++) {
+    double p1 = d(0) + sig(0);
+    double p2 = d(1) + sig(1);
+    double p3 = d(2) + sig(2);
+
+    lhs << 1.0, lambda * p3, lambda * p2, p2 * p3,  //
+        lambda * p3, 1.0, lambda * p1, p1 * p3,     //
+        lambda * p2, lambda * p1, 1.0, p1 * p2,     //
+        p2 * p3, p1 * p3, p1 * p2, 0.0;             //
+    rhs << d(0) + lambda * p2 * p3,                 //
+        d(1) + lambda * p1 * p3,                    //
+        d(2) + lambda * p1 * p2,                    //
+        p1 * p2 * p3 - 1.0;
+    rhs = -rhs;
+    Vecxd delta = lhs.partialPivLu().solve(rhs);
+    if ((delta.squaredNorm()) < 1e-6) break;
+    d(0) += delta(0);
+    d(1) += delta(1);
+    d(2) += delta(2);
+    lambda += delta(3);
+  }
+  return d;
+}
+
 ProjectiveDynamicsSolver3D::ProjectiveDynamicsSolver3D(
     const MatxXd& verts, const MatxXd& verts_ref, const Matx4i& tets,
     const Vecxd& tet_mass, const Vecxd& vert_mass, const MatxXd& external_force,
@@ -88,9 +120,6 @@ void ProjectiveDynamicsSolver3D::localStep(const MatxXd& verts,
   MatxXd U, V;
   Vecxd S;
   MatxXd F(3, 3);
-  MatxXd lhs(4, 4);
-  Vecxd rhs(4);
-  Vecxd delta(4);
   for (int j = 0; j < n_tets; j++) {
     int i0 = tets(j, 0);
     int i1 = tets(j, 1);
@@ -108,41 +137,12 @@ void ProjectiveDynamicsSolver3D::localStep(const MatxXd& verts,
     S = svd.singularValues();
     ssvd<3>(U, S, V);
 
-    double sig11 = S(0);
-    double sig22 = S(1);
-    double sig33 = S(2);
+    Vecxd d = solve_volume_sig<3>(S);
 
-    double d1, d2, d3;
-    d1 = 1.0 - sig11;
-    d2 = 1.0 - sig22;
-    d3 = 1.0 - sig33;
+    // std::cout << (d1 + sig11) * (d2 + sig22) * (d3 + sig33) - 1.0 <<
+    // std::endl;
 
-    // solve
-    double lambda = 0.0f;
-    for (int iter = 0; iter < 20; iter++) {
-      double p1 = d1 + sig11;
-      double p2 = d2 + sig22;
-      double p3 = d3 + sig33;
-
-      lhs << 1.0f, lambda * p3, lambda * p2, p2 * p3,  //
-          lambda * p3, 1.0f, lambda * p1, p1 * p3,     //
-          lambda * p2, lambda * p1, 1.0, p1 * p2,      //
-          p2 * p3, p1 * p3, p1 * p2, 0.0f;             //
-      rhs << d1 + lambda * p2 * p3,                    //
-          d2 + lambda * p1 * p3,                       //
-          d3 + lambda * p1 * p2,                       //
-          p1 * p3 * p3 - 1.0f;
-      rhs = -rhs;
-      delta = lhs.partialPivLu().solve(rhs);
-      if ((delta.squaredNorm()) < 1e-6) break;
-      d1 += delta(0);
-      d2 += delta(1);
-      d3 += delta(2);
-      lambda += delta(3);
-    }
-
-    Vecxd S_new(3);
-    S_new << d1 + sig11, d2 + sig22, d3 + sig33;
+    Vecxd S_new = S + d;
     MatxXd D = U * S_new.asDiagonal() * V.transpose();
     MatxXd R = U * V.transpose();
     P.block(j * 3, 0, 3, 3) = (1.0f - ratio) * D + ratio * R;

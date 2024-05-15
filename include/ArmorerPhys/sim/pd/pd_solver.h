@@ -59,6 +59,10 @@ struct ControlledProjDynSolver {
                   const MatxXd& control_verts, MatxXd& lambda);
 };
 
+template <int dim>
+Eigen::Vector<double, dim> solve_volume_sig(
+    const Eigen::Vector<double, dim>& sig);
+
 // Data for projective dynamics:
 //  verts: n_verts x 3
 //  verts_ref: n_verts x 3
