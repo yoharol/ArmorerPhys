@@ -15,10 +15,10 @@ namespace aphys {
 
 template <>
 Eigen::Vector<double, 3> solve_volume_sig<3>(
-    const Eigen::Vector<double, 3>& sig) {
+    const Eigen::Vector<double, 3>& sig, double& lambda) {
   Eigen::Vector<double, 3> d;
   d << 1.0 - sig(0), 1.0 - sig(1), 1.0 - sig(2);
-  double lambda = 0.0;
+  lambda = 0.0;
   MatxXd lhs(4, 4);
   Vecxd rhs(4);
   for (int iter = 0; iter < 20; iter++) {
@@ -137,7 +137,8 @@ void ProjectiveDynamicsSolver3D::localStep(const MatxXd& verts,
     S = svd.singularValues();
     ssvd<3>(U, S, V);
 
-    Vecxd d = solve_volume_sig<3>(S);
+    double lambda;
+    Vecxd d = solve_volume_sig<3>(S, lambda);
 
     // std::cout << (d1 + sig11) * (d2 + sig22) * (d3 + sig33) - 1.0 <<
     // std::endl;
