@@ -117,13 +117,13 @@ void ProjectiveDynamicsSolver3D::localStep(const MatxXd& verts,
     d2 = 1.0 - sig22;
     d3 = 1.0 - sig33;
 
-    double p1 = d1 + sig11;
-    double p2 = d2 + sig22;
-    double p3 = d3 + sig33;
-
     // solve
     double lambda = 0.0f;
     for (int iter = 0; iter < 20; iter++) {
+      double p1 = d1 + sig11;
+      double p2 = d2 + sig22;
+      double p3 = d3 + sig33;
+
       lhs << 1.0f, lambda * p3, lambda * p2, p2 * p3,  //
           lambda * p3, 1.0f, lambda * p1, p1 * p3,     //
           lambda * p2, lambda * p1, 1.0, p1 * p2,      //
@@ -134,9 +134,7 @@ void ProjectiveDynamicsSolver3D::localStep(const MatxXd& verts,
           p1 * p3 * p3 - 1.0f;
       rhs = -rhs;
       delta = lhs.partialPivLu().solve(rhs);
-      if ((delta(0) * delta(0) + delta(1) * delta(1) + delta(2) * delta(2)) <
-          1e-6)
-        break;
+      if ((delta.squaredNorm()) < 1e-6) break;
       d1 += delta(0);
       d2 += delta(1);
       d3 += delta(2);

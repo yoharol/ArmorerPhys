@@ -134,5 +134,5 @@ Implementing 2D deformable simulation from [stable neohookean flesh simulation](
 
 ## TODO
 
-[ ] Export simulated animation to gltf
-[ ] Cloth simulation by projective dynamics
+- [ ] Export simulated animation to gltf
+- [ ] Cloth simulation by projective dynamics
