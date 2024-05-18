@@ -7,6 +7,7 @@
 #include "ArmorerPhys/RenderCore.h"
 #include "ArmorerPhys/SimCore.h"
 #include "ArmorerPhys/sim/fem.h"
+#include "ArmorerPhys/timer.h"
 
 const unsigned int SCR_WIDTH = 700;
 const unsigned int SCR_HEIGHT = 700;
@@ -74,8 +75,10 @@ int main() {
     // dx = (M/h^2 + H(x))^-1 (M/h^2 (x-p) + J(x))
     for (int _ = 0; _ < substep; _++) {
       v_cache = v_p;
+      aphys::Timer::getInstance()->start("predict");
       aphys::ImplicitEuler::predict(v_pred, v_p, v_vel, external_force,
                                     vert_mass, dt);
+      aphys::Timer::getInstance()->pause("predict");
 
       // aphys::NeoHookeanFEM2D::project_F(v_p, face_indices, B, F);
       // aphys::NeoHookeanFEM2D::Jacobian(F, B, face_indices, face_mass, J, mu,
@@ -87,23 +90,36 @@ int main() {
 
       int solver_step = 0;
       while (true) {
+        aphys::Timer::getInstance()->start("project");
         aphys::NeoHookeanFEM2D::project_F(v_p, face_indices, B, F);
+        aphys::Timer::getInstance()->pause("project");
+        aphys::Timer::getInstance()->start("jacobian");
         aphys::NeoHookeanFEM2D::Jacobian(F, B, face_indices, face_mass, J, mu,
                                          lambda);
         aphys::ImplicitEuler::modifyJacobian(J, v_p, v_pred, vert_mass, dt);
-        if (J.norm() < 1e-2 or solver_step > 20) break;
+        aphys::Timer::getInstance()->pause("jacobian");
+        if (J.norm() < 1e-2 || solver_step > 20) break;
+        aphys::Timer::getInstance()->start("hessian");
         aphys::NeoHookeanFEM2D::Hessian(F, B, face_indices, face_mass, H, mu,
                                         lambda);
         aphys::ImplicitEuler::modifyHessian(H, vert_mass, dt);
+        aphys::Timer::getInstance()->pause("hessian");
+        aphys::Timer::getInstance()->start("solve");
         dv = -H.colPivHouseholderQr().solve(J);
+        aphys::Timer::getInstance()->pause("solve");
+        aphys::Timer::getInstance()->start("update");
         aphys::concatenate_add(v_p, dv);
+        aphys::Timer::getInstance()->pause("update");
       }
       // v_p = v_pred;
 
       aphys::collision2d(box, v_p);
+      aphys::Timer::getInstance()->start("updateVelocity");
       aphys::ImplicitEuler::updateVelocity(v_vel, v_p, v_cache, dt);
+      aphys::Timer::getInstance()->pause("updateVelocity");
     }
 
+    aphys::Timer::getInstance()->start("render");
     glfwPollEvents();
 
     aphys::set_points_data(points, v_p.cast<float>(), aphys::MatxXf());
@@ -113,8 +129,10 @@ int main() {
     aphys::set_background_RGB({244, 244, 244});
 
     aphys::render_scene(scene);
+    aphys::Timer::getInstance()->pause("render");
 
     glfwSwapBuffers(window);
   }
+  aphys::Timer::getInstance()->print_all("ms");
   glfwTerminate();
 }
