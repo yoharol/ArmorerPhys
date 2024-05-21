@@ -2,7 +2,6 @@
 #define ARMORER_SIM_PD_SOLVER_H_
 
 #include <vector>
-#include <Eigen/Core>
 #include <Eigen/SparseLU>
 #include <Eigen/SparseQR>
 #include <Eigen/LU>
@@ -61,8 +60,8 @@ struct ControlledProjDynSolver {
 };
 
 template <int dim>
-Eigen::VectorXd<dim> solve_volume_sig(const Eigen::VectorXd<dim>& sig,
-                                      double& lambda);
+Eigen::Vector<double, dim> solve_volume_sig(
+    const Eigen::Vector<double, dim>& sig, double& lambda);
 
 // Data for projective dynamics:
 //  verts: n_verts x 3
