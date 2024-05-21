@@ -41,8 +41,8 @@ std::string mus_to_string(double mus, std::string format) {
 
 struct SingleTimer::Impl {
   std::chrono::time_point<std::chrono::high_resolution_clock> start_time;
-  std::chrono::duration<int64_t, std::__1::nano> duration;
-  std::vector<std::chrono::duration<int64_t, std::__1::nano>> durations;
+  std::chrono::duration<int64_t, std::nano> duration;
+  std::vector<std::chrono::duration<int64_t, std::nano>> durations;
 };
 
 SingleTimer::SingleTimer() : impl(new Impl()) {}
