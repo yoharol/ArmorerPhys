@@ -2,6 +2,7 @@
 #define ARMORER_SIM_PD_SOLVER_H_
 
 #include <vector>
+#include <Eigen/Core>
 #include <Eigen/SparseLU>
 #include <Eigen/SparseQR>
 #include <Eigen/LU>
