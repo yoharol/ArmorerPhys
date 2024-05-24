@@ -211,6 +211,7 @@ const ShaderSource basic_diffuse_shader = {
     in vec3 Normal;
     in vec3 FragPos;
 
+    uniform float alpha;
     uniform float specularStrength;
     uniform vec3 viewPos;
     uniform vec3 lightPos;
@@ -231,7 +232,7 @@ const ShaderSource basic_diffuse_shader = {
       float spec = pow(max(dot(viewDir, reflectDir), 0.0), 32);
       vec3 specular = specularStrength * spec * lightColor * specularColor;
       vec3 result = (ambient + diffuse + specular) * diffuseColor;
-      FragColor = vec4(result, 1.0);
+      FragColor = vec4(result, alpha);
     }
   )"};
 
