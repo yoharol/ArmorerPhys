@@ -35,6 +35,7 @@ struct DiffuseMesh {
   DiffuseMaterial material;
   int n_vertices;
   int n_faces;
+  float alpha;
 };
 
 DiffuseMesh create_diffuse_mesh(DiffuseMaterial &material);

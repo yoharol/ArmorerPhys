@@ -77,6 +77,7 @@ DiffuseMesh create_diffuse_mesh(DiffuseMaterial &material) {
       create_shader(source::basic_diffuse_shader.vertex, GL_VERTEX_SHADER),
       create_shader(source::basic_diffuse_shader.fragment, GL_FRAGMENT_SHADER));
   mesh.material = material;
+  mesh.alpha = 1.0f;
 
   return mesh;
 }
@@ -110,6 +111,7 @@ void set_mesh_data(DiffuseMesh &mesh, MatxXf V, MatxXi F) {
   set_uniform_RGB(mesh.program, "specularColor", mesh.material.specular_color);
   set_uniform_float(mesh.program, "specularStrength",
                     mesh.material.specular_strength);
+  set_uniform_float(mesh.program, "alpha", mesh.alpha);
   unuse_program();
   unbind_vao();
 }
@@ -124,6 +126,7 @@ RenderFunc get_render_func(DiffuseMesh &mesh) {
     set_uniform_float3(mesh.program, "viewPos", scene.camera.position);
     set_uniform_mat4(mesh.program, "projection", scene.camera.projection);
     set_uniform_float3(mesh.program, "viewPos", scene.camera.position);
+    set_uniform_float(mesh.program, "alpha", mesh.alpha);
     bind_vao(mesh.vertex_array);
     bind_ebo(mesh.index_buffer);
     glDrawElements(GL_TRIANGLES, mesh.n_faces * 3, GL_UNSIGNED_INT, 0);
