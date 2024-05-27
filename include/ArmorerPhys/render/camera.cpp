@@ -66,19 +66,37 @@ void update_camera(Camera& camera) {
       z.x(), z.y(), z.z(), -z.dot(camera.position),                 //
       0.0f, 0.0f, 0.0f, 1.0f;
 
-  Mat4f perspective;
-  perspective << n, 0.0f, 0.0f, 0.0f,  //
-      0.0f, n, 0.0f, 0.0f,             //
-      0.0f, 0.0f, n + f, -f * n,       //
-      0.0f, 0.0f, 1.0f, 0.0f;
+  if (camera.type == CameraType::Perspective) {
+    Mat4f perspective;
+    perspective << n, 0.0f, 0.0f, 0.0f,  //
+        0.0f, n, 0.0f, 0.0f,             //
+        0.0f, 0.0f, n + f, -f * n,       //
+        0.0f, 0.0f, 1.0f, 0.0f;
 
-  Mat4f orthographic;
-  orthographic << 2.0f / xscale, 0.0f, 0.0f, 0.0f,     //
-      0.0f, 2.0f / yscale, 0.0f, 0.0f,                 //
-      0.0f, 0.0f, -2.0f / (n - f), (n + f) / (n - f),  //
-      0.0f, 0.0f, 0.0f, 1.0f;
+    Mat4f orthographic;
+    orthographic << 2.0f / xscale, 0.0f, 0.0f, 0.0f,     //
+        0.0f, 2.0f / yscale, 0.0f, 0.0f,                 //
+        0.0f, 0.0f, -2.0f / (n - f), (n + f) / (n - f),  //
+        0.0f, 0.0f, 0.0f, 1.0f;
 
-  camera.projection = orthographic * perspective * to_camera_space;
+    camera.projection = orthographic * perspective * to_camera_space;
+  } else if (camera.type == CameraType::Orthographic) {
+    float dis = (camera.position - camera.lookat).norm();
+    float y_window = tan(camera.fov / 2.0f) * dis * 2.0f;
+    float x_window = y_window * camera.aspect;
+    double l = -x_window / 2.0;
+    double r = x_window / 2.0;
+    double b = -y_window / 2.0;
+    double t = y_window / 2.0;
+    Eigen::Matrix4f orthographic;
+    orthographic <<  //
+        2.0f / (r - l),
+        0.0f, 0.0f, -(r + l) / (r - l),                  // x
+        0.0f, 2.0f / (t - b), 0.0f, -(t + b) / (t - b),  // y
+        0.0f, 0.0f, 2.0f / (f - n), -(f + n) / (f - n),  // z
+        0.0f, 0.0f, 0.0f, 1.0f;                          // w
+    camera.projection = orthographic * to_camera_space;
+  }
 }
 
 void set_camera(Camera& camera, Vec3f position, Vec3f lookat, Vec3f up,

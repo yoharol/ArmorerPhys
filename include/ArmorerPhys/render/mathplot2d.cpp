@@ -46,6 +46,22 @@ Lines create_axis2d(float x_min, float x_max, float y_min, float y_max,
   return lines;
 }
 
+Lines create_axis3d(float x_min, float x_max, float y_min, float y_max,
+                    float z_min, float z_max, RGB color) {
+  Lines lines = create_lines();
+  Matx3f verts(6, 3);
+  verts << x_min, 0.f, 0.f,  //
+      x_max, 0.f, 0.f,       //
+      0.f, y_min, 0.f,       //
+      0.f, y_max, 0.f,       //
+      0.f, 0.f, z_min,       //
+      0.f, 0.f, z_max;       //
+  set_lines_data(lines, verts, MatxXf());
+  lines.color = color;
+  lines.mode = GL_LINES;
+  return lines;
+}
+
 Lines create_grid_axis2d(float x_min, float x_max, float y_min, float y_max,
                          int gridx, int gridy, RGB color) {
   Lines lines = create_lines();
