@@ -11,6 +11,7 @@ namespace aphys {
 
 enum CameraType {
   Perspective,
+  Orthographic,
   View2d,
 };
 
