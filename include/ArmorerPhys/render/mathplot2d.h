@@ -20,6 +20,9 @@ Lines create_axis2d(float x_min, float x_max, float y_min, float y_max,
 Lines create_grid_axis2d(float x_min, float x_max, float y_min, float y_max,
                          int gridx, int gridy, RGB color);
 
+Lines create_axis3d(float x_min, float x_max, float y_min, float y_max,
+                    float z_min, float z_max, RGB color);
+
 struct ControlPoint {
   int n_control_points;
   float scale;

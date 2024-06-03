@@ -21,10 +21,7 @@ struct DeformConstraint : public PbdConstraint {
 
   void preProject() override;
   void project(MatxXd& verts, MatxXd& verts_ref, const Matx3i& faces,
-               Vecxd& face_mass, Vecxd& verts_invm, double dt) {
-    throw std::invalid_argument(
-        "DeformConstraint::project() not implemented for dim != 2 or 3");
-  }
+               Vecxd& face_mass, Vecxd& verts_invm, double dt);
 };
 
 }  // namespace aphys
