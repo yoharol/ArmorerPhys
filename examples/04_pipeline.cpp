@@ -3,8 +3,7 @@
 #include <Eigen/Core>
 #include <iostream>
 
-#include <igl/readOBJ.h>
-
+#include "igl/readOBJ.h"
 #include "ArmorerPhys/RenderCore.h"
 
 // settings

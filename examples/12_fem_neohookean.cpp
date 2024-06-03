@@ -30,8 +30,8 @@ int main() {
   // ===================== prepare simulation data =====================
   int substep = 20;
   double dt = 1.0 / 60.0 / (double)substep;
-  double mu = 5.0f;
-  double lambda = 3.0f;
+  double mu = 5.0;
+  double lambda = 3.0;
   int dim = 2;
   aphys::Vecxd gravity(dim);
   gravity << 0.0, -1.0;
