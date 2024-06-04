@@ -106,11 +106,9 @@ void extract_surface_from_tets(const int n_verts, const Matx4i& tets,
 
   std::sort(sorted_faces.begin(), sorted_faces.end(),
             [](const Vec4i& a, const Vec4i& b) {
-              if (a(0) < b(0)) return true;
-              if (a(0) > b(0)) return false;
-              if (a(1) < b(1)) return true;
-              if (a(1) > b(1)) return false;
-              return a(2) <= b(2);
+              if (a(0) != b(0)) return a(0) < b(0);
+              if (a(1) != b(1)) return a(1) < b(1);
+              return a(2) < b(2);
             });
 
   std::vector<Vec3i> surface_face_indices;
