@@ -61,6 +61,17 @@ void extract_edge(const Matx3i &faces, Matx2i &edge);
 void compute_edge_length(const MatxXd &verts, const Matx2i &edge,
                          Vecxd &length);
 
+bool inside_tet(const Vec3d &vert, const Vec3d &tv0, const Vec3d &tv1,
+                const Vec3d &tv2, const Vec3d &tv3);
+
+inline double compute_volume(const Vec3d &v0, const Vec3d &v1, const Vec3d &v2,
+                             const Vec3d &v3) {
+  return std::abs((v1 - v0).dot((v2 - v0).cross(v3 - v0))) / 6.0;
+}
+
+void compute_barycentric_tet(Vec3d &p, Vec3d &v0, Vec3d &v1, Vec3d &v2,
+                             Vec3d &v3, Vec4d &bary);
+
 }  // namespace aphys
 
 #endif  // GL_GEOM_H_

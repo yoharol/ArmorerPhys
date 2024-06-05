@@ -23,13 +23,15 @@ struct Scene {
   Camera camera;
   std::vector<RenderFunc> render_funcs;
   std::vector<bool> depth_test;
+  std::vector<bool> wireframe_mode;
   float delta_time;
   float time;
 };
 
 Scene create_scene(Light light, Camera camera);
 
-void add_render_func(Scene& scene, RenderFunc func, bool depth_test = true);
+void add_render_func(Scene& scene, RenderFunc func, bool depth_test = true,
+                     bool wireframe_mode = false);
 
 void render_scene(Scene& scene);
 

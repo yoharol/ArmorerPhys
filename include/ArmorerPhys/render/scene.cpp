@@ -21,9 +21,11 @@ Scene create_scene(Light light, Camera camera) {
   return scene;
 }
 
-void add_render_func(Scene& scene, RenderFunc func, bool depth_test) {
+void add_render_func(Scene& scene, RenderFunc func, bool depth_test,
+                     bool wireframe_mode) {
   scene.render_funcs.push_back(func);
   scene.depth_test.push_back(depth_test);
+  scene.wireframe_mode.push_back(wireframe_mode);
 }
 
 void render_scene(Scene& scene) {
@@ -32,6 +34,11 @@ void render_scene(Scene& scene) {
       glEnable(GL_DEPTH_TEST);
     } else {
       glDisable(GL_DEPTH_TEST);
+    }
+    if (scene.wireframe_mode[i]) {
+      glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+    } else {
+      glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
     }
     scene.render_funcs[i](scene);
   }

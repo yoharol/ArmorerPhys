@@ -2,6 +2,7 @@
 
 #define VOXELIZER_IMPLEMENTATION
 #include "ArmorerPhys/data/voxelizer.h"
+#include "ArmorerPhys/geom.h"
 
 #include <memory>
 #include <iostream>
@@ -10,8 +11,16 @@
 
 namespace aphys {
 
-VoxelTet::VoxelTet(const aphys::MatxXd& verts, const aphys::Matx4i& tets,
-                   const double res, double precision) {}
+VoxelTet::VoxelTet(const aphys::MatxXd& V, const aphys::Matx3i& F,
+                   const double res, double precision) {
+  aphys::extract_voxel_point_cloud(V, F, pc_verts, res);
+  aphys::build_voxel_tet(pc_verts, res, verts, tets);
+  aphys::extract_surface_from_tets(verts.rows(), tets, faces);
+  // aphys::VisualTetMesh vtm;
+  // aphys::extract_visual_tets_surfaces(tm.tets, tm.verts, vtm.visual_faces);
+  // aphys::construct_visual_tets(vtm.visual_verts, tm.verts, tm.tets);
+  aphys::bind_to_pc_tet(pc_verts, V, verts, tets, bind_index, bind_weights);
+}
 
 void extract_voxel_point_cloud(const aphys::MatxXd& verts,
                                const aphys::Matx3i& faces,
@@ -114,6 +123,71 @@ void build_voxel_tet(const aphys::MatxXd& point_cloud, const double res,
   verts.resize(sorted_verts_raw.size(), 3);
   for (int i = 0; i < sorted_verts_raw.size(); i++) {
     verts.row(i) = sorted_verts_raw[i].transpose();
+  }
+}
+
+void bind_to_pc_tet(const aphys::MatxXd& point_cloud, const aphys::MatxXd& mesh,
+                    const aphys::MatxXd& verts, const aphys::Matx4i& tets,
+                    Vecxi& bind_index, MatxXd& bind_weights) {
+  bind_index.resize(mesh.rows());
+  bind_weights.resize(mesh.rows(), 4);
+
+  for (int i = 0; i < mesh.rows(); i++) {
+    Vec3d p = mesh.row(i);
+    double min_dist = std::numeric_limits<double>::max();
+    int min_idx = -1;
+    for (int j = 0; j < point_cloud.rows(); j++) {
+      Vec3d pj = point_cloud.row(j);
+      double dist = (p - pj).norm();
+      if (dist < min_dist) {
+        min_dist = dist;
+        min_idx = j;
+      }
+    }
+
+    int inside_tet_idx = -1;
+    for (int j = 0; j < 6; j++) {
+      int tet_idx = min_idx * 6 + j;
+      Vec4i tet = tets.row(tet_idx);
+      Vec3d v0 = verts.row(tet(0));
+      Vec3d v1 = verts.row(tet(1));
+      Vec3d v2 = verts.row(tet(2));
+      Vec3d v3 = verts.row(tet(3));
+      if (inside_tet(p, v0, v1, v2, v3)) {
+        inside_tet_idx = tet_idx;
+        break;
+      }
+    }
+    if (inside_tet_idx == -1) {
+      std::cerr << "Warning: point " << i << " is not inside any tetrahedron."
+                << std::endl;
+      inside_tet_idx = min_idx * 6;
+    }
+
+    bind_index(i) = inside_tet_idx;
+    Vec4d bary;
+    Vec3d v0 = verts.row(tets(inside_tet_idx, 0));
+    Vec3d v1 = verts.row(tets(inside_tet_idx, 1));
+    Vec3d v2 = verts.row(tets(inside_tet_idx, 2));
+    Vec3d v3 = verts.row(tets(inside_tet_idx, 3));
+    compute_barycentric_tet(p, v0, v1, v2, v3, bary);
+    bind_weights.row(i) = bary.transpose();
+  }
+}
+
+void interpolate_barycentric(aphys::MatxXd& mesh, const aphys::MatxXd& verts,
+                             const aphys::Matx4i& tets, const Vecxi& bind_index,
+                             const MatxXd& bind_weights) {
+  for (int i = 0; i < mesh.rows(); i++) {
+    int idx = bind_index(i);
+    Vec4i tet = tets.row(idx);
+    Vecxd v0 = verts.row(tet(0));
+    Vecxd v1 = verts.row(tet(1));
+    Vecxd v2 = verts.row(tet(2));
+    Vecxd v3 = verts.row(tet(3));
+    Vec4d bary = bind_weights.row(i);
+    mesh.row(i) =
+        (bary(0) * v0 + bary(1) * v1 + bary(2) * v2 + bary(3) * v3).transpose();
   }
 }
 

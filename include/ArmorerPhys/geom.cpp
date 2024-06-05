@@ -186,4 +186,32 @@ void extract_edge(const Matx3i &faces, Matx2i &edge) {
   }
 }
 
+// check if vert is inside the tetrahedron
+bool inside_tet(const Vec3d &vert, const Vec3d &tv0, const Vec3d &tv1,
+                const Vec3d &tv2, const Vec3d &tv3) {
+  auto same_side = [](const Vec3d &p1, const Vec3d &p2, const Vec3d &p3,
+                      const Vec3d &a, const Vec3d &b) -> bool {
+    Vec3d norm = (p2 - p1).cross(p3 - p1);
+    double sign1 = (norm.dot(a - p1));
+    double sign2 = (norm.dot(b - p1));
+    return sign1 * sign2 > 0;
+  };
+
+  return same_side(tv0, tv1, tv2, tv3, vert) &&
+         same_side(tv1, tv2, tv3, tv0, vert) &&
+         same_side(tv2, tv3, tv0, tv1, vert) &&
+         same_side(tv3, tv0, tv1, tv2, vert);
+}
+
+void compute_barycentric_tet(Vec3d &p, Vec3d &v0, Vec3d &v1, Vec3d &v2,
+                             Vec3d &v3, Vec4d &bary) {
+  double volume0 = compute_volume(p, v1, v2, v3);
+  double volume1 = compute_volume(p, v0, v2, v3);
+  double volume2 = compute_volume(p, v0, v1, v3);
+  double volume3 = compute_volume(p, v0, v1, v2);
+  double volume_sum = volume0 + volume1 + volume2 + volume3;
+  bary << volume0 / volume_sum, volume1 / volume_sum, volume2 / volume_sum,
+      volume3 / volume_sum;
+}
+
 }  // namespace aphys
