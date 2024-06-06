@@ -45,6 +45,8 @@ struct Timer {
   void reset_all();
 };
 
+void sleep(float seconds);
+
 }  // namespace aphys
 
 #endif  // ARMORER_PHYS_TIMER_H_

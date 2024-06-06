@@ -7,6 +7,7 @@
 #include <vector>
 #include <sstream>
 #include <iostream>
+#include <thread>
 
 // add more advanced log in the future
 
@@ -128,5 +129,10 @@ void Timer::reset_all() {
 }
 
 std::unique_ptr<Timer> Timer::instance = nullptr;
+
+void sleep(float seconds) {
+  std::this_thread::sleep_for(
+      std::chrono::milliseconds(static_cast<int>(seconds * 1000)));
+}
 
 }  // namespace aphys
