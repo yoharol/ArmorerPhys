@@ -14,6 +14,33 @@ namespace aphys {
 VoxelTet::VoxelTet(const aphys::MatxXd& V, const aphys::Matx3i& F,
                    const double res, double precision) {
   aphys::extract_voxel_point_cloud(V, F, pc_verts, res);
+
+  int selected_num = 0;
+  aphys::Vecxi bind_num(pc_verts.rows());
+  bind_num.setZero();
+  for (int i = 0; i < pc_verts.rows(); i++) {
+    for (int j = 0; j < V.rows(); j++) {
+      if ((std::abs(pc_verts(i, 0) - V(j, 0)) < res / 2.0)     //
+          && (std::abs(pc_verts(i, 1) - V(j, 1)) < res / 2.0)  //
+          && (std::abs(pc_verts(i, 2) - V(j, 2)) < res / 2.0)) {
+        bind_num(i) = 1;
+        selected_num++;
+        break;
+      }
+    }
+  }
+
+  aphys::MatxXd tmp = pc_verts;
+  pc_verts.resize(selected_num, 3);
+  pc_verts.setZero();
+  int idx = 0;
+  for (int i = 0; i < tmp.rows(); i++) {
+    if (bind_num(i) == 1) {
+      pc_verts.row(idx) = tmp.row(i);
+      idx++;
+    }
+  }
+
   aphys::build_voxel_tet(pc_verts, res, verts, tets);
   aphys::extract_surface_from_tets(verts.rows(), tets, faces);
   // aphys::VisualTetMesh vtm;
