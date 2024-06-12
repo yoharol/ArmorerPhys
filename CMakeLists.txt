@@ -32,6 +32,8 @@ include("${CMAKE_CURRENT_SOURCE_DIR}/cmake/spdlog.cmake")
 #   include("${CMAKE_CURRENT_SOURCE_DIR}/cmake/pxr.cmake")
 # endif()
 
+igl_include(copyleft tetgen)
+
 # set a list of targets
 set(GL_TARGETS
   OpenGL::GL
@@ -40,6 +42,7 @@ set(GL_TARGETS
   glad
   Eigen3::Eigen
   igl::core
+  tetgen::tetgen
 #  nlohmann_json::nlohmann_json
   spdlog::spdlog
 )

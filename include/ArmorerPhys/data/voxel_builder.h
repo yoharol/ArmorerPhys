@@ -3,6 +3,7 @@
 
 #include "ArmorerPhys/type.h"
 #include "ArmorerPhys/tet.h"
+#include "ArmorerPhys/data/tet_bind.h"
 
 namespace aphys {
 
@@ -31,10 +32,6 @@ void build_voxel_tet(const aphys::MatxXd& point_cloud, const double res,
 void bind_to_pc_tet(const aphys::MatxXd& point_cloud, const aphys::MatxXd& mesh,
                     const aphys::MatxXd& verts, const aphys::Matx4i& tets,
                     Vecxi& bind_index, MatxXd& bind_weights);
-
-void interpolate_barycentric(aphys::MatxXd& mesh, const aphys::MatxXd& verts,
-                             const aphys::Matx4i& tets, const Vecxi& bind_index,
-                             const MatxXd& bind_weights);
 
 }  // namespace aphys
 

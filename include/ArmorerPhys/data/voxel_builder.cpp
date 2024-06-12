@@ -202,20 +202,4 @@ void bind_to_pc_tet(const aphys::MatxXd& point_cloud, const aphys::MatxXd& mesh,
   }
 }
 
-void interpolate_barycentric(aphys::MatxXd& mesh, const aphys::MatxXd& verts,
-                             const aphys::Matx4i& tets, const Vecxi& bind_index,
-                             const MatxXd& bind_weights) {
-  for (int i = 0; i < mesh.rows(); i++) {
-    int idx = bind_index(i);
-    Vec4i tet = tets.row(idx);
-    Vecxd v0 = verts.row(tet(0));
-    Vecxd v1 = verts.row(tet(1));
-    Vecxd v2 = verts.row(tet(2));
-    Vecxd v3 = verts.row(tet(3));
-    Vec4d bary = bind_weights.row(i);
-    mesh.row(i) =
-        (bary(0) * v0 + bary(1) * v1 + bary(2) * v2 + bary(3) * v3).transpose();
-  }
-}
-
 }  // namespace aphys
