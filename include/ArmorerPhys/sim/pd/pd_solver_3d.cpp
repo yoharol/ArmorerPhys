@@ -95,8 +95,6 @@ ProjectiveDynamicsSolver3D::ProjectiveDynamicsSolver3D(
     SjT.insert(1, 3 * j + 1) = 1.0;
     SjT.insert(2, 3 * j + 2) = 1.0;
 
-    SparseMatd test = Gj * Gj.transpose();
-
     L_mat +=
         tet_mass(j) * (stiffness_hydro + stiffness_devia) * Gj * Gj.transpose();
     J_mat += tet_mass(j) * (stiffness_hydro + stiffness_devia) * Gj * SjT;
@@ -146,7 +144,7 @@ void ProjectiveDynamicsSolver3D::localStep(const MatxXd& verts,
     Vecxd S_new = S + d;
     MatxXd D = U * S_new.asDiagonal() * V.transpose();
     MatxXd R = U * V.transpose();
-    P.block(j * 3, 0, 3, 3) = (1.0f - ratio) * D + ratio * R;
+    P.block(j * 3, 0, 3, 3) = ((1.0f - ratio) * D + ratio * R).transpose();
   }
 }
 

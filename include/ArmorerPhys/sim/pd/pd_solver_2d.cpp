@@ -123,7 +123,7 @@ void ProjectiveDynamicsSolver2D::localStep(const MatxXd& verts,
     S_new << d1 + sig11, d2 + sig22;
     MatxXd D = U * S_new.asDiagonal() * V.transpose();
     MatxXd R = U * V.transpose();
-    P.block(j * 2, 0, 2, 2) = (1.0f - ratio) * D + ratio * R;
+    P.block(j * 2, 0, 2, 2) = ((1.0f - ratio) * D + ratio * R).transpose();
   }
 }
 
