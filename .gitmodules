@@ -2,3 +2,6 @@
 	path = external/imgui
 	url = https://github.com/ocornut/imgui.git
 	ignore = all
+[submodule "external/libigl"]
+	path = external/libigl
+	url = https://github.com/libigl/libigl.git

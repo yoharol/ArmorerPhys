@@ -76,7 +76,7 @@ int main() {
   int substep = 2;
   double dt = 1.0f / 60.0f / (double)substep;
   double devia_stiffness = 70.0f;
-  double hydro_stiffness = 20.0f;
+  double hydro_stiffness = 70.0f;
   double rho = 1000.0f;
   int dim = 3;
   aphys::Vecxd gravity(dim);

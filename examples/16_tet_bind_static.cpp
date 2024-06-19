@@ -5,6 +5,7 @@
 
 #include "igl/readOBJ.h"
 #include "igl/readMESH.h"
+#include "igl/writeDMAT.h"
 #include "ArmorerPhys/data/tetrahetralize.h"
 
 #include "ArmorerPhys/RenderCore.h"
@@ -54,6 +55,7 @@ int main() {
 
   igl::readMESH(std::string(ASSETS_PATH) + "/dino/dino.mesh", tm.verts, tm.tets,
                 tm.faces);
+
   aphys::extract_visual_tets_surfaces(tm.tets, tm.verts, vtm.visual_faces);
 
   aphys::MatxXd bc_weights;
@@ -62,6 +64,10 @@ int main() {
   aphys::SparseMatd bind_mat;
   aphys::generate_bind_mat(tm.verts.rows(), tm.tets, bc_index, bc_weights,
                            bind_mat);
+  igl::writeDMAT(std::string(ASSETS_PATH) + "/dino/dino_weight_idx.dmat",
+                 bc_index);
+  igl::writeDMAT(std::string(ASSETS_PATH) + "/dino/dino_weight_weight.dmat",
+                 bc_weights);
 
   // ===================== Simulation =====================
 
@@ -70,7 +76,7 @@ int main() {
   aphys::Vecxd tet_mass;
   aphys::compute_tet_mass(tm.verts, tm.tets, tet_mass, vert_mass);
   double devia_stiffness = 70.0f;
-  double hydro_stiffness = 20.0f;
+  double hydro_stiffness = 70.0f;
   double rho = 1000.0f;
   int dim = 3;
   aphys::Vecxd gravity(dim);
@@ -105,6 +111,22 @@ int main() {
     target_verts = target_verts * 0.3;
   };
   read_target(idx);
+
+  /*for (int i = 0; i < 11; i++) {
+    read_target(i);
+    v_cache = tm.verts;
+    v_cache.setZero();
+    while ((tm.verts - v_cache).squaredNorm() > 1e-6) {
+      v_cache = tm.verts;
+      static_pd.local_step(tm.verts, tm.tets);
+      static_pd.global_step(tm.verts, target_verts, bind_mat);
+    }
+    std::string export_path = std::string(ASSETS_PATH) +
+                              "/dino/anim/dino_tet_" + std::to_string(i) +
+                              ".mesh";
+
+    igl::writeMESH(export_path, tm.verts, tm.tets, tm.faces);
+  }*/
 
   while (!glfwWindowShouldClose(window)) {
     aphys::set_background_RGB(aphys::RGB(250, 240, 228));
