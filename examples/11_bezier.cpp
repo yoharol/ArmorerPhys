@@ -8,8 +8,9 @@ const unsigned int SCR_WIDTH = 600;
 const unsigned int SCR_HEIGHT = 600;
 
 int main() {
-  GLFWwindow* window = aphys::create_window(
-      SCR_WIDTH, SCR_HEIGHT, "Example9: 2D Math Plot with Projective Dynamics");
+  GLFWwindow* window =
+      aphys::create_window(SCR_WIDTH, SCR_HEIGHT,
+                           "Example11: 2D Math Plot with Bezier and B-Spline");
   aphys::Scene scene =
       aphys::create_scene(aphys::default_light, aphys::default_camera);
   aphys::set_2d_camera(scene.camera, 0.0f, 1.0f, 0.0f, 1.0f);

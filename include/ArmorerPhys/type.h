@@ -3,6 +3,7 @@
 
 #include <Eigen/Core>
 #include <Eigen/SparseCore>
+#include "spdlog/spdlog.h"
 
 namespace aphys {
 
@@ -56,6 +57,13 @@ using SparseMatd = Eigen::SparseMatrix<double>;
 using SparseVecd = Eigen::SparseVector<double>;
 using Tripletf = Eigen::Triplet<float>;
 using Tripletd = Eigen::Triplet<double>;
+
+template <typename... Args>
+void CheckError(bool condition, const char* fmt, Args&&... args) {
+  if (!condition) {
+    spdlog::error(fmt, std::forward<Args>(args)...);
+  }
+}
 
 }  // namespace aphys
 

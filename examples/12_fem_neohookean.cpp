@@ -14,7 +14,7 @@ const unsigned int SCR_HEIGHT = 700;
 
 int main() {
   GLFWwindow* window = aphys::create_window(
-      SCR_WIDTH, SCR_HEIGHT, "Example8: 2D FEM Neo-Hookean simulation");
+      SCR_WIDTH, SCR_HEIGHT, "Example12: 2D FEM Neo-Hookean simulation");
 
   aphys::Scene scene =
       aphys::create_scene(aphys::default_light, aphys::default_camera);

@@ -1,5 +1,7 @@
 #include "ArmorerPhys/sim/common.h"
 
+#include <Eigen/Dense>
+
 #include <vector>
 #include <algorithm>
 #include <iostream>

@@ -14,8 +14,8 @@ const unsigned int SCR_WIDTH = 1000;
 const unsigned int SCR_HEIGHT = 800;
 
 int main() {
-  GLFWwindow *window =
-      aphys::create_window(SCR_WIDTH, SCR_HEIGHT, "Example4: Pipeline");
+  GLFWwindow *window = aphys::create_window(
+      SCR_WIDTH, SCR_HEIGHT, "Example13: 3D Projective Dynamics");
 
   aphys::DiffuseMaterial material{
       {90, 178, 255},   // diffuse color
@@ -49,7 +49,7 @@ int main() {
   int n_verts;
   aphys::TetMesh tm;
   aphys::VisualTetMesh vtm;
-  aphys::create_rectangular_prism(-0.5, 0.5, 5, 0.0, 3.0, 15, -0.3, 0.3, 5,
+  aphys::create_rectangular_prism(-0.5, 0.5, 4, 0.0, 2.0, 8, -0.5, 0.5, 4,
                                   tm.verts, tm.tets);
   n_verts = tm.verts.rows();
   aphys::extract_surface_from_tets(tm.verts.rows(), tm.tets, tm.faces);
@@ -57,7 +57,7 @@ int main() {
   int n_faces = tm.faces.rows();
 
   aphys::Vecxi top_face_indices;
-  aphys::get_axis_value_indices(3.0, 1, tm.verts, top_face_indices);
+  aphys::get_axis_value_indices(2.0, 1, tm.verts, top_face_indices);
   aphys::Vecxi bottom_face_indices;
   aphys::get_axis_value_indices(0.0, 1, tm.verts, bottom_face_indices);
 
@@ -82,8 +82,8 @@ int main() {
 
   int substep = 2;
   double dt = 1.0f / 60.0f / (double)substep;
-  double devia_stiffness = 70.0f;
-  double hydro_stiffness = 20.0f;
+  double devia_stiffness = 100.0f;
+  double hydro_stiffness = 0.0f;
   double rho = 1000.0f;
   int dim = 3;
   aphys::Vecxd gravity(dim);

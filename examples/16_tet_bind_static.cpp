@@ -112,7 +112,7 @@ int main() {
   };
   read_target(idx);
 
-  /*for (int i = 0; i < 11; i++) {
+  for (int i = 0; i < 11; i++) {
     read_target(i);
     v_cache = tm.verts;
     v_cache.setZero();
@@ -126,7 +126,7 @@ int main() {
                               ".mesh";
 
     igl::writeMESH(export_path, tm.verts, tm.tets, tm.faces);
-  }*/
+  }
 
   while (!glfwWindowShouldClose(window)) {
     aphys::set_background_RGB(aphys::RGB(250, 240, 228));

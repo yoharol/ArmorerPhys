@@ -3,7 +3,6 @@
 
 #include <random>
 #include <stdexcept>
-#include <Eigen/SVD>
 
 #include "ArmorerPhys/type.h"
 
@@ -53,6 +52,11 @@ double computeVolume(const Vec3d vec1, const Vec3d vec2, const Vec3d vec3);
 
 template <int dim>
 void ssvd(MatxXd& U, Vecxd& S, MatxXd& V);
+
+template <int dim>
+void SVD(const MatxXd& A, MatxXd& U, Vecxd& S, MatxXd& V);
+
+MatxXd rotation_extraction(const MatxXd& A);
 
 Vecxd getMassCenter(const MatxXd& verts, Vecxd& vert_mass);
 

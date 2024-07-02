@@ -3,9 +3,6 @@
 
 #include <vector>
 #include <Eigen/SparseLU>
-#include <Eigen/SparseQR>
-#include <Eigen/LU>
-#include <iostream>
 
 #include "ArmorerPhys/type.h"
 

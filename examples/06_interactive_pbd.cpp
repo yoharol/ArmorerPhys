@@ -14,7 +14,8 @@ const unsigned int SCR_HEIGHT = 700;
 
 int main() {
   GLFWwindow* window = aphys::create_window(
-      SCR_WIDTH, SCR_HEIGHT, "Example6: interactive pbd simulator");
+      SCR_WIDTH, SCR_HEIGHT,
+      "Example6: interactive position-based dynamics simulator");
   double bottom = 0.0f;
   double top = 1.0f;
   double left = 0.0f;

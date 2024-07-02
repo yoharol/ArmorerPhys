@@ -1,6 +1,7 @@
 #include <algorithm>
 #include <Eigen/Core>
 #include <Eigen/Geometry>
+#include <Eigen/SVD>
 #include <vector>
 #include <cassert>
 #include <cmath>
@@ -113,6 +114,25 @@ void ssvd(MatxXd& U, Vecxd& S, MatxXd& V) {
 
 template void ssvd<2>(MatxXd& U, Vecxd& S, MatxXd& V);
 template void ssvd<3>(MatxXd& U, Vecxd& S, MatxXd& V);
+
+void SVD(const MatxXd& A, MatxXd& U, Vecxd& S, MatxXd& V) {
+  Eigen::JacobiSVD<MatxXd> svd(A, Eigen::ComputeFullU | Eigen::ComputeFullV);
+  U = svd.matrixU();
+  V = svd.matrixV();
+  S = svd.singularValues();
+}
+
+template <int dim>
+MatxXd rotation_extraction(const MatxXd& A) {
+  MatxXd U, V;
+  Vecxd sig;
+  SVD(A, U, sig, V);
+  ssvd<dim>(U, sig, V);
+  return U * V.transpose();
+}
+
+template MatxXd rotation_extraction<2>(const MatxXd& A);
+template MatxXd rotation_extraction<3>(const MatxXd& A);
 
 Vecxd getMassCenter(const MatxXd& verts, Vecxd& vert_mass) {
   Vecxd center = Vecxd::Zero(verts.cols());

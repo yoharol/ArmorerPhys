@@ -4,7 +4,6 @@
 #include <Eigen/SparseCore>
 #include <Eigen/SparseCholesky>
 #include <Eigen/SVD>
-#include <Eigen/IterativeLinearSolvers>
 
 #include <stdexcept>
 #include <iostream>
