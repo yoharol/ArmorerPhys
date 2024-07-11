@@ -33,6 +33,7 @@ include("${CMAKE_CURRENT_SOURCE_DIR}/cmake/spdlog.cmake")
 # endif()
 
 igl_include(copyleft tetgen)
+igl_include(restricted triangle)
 
 # set a list of targets
 set(GL_TARGETS
@@ -43,6 +44,7 @@ set(GL_TARGETS
   Eigen3::Eigen
   igl::core
   tetgen::tetgen
+  triangle::triangle
 #  nlohmann_json::nlohmann_json
   spdlog::spdlog
 )

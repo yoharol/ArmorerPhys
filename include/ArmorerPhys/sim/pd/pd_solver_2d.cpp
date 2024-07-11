@@ -130,8 +130,8 @@ void ProjectiveDynamicsSolver2D::localStep(const MatxXd& verts,
 void ProjectiveDynamicsSolver2D::globalStep(MatxXd& verts,
                                             const MatxXd& verts_pred) {
   Eigen::MatrixXd rhs = M_h2 * verts_pred + J * P;
-  Eigen::MatrixXd result = sparse_solver.solve(rhs.cast<double>());
-  verts = result.cast<double>();
+  Eigen::MatrixXd result = sparse_solver.solve(rhs);
+  verts = result;
 }
 
 ControlledProjDynSolver::ControlledProjDynSolver(
