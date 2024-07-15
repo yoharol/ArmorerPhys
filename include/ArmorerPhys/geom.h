@@ -72,6 +72,12 @@ inline double compute_volume(const Vec3d &v0, const Vec3d &v1, const Vec3d &v2,
 void compute_barycentric_tet(Vec3d &p, Vec3d &v0, Vec3d &v1, Vec3d &v2,
                              Vec3d &v3, Vec4d &bary);
 
+void compute_barycentric_triangle(Vec2d &p, Vec2d &v0, Vec2d &v1, Vec2d &v2,
+                                  Vec3d &bary);
+
+void limited_barycentric_triangle(Vec2d &p, Vec2d &v0, Vec2d &v1, Vec2d &v2,
+                                  Vec3d &bary);
+
 }  // namespace aphys
 
 #endif  // GL_GEOM_H_

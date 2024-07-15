@@ -76,10 +76,8 @@ int main() {
                              tri_v_p, tri_face_indices);
   aphys::extract_edge(tri_face_indices, tri_edge_indices);
 
-  tri_v_p.conservativeResize(tri_v_p.rows(), 3);
-  tri_v_p.col(2).setZero();
-  igl::writeOBJ(std::string(ASSETS_PATH) + "/capsule/capsule.obj", tri_v_p,
-                tri_face_indices);
+  aphys::writeOBJ(std::string(ASSETS_PATH) + "/capsule/capsule.obj", tri_v_p,
+                  tri_face_indices);
 
   int lr_idx = aphys::find_nearest_point(tri_v_p, lc);
   int rr_idx = aphys::find_nearest_point(tri_v_p, rc);

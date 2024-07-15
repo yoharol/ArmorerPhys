@@ -32,18 +32,20 @@ int main() {
   // ================= create the outside edge of a capsule ==================
   aphys::MatxXd handles;
   aphys::MatxXi handle_edges;
-  aphys::MatxXd v_p;
+  aphys::MatxXd v_p, v_p_ref;
   aphys::Matx3i face_indices;
   aphys::Matx2i edge_indices;
 
   igl::readOBJ(std::string(ASSETS_PATH) + "/capsule/capsule.obj", v_p,
                face_indices);
+  v_p_ref = v_p.leftCols(2);
+  v_p = v_p_ref;
   aphys::extract_edge(face_indices, edge_indices);
   Eigen::MatrixXd read_handles;
   Eigen::MatrixXi read_handle_edges;
   igl::readTGF(std::string(ASSETS_PATH) + "/capsule/capsule.tgf", read_handles,
                read_handle_edges);
-  handles = read_handles;
+  handles = read_handles.leftCols(2);
   handle_edges = read_handle_edges;
 
   aphys::MatxXd weights;
@@ -102,15 +104,6 @@ int main() {
   aphys::add_render_func(scene, aphys::get_render_func(points));
   aphys::add_render_func(scene, aphys::get_render_func(edges));
 
-  // ===================== handle input =====================
-  int curr_weight = 0;
-  aphys::add_gui_key_input_func(
-      gui, [&curr_weight, &handles, &set_weight_color]() {
-        if (ImGui::IsKeyPressed(ImGuiKey_H)) {
-          curr_weight = (curr_weight + 1) % handles.rows();
-          set_weight_color(curr_weight);
-        }
-      });
   // ===================== lbs =====================
   std::vector<aphys::MatxXd> T;
   for (int i = 0; i < handles.rows(); i++) {
@@ -124,17 +117,18 @@ int main() {
   auto lbs = [&]() {
     for (int i = 0; i < v_p.rows(); i++) {
       aphys::MatxXd t(2, 3);
+      t.setZero();
       for (int j = 0; j < T.size(); j++) {
         t += weights(i, j) * T[j];
       }
       aphys::Vecxd x_tilde(3);
       x_tilde << v_p(i, 0), v_p(i, 1), 1;
-      v_p_rig.row(i) = (t * x_tilde).transpose();
+      v_p_rig.row(i) = (t * x_tilde).head(2).transpose();
     }
     for (int j = 0; j < T.size(); j++) {
       aphys::Vecxd x_tilde(3);
       x_tilde << handles(j, 0), handles(j, 1), 1.0;
-      handles_rig.row(j) = (T[j] * x_tilde).transpose();
+      handles_rig.row(j) = (T[j] * x_tilde).head(2).transpose();
     }
   };
 
@@ -156,6 +150,19 @@ int main() {
     R(2, 2) = 1.0;
     local_T = (L * C * R).block(0, 0, 2, 3);
   };
+
+  // ===================== handle input =====================
+  int curr_weight = 0;
+  aphys::add_gui_key_input_func(
+      gui, [&curr_weight, &handles, &set_weight_color, &v_p_rig]() {
+        if (ImGui::IsKeyPressed(ImGuiKey_H)) {
+          curr_weight = (curr_weight + 1) % handles.rows();
+          set_weight_color(curr_weight);
+        }
+        if (ImGui::IsKeyPressed(ImGuiKey_S)) {
+          std::cout << v_p_rig << std::endl;
+        }
+      });
 
   // ===================== main loop =====================
   glfwSwapInterval(1);

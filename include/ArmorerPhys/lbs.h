@@ -25,6 +25,13 @@ void initialize_T_mat(int n, std::vector<MatxXd>& T);
 template <int dim>
 void rotation_extraction(std::vector<MatxXd>& T);
 
+template <int dim>
+bool bounded_biharmonic_weights(const MatxXd& verts, const Matx3i& faces,
+                                const MatxXd& handles,
+                                const Vecxi& control_point_indices,
+                                const MatxXi& handle_edges, MatxXd& W,
+                                int max_iter = 8, int verbose = 2);
+
 }  // namespace aphys
 
 #endif  // ARMORER_PHYS_LBS_H_

@@ -29,6 +29,17 @@ struct RandomEngine {
   RandomEngine() : gen(rd()), dis(0.0, 1.0) {}
 };
 
+inline double ranged_atan2(double y, double x, double min_value) {
+  double angle = std::atan2(y, x);
+  while (angle < min_value) angle += 2 * M_PI;
+  return angle;
+}
+
+template <typename T>
+inline T clamp(T value, T min, T max) {
+  return std::max(min, std::min(max, value));
+}
+
 Vec3d heat_rgb(double value, double minv, double maxv);
 
 void set_sparse_block(SparseMatd& mat, const MatxXd& block, int row, int col,
@@ -46,7 +57,7 @@ void List2fToList3f(const Listx2f& vec2, Listx3f& vec3);
 
 void Mat2fToList3f(const Matx2d& mat, Listx3f& vec);
 
-double computeArea(const Vecxd& vec1, const Vecxd& vec2);
+double computeArea(Vecxd vec1, Vecxd vec2);
 
 double computeVolume(const Vec3d vec1, const Vec3d vec2, const Vec3d vec3);
 
@@ -57,6 +68,9 @@ template <int dim>
 void SVD(const MatxXd& A, MatxXd& U, Vecxd& S, MatxXd& V);
 
 MatxXd rotation_extraction(const MatxXd& A);
+
+template <int dim>
+void polar_decomposition(const MatxXd& A, MatxXd& R, MatxXd& S);
 
 Vecxd getMassCenter(const MatxXd& verts, Vecxd& vert_mass);
 

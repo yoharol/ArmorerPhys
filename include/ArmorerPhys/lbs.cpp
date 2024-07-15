@@ -1,6 +1,9 @@
 #include "ArmorerPhys/lbs.h"
 #include "ArmorerPhys/math.h"
 
+#include "igl/bbw.h"
+#include "igl/boundary_conditions.h"
+
 namespace aphys {
 
 template <int dim>
@@ -91,5 +94,35 @@ void rotation_extraction(std::vector<MatxXd>& T) {
 
 template void rotation_extraction<2>(std::vector<MatxXd>& T);
 template void rotation_extraction<3>(std::vector<MatxXd>& T);
+
+template <int dim>
+bool bounded_biharmonic_weights(const MatxXd& verts, const Matx3i& faces,
+                                const MatxXd& handles,
+                                const Vecxi& control_point_indices,
+                                const MatxXi& handle_edges, MatxXd& W,
+                                int max_iter, int verbose) {
+  igl::BBWData bbw_data;
+
+  bbw_data.active_set_params.max_iter = max_iter;
+  bbw_data.verbosity = verbose;
+
+  Eigen::MatrixXd bc;
+  Eigen::VectorXi b;
+  Eigen::MatrixXd V = verts;
+  Eigen::MatrixXi F = faces;
+  Eigen::MatrixXd C = handles;
+  Eigen::MatrixXi BE = handle_edges;
+  igl::boundary_conditions(V, F, C, control_point_indices, BE,
+                           Eigen::MatrixXi(), Eigen::MatrixXi(), b, bc);
+  if (!igl::bbw(V, F, b, bc, bbw_data, W)) {
+    return false;
+  }
+  for (int i = 0; i < W.rows(); i++) {
+    // for (int j = 0; j < W.cols(); j++)
+    //   if (W(i, j) < 1e-3) W(i, j) = 0;
+    W.row(i) /= W.row(i).sum();
+  }
+  return true;
+}
 
 }  // namespace aphys

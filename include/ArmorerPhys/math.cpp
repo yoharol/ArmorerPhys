@@ -75,13 +75,13 @@ void set_diag_matrix(Vecxd& diag_vec, DiagMatxXd& diag_mat, int expand) {
   diag_mat = expanded_vec.asDiagonal();
 }
 
-double computeArea(const Vecxd& vec1, const Vecxd& vec2) {
+double computeArea(Vecxd vec1, Vecxd vec2) {
   if (vec1.size() != vec2.size()) {
     throw std::runtime_error("computeArea: vec1.size() != vec2.size()");
   }
   double area = 0.0;
   if (vec1.size() == 2) {
-    area = 0.5 * (vec1(0) * vec2(1) - vec1(1) * vec2(0));
+    area = std::abs(0.5 * (vec1(0) * vec2(1) - vec1(1) * vec2(0)));
   } else if (vec1.size() == 3) {
     Vec3d v1 = vec1;
     Vec3d v2 = vec2;
@@ -133,6 +133,19 @@ MatxXd rotation_extraction(const MatxXd& A) {
 
 template MatxXd rotation_extraction<2>(const MatxXd& A);
 template MatxXd rotation_extraction<3>(const MatxXd& A);
+
+template <int dim>
+void polar_decomposition(const MatxXd& A, MatxXd& R, MatxXd& S) {
+  MatxXd U, V;
+  Vecxd sig;
+  SVD(A, U, sig, V);
+  ssvd<dim>(U, sig, V);
+  R = U * V.transpose();
+  S = V * sig.asDiagonal() * V.transpose();
+}
+
+template void polar_decomposition<2>(const MatxXd& A, MatxXd& R, MatxXd& S);
+template void polar_decomposition<3>(const MatxXd& A, MatxXd& R, MatxXd& S);
 
 Vecxd getMassCenter(const MatxXd& verts, Vecxd& vert_mass) {
   Vecxd center = Vecxd::Zero(verts.cols());

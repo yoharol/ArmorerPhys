@@ -1,8 +1,10 @@
-#include <cassert>
-#include <Eigen/Core>
-#include <Eigen/Geometry>
-
 #include "ArmorerPhys/geom.h"
+
+#include <cassert>
+
+#include "ArmorerPhys/math.h"
+#include "Eigen/Core"
+#include "Eigen/Geometry"
 
 namespace aphys {
 
@@ -212,6 +214,30 @@ void compute_barycentric_tet(Vec3d &p, Vec3d &v0, Vec3d &v1, Vec3d &v2,
   double volume_sum = volume0 + volume1 + volume2 + volume3;
   bary << volume0 / volume_sum, volume1 / volume_sum, volume2 / volume_sum,
       volume3 / volume_sum;
+}
+
+void compute_barycentric_triangle(Vec2d &p, Vec2d &v0, Vec2d &v1, Vec2d &v2,
+                                  Vec3d &bary) {
+  double area0 = computeArea(v1 - p, v2 - p);
+  double area1 = computeArea(v0 - p, v2 - p);
+  double area2 = computeArea(v0 - p, v1 - p);
+  double area_sum = area0 + area1 + area2;
+  bary << area0 / area_sum, area1 / area_sum, area2 / area_sum;
+}
+
+// ! not correct
+void limited_barycentric_triangle(Vec2d &p, Vec2d &v0, Vec2d &v1, Vec2d &v2,
+                                  Vec3d &bary) {
+  double area0 = computeArea(v1 - p, v2 - p);
+  double area1 = computeArea(v0 - p, v2 - p);
+  double area2 = computeArea(v0 - p, v1 - p);
+  double area_sum = computeArea(v1-v0, v2-v0);
+  bary << area0 / area_sum, area1 / area_sum, area2 / area_sum;
+  bary(0) = clamp(bary(0), 0.0, 1.0);
+  bary(1) = clamp(bary(1), 0.0, 1.0);
+  bary(2) = clamp(bary(2), 0.0, 1.0);
+  area_sum = bary(0) + bary(1) + bary(2);
+  bary /= area_sum;
 }
 
 }  // namespace aphys
