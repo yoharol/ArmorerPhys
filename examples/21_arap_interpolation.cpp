@@ -44,7 +44,7 @@ int main() {
                  face_indices, 2);
   aphys::readOBJ(std::string(ASSETS_PATH) + "/rect_twist/twist2.obj", v_twist2,
                  face_indices, 2);
-
+  // v_twist2 = v_p_ref;
   v_p = v_p_ref;
 
   aphys::extract_edge(face_indices, edge_indices);

@@ -2,7 +2,7 @@
 #define ARMORER_GL_H_
 
 #include "ArmorerPhys/type.h"
-#include "ArmorerPhys/math.h"
+#include "ArmorerPhys/glmath.h"
 #include "ArmorerPhys/utils.h"
 #include "ArmorerPhys/os.h"
 #include "ArmorerPhys/image.h"

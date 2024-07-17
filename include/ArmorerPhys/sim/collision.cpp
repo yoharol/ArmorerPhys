@@ -1,7 +1,7 @@
 #include "ArmorerPhys/sim/collision.h"
 
 #include <ArmorerPhys/type.h>
-#include <ArmorerPhys/math.h>
+#include <ArmorerPhys/glmath.h>
 
 namespace aphys {
 

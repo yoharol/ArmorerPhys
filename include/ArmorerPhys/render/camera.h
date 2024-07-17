@@ -5,7 +5,6 @@
 #include <GLFW/glfw3.h>
 
 #include "ArmorerPhys/type.h"
-#include "ArmorerPhys/render/camera.h"
 
 namespace aphys {
 

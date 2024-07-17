@@ -1,6 +1,8 @@
 #include "ArmorerPhys/sim/pd/static_pd.h"
 #include "ArmorerPhys/sim/fem.h"
-#include "ArmorerPhys/math.h"
+#include "ArmorerPhys/glmath.h"
+
+#include <iostream>
 
 namespace aphys {
 
@@ -28,7 +30,7 @@ ARAPInterpolate2D::ARAPInterpolate2D(
 void ARAPInterpolate2D::local_step(const MatxXd& verts, const Matx3i& faces,
                                    MatxXd& P) {
   solver.localStep(verts, faces);
-  P = solver.P;
+  P = solver.P.transpose();
 }
 
 void ARAPInterpolate2D::solver_static_shape(MatxXd& verts, const Matx3i& faces,

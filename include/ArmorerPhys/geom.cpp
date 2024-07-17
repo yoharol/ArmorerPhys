@@ -2,7 +2,7 @@
 
 #include <cassert>
 
-#include "ArmorerPhys/math.h"
+#include "ArmorerPhys/glmath.h"
 #include "Eigen/Core"
 #include "Eigen/Geometry"
 
@@ -231,7 +231,7 @@ void limited_barycentric_triangle(Vec2d &p, Vec2d &v0, Vec2d &v1, Vec2d &v2,
   double area0 = computeArea(v1 - p, v2 - p);
   double area1 = computeArea(v0 - p, v2 - p);
   double area2 = computeArea(v0 - p, v1 - p);
-  double area_sum = computeArea(v1-v0, v2-v0);
+  double area_sum = computeArea(v1 - v0, v2 - v0);
   bary << area0 / area_sum, area1 / area_sum, area2 / area_sum;
   bary(0) = clamp(bary(0), 0.0, 1.0);
   bary(1) = clamp(bary(1), 0.0, 1.0);

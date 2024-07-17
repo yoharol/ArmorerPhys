@@ -1,5 +1,5 @@
 #include "ArmorerPhys/lbs.h"
-#include "ArmorerPhys/math.h"
+#include "ArmorerPhys/glmath.h"
 
 #include "igl/bbw.h"
 #include "igl/boundary_conditions.h"

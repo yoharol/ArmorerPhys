@@ -4,11 +4,11 @@
 #include <GLFW/glfw3.h>
 #include <iostream>
 
+#include "ArmorerPhys/RenderCore.h"
 #include "igl/readTGF.h"
 #include "igl/bbw.h"
 #include "igl/writeDMAT.h"
 #include "igl/boundary_conditions.h"
-#include "ArmorerPhys/RenderCore.h"
 
 const unsigned int SCR_WIDTH = 700;
 const unsigned int SCR_HEIGHT = 700;
@@ -78,11 +78,11 @@ int main() {
   points.point_size = 3.0f;
 
   aphys::Points handle_points = aphys::create_points();
-  handle_points.color = aphys::RGB(0, 0, 0);
+  handle_points.color = aphys::RGB{0, 0, 0};
   handle_points.point_size = 5.0f;
 
   aphys::Edges edges = aphys::create_edges();
-  edges.color = aphys::RGB(0, 0, 0);
+  edges.color = aphys::RGB{0, 0, 0};
   edges.width = 1.0f;
 
   aphys::MatxXf weight_color(v_p.rows(), 3);

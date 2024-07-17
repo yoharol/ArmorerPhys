@@ -4,6 +4,11 @@
 #include <random>
 #include <stdexcept>
 
+#ifdef WIN32
+#define _USE_MATH_DEFINES
+#endif
+#include "math.h"
+
 #include "ArmorerPhys/type.h"
 
 namespace aphys {
@@ -28,12 +33,6 @@ struct RandomEngine {
  private:
   RandomEngine() : gen(rd()), dis(0.0, 1.0) {}
 };
-
-inline double ranged_atan2(double y, double x, double min_value) {
-  double angle = std::atan2(y, x);
-  while (angle < min_value) angle += 2 * M_PI;
-  return angle;
-}
 
 template <typename T>
 inline T clamp(T value, T min, T max) {

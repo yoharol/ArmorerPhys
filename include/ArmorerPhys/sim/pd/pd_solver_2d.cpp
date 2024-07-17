@@ -9,7 +9,7 @@
 #include <stdexcept>
 #include <iostream>
 
-#include "ArmorerPhys/math.h"
+#include "ArmorerPhys/glmath.h"
 
 namespace aphys {
 
