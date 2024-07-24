@@ -174,7 +174,7 @@ int main() {
 
     double t = scene.time * 0.5;
     double angle_l = std::pow(std::sin(t * M_PI), 2.0) * M_PI / 3.0;
-    double angle_r = -angle_l;
+    double angle_r = angle_l;
 
     T[0].setZero();
     T[0].block(0, 0, 2, 2) << std::cos(angle_l), -std::sin(angle_l),

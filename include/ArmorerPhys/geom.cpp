@@ -240,4 +240,29 @@ void limited_barycentric_triangle(Vec2d &p, Vec2d &v0, Vec2d &v1, Vec2d &v2,
   bary /= area_sum;
 }
 
+Mat3d rotate_around_center(const Vec2d &center, double angle) {
+  Mat3d translateToOrigin;
+  translateToOrigin << 1, 0, -center.x(), 0, 1, -center.y(), 0, 0, 1;
+  Mat3d rotation;
+  rotation << cos(angle), -sin(angle), 0, sin(angle), cos(angle), 0, 0, 0, 1;
+  Mat3d translateBack;
+  translateBack << 1, 0, center.x(), 0, 1, center.y(), 0, 0, 1;
+
+  return translateBack * rotation * translateToOrigin;
+}
+
+Mat3d rotate_and_scale_around_center(const Vec2d &center, const Vec2d &scalexy,
+                                     double angle) {
+  Mat3d translateToOrigin;
+  translateToOrigin << 1, 0, -center.x(), 0, 1, -center.y(), 0, 0, 1;
+  Mat3d rotation;
+  rotation << cos(angle), -sin(angle), 0, sin(angle), cos(angle), 0, 0, 0, 1;
+  Mat3d scale;
+  scale << scalexy.x(), 0, 0, 0, scalexy.y(), 0, 0, 0, 1;
+  Mat3d translateBack;
+  translateBack << 1, 0, center.x(), 0, 1, center.y(), 0, 0, 1;
+
+  return translateBack * rotation * scale * translateToOrigin;
+}
+
 }  // namespace aphys

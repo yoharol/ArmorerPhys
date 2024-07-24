@@ -78,6 +78,17 @@ void compute_barycentric_triangle(Vec2d &p, Vec2d &v0, Vec2d &v1, Vec2d &v2,
 void limited_barycentric_triangle(Vec2d &p, Vec2d &v0, Vec2d &v1, Vec2d &v2,
                                   Vec3d &bary);
 
+Mat3d rotate_around_center(const Vec2d &center, double angle);
+
+Mat3d rotate_and_scale_around_center(const Vec2d &center, const Vec2d &scalexy,
+                                     double angle);
+
+inline Vecxd quadratic_basis(Vec2d p) {
+  Vecxd res(6);
+  res << p(0), p(1), p(0) * p(0), p(1) * p(1), p(0) * p(1), 1.0;
+  return res;
+}
+
 }  // namespace aphys
 
 #endif  // GL_GEOM_H_

@@ -88,7 +88,7 @@ template <int dim>
 void rotation_extraction(std::vector<MatxXd>& T) {
   for (int i = 0; i < T.size(); i++) {
     MatxXd A = T[i].block(0, 0, dim, dim);
-    T[i].block(0, 0, dim, dim) = rotation_extraction(A);
+    T[i].block(0, 0, dim, dim) = rotation_extraction<dim>(A);
   }
 }
 

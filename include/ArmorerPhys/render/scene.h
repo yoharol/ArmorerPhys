@@ -13,7 +13,7 @@ struct Scene;
 
 struct InputHandler;
 
-typedef std::function<void(Scene)> RenderFunc;
+typedef std::function<void(Scene&)> RenderFunc;
 typedef std::function<void(InputHandler&, int, int)> MouseInputFunc;
 typedef std::function<void(InputHandler&)> MouseMoveFunc;
 typedef std::function<void(InputHandler&, int, int)> KeyInputFunc;

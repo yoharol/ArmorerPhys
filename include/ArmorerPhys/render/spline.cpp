@@ -122,7 +122,7 @@ void update_bezier_spline(BezierSpline& spline) {
 }
 
 RenderFunc get_render_func(BezierSpline& spline) {
-  RenderFunc render_func = [&spline](Scene scene) {
+  RenderFunc render_func = [&spline](Scene& scene) {
     get_render_func(spline.points)(scene);
     get_render_func(spline.edges)(scene);
     get_render_func(spline.spline)(scene);
@@ -333,6 +333,65 @@ Vecxd Bspline_second_deriv_Basis(double t, int n, int k, int& idx) {
   }
   idx = index;
   return boor;
+}
+
+// =========== BezierSegment ===============
+BezierSegment::BezierSegment(Vec2d p1, Vec2d p2, Vec2d p3, Vec2d p4)
+    : p1(p1), p2(p2), p3(p3), p4(p4) {
+  spline = create_bezier_spline();
+  set_bezier_data();
+}
+
+BezierSegment::BezierSegment(MatxXd p, Vec4i id)
+    : p1(p.row(id(0))), p2(p.row(id(1))), p3(p.row(id(2))), p4(p.row(id(3))) {
+  spline = create_bezier_spline();
+  set_bezier_data();
+}
+
+void BezierSegment::set_data(MatxXd p, Vec4i id) {
+  p1 = p.row(id(0));
+  p2 = p.row(id(1));
+  p3 = p.row(id(2));
+  p4 = p.row(id(3));
+  set_bezier_data();
+}
+
+void BezierSegment::set_bezier_data() {
+  MatxXf& cp = spline.control_points;
+  cp.resize(2, 2);
+  cp.row(0) = p1.cast<float>().transpose();
+  cp.row(1) = p4.cast<float>().transpose();
+  MatxXf& cd = spline.deriv_handles;
+  cd.resize(2, 2);
+  cd.row(0) = (p2 - p1).cast<float>().transpose();
+  cd.row(1) = (p4 - p3).cast<float>().transpose();
+  set_bezier_spline_data(20, spline, cp, cd, RGB(1.0f, 0.0f, 0.0f),
+                         RGB(0.0f, 1.0f, 0.0f), RGB(0.0f, 0.0f, 1.0f));
+}
+
+// =========== BezierPeices ===============
+
+BezierPeices::BezierPeices(MatxXd& cp, Matx4i& edges) {
+  peices.clear();
+  for (int i = 0; i < edges.rows(); i++) {
+    Vec4i id = edges.row(i);
+    peices.push_back(BezierSegment(cp, id));
+  }
+}
+
+void BezierPeices::set_data(MatxXd& cp, Matx4i& edges) {
+  for (int i = 0; i < edges.rows(); i++) {
+    peices[i].set_data(cp, edges.row(i));
+  }
+}
+
+RenderFunc get_render_func(BezierPeices& bp) {
+  RenderFunc render_func = [&bp](Scene& scene) {
+    for (BezierSegment& seg : bp.peices) {
+      get_render_func(seg.spline)(scene);
+    }
+  };
+  return render_func;
 }
 
 }  // namespace aphys

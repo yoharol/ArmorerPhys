@@ -66,6 +66,7 @@ void ssvd(MatxXd& U, Vecxd& S, MatxXd& V);
 template <int dim>
 void SVD(const MatxXd& A, MatxXd& U, Vecxd& S, MatxXd& V);
 
+template <int dim>
 MatxXd rotation_extraction(const MatxXd& A);
 
 template <int dim>

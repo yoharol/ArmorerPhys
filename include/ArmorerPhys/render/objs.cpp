@@ -117,7 +117,7 @@ void set_mesh_data(DiffuseMesh &mesh, MatxXf V, MatxXi F) {
 }
 
 RenderFunc get_render_func(DiffuseMesh &mesh) {
-  RenderFunc render_func = [&](Scene scene) {
+  RenderFunc render_func = [&](Scene &scene) {
     use_program(mesh.program);
     set_uniform_mat4(mesh.program, "projection", scene.camera.projection);
     set_uniform_RGB(mesh.program, "lightColor", scene.light.light_color);
@@ -198,7 +198,7 @@ void set_color_mesh_data(ColorMesh &mesh, MatxXf V, MatxXi F, MatxXf C) {
 }
 
 RenderFunc get_render_func(ColorMesh &mesh) {
-  RenderFunc render_func = [&](Scene scene) {
+  RenderFunc render_func = [&](Scene &scene) {
     use_program(mesh.program);
     set_uniform_mat4(mesh.program, "projection", scene.camera.projection);
     set_uniform_RGB(mesh.program, "lightColor", scene.light.light_color);
@@ -281,7 +281,7 @@ void set_points_data(Points &points, const MatxXf &points_data,
 RenderFunc get_render_func(Points &points) {
   Window &window = Window::get_instance();
   float asepect_ratio = float(window.width) / float(window.height);
-  RenderFunc render_func = [&points, asepect_ratio](Scene scene) {
+  RenderFunc render_func = [&points, asepect_ratio](Scene &scene) {
     use_program(points.program);
     set_uniform_mat4(points.program, "projection", scene.camera.projection);
     set_uniform_RGB(points.program, "color", points.color);
@@ -355,7 +355,7 @@ void set_lines_data(Lines &lines, const MatxXf &points_data,
 RenderFunc get_render_func(Lines &lines) {
   Window &window = Window::get_instance();
   float asepect_ratio = float(window.width) / float(window.height);
-  RenderFunc render_func = [&lines, asepect_ratio](Scene scene) {
+  RenderFunc render_func = [&lines, asepect_ratio](Scene &scene) {
     use_program(lines.program);
     set_uniform_mat4(lines.program, "projection", scene.camera.projection);
     set_uniform_RGB(lines.program, "color", lines.color);
@@ -434,7 +434,7 @@ void set_edges_data(Edges &edges, const MatxXf &points_data,
 RenderFunc get_render_func(Edges &edges) {
   Window &window = Window::get_instance();
   float asepect_ratio = float(window.width) / float(window.height);
-  RenderFunc render_func = [&edges, asepect_ratio](Scene scene) {
+  RenderFunc render_func = [&edges, asepect_ratio](Scene &scene) {
     use_program(edges.program);
     set_uniform_mat4(edges.program, "projection", scene.camera.projection);
     set_uniform_RGB(edges.program, "color", edges.color);

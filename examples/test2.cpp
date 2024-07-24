@@ -60,7 +60,6 @@ int main() {
   aphys::ARAPTargetShape2D donut_shape(v_donut, face_indices, source_B);
   aphys::ARAPTargetShape2D twist1_shape(v_twist1, face_indices, source_B);
 
-
   for (int i = 100; i < face_indices.rows(); i++) {
     if (donut_shape.rotate_angle(i) < 0.0)
       donut_shape.rotate_angle(i) += 2.0 * M_PI;
@@ -77,18 +76,17 @@ int main() {
                                        vert_mass, external_force, 0.0, 1.0,
                                        fixed_verts);
   aphys::MatxXd I(2, face_indices.rows() * 2);
-  for(int i=0; i<face_indices.rows(); i++)
-    I.block(0, i*2, 2, 2) = aphys::MatxXd::Identity(2, 2);
+  for (int i = 0; i < face_indices.rows(); i++)
+    I.block(0, i * 2, 2, 2) = aphys::MatxXd::Identity(2, 2);
   aphys::MatxXd interpolated_S(2, face_indices.rows() * 2);
 
   auto arap_interpolate = [&]() {
     weight = std::pow(weight, pow_num);
-    interpolated_S =
-        weight * twist1_shape.S + (1.0 - weight) * donut_shape.S;
+    interpolated_S = weight * twist1_shape.S + (1.0 - weight) * donut_shape.S;
     // aphys::MatxXd its1 = weight * twist1_shape.S + (1.0 - weight) * I;
     // aphys::MatxXd its2 = weight * I + (1.0 - weight) * donut_shape.S;
     // interpolated_S = weight * its1 + (1.0 - weight) * its2;
-    
+
     aphys::Vecxd interpolate_rotate = weight * twist1_shape.rotate_angle +
                                       (1.0 - weight) * donut_shape.rotate_angle;
     aphys::ARAPTargetShape2D::recover_deformation_map(
@@ -131,33 +129,34 @@ int main() {
   aphys::Vecxd U(100);
   double max_U = 0.0;
 
-  auto compute_energy_line = [&](){
+  auto compute_energy_line = [&]() {
     max_U = 0.0;
-    for(int i=0; i<=100; i++){
+    for (int i = 0; i <= 100; i++) {
       double t = i / 100.0;
       weight = t;
       arap_interpolate();
       U(i) = 0.5 * (interpolated_S - I).squaredNorm();
       max_U = std::max(max_U, U(i));
-    }};
+    }
+  };
   compute_energy_line();
 
   aphys::add_gui_func(gui, [&]() {
     aphys::Vecxf U_f = U.cast<float>();
     ImGui::InputInt("iters", &iter_input);
     ImGui::SliderFloat("weight", &weightSlider, 0.0, 1.0, "%.3f");
-    ImGui::PlotLines("Energy", U_f.data(), U_f.size(), 0,
-                     nullptr, 0.0f, max_U, ImVec2(300, 50));
+    ImGui::PlotLines("Energy", U_f.data(), U_f.size(), 0, nullptr, 0.0f, max_U,
+                     ImVec2(300, 50));
     if (weight != weightSlider || iter_number != iter_input) {
       weight = weightSlider;
       iter_number = iter_input;
-      arap_interpolate(); 
+      arap_interpolate();
       aphys::set_points_data(points, v_p.cast<float>(), aphys::MatxXf());
       aphys::set_edges_data(edges, v_p.cast<float>(), edge_indices,
                             aphys::MatxXf());
     }
     ImGui::InputFloat("Pow", &pownum_input);
-    if(pownum_input != pow_num){
+    if (pownum_input != pow_num) {
       pow_num = pownum_input;
       compute_energy_line();
     }
