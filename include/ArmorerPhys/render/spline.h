@@ -90,6 +90,14 @@ struct BezierPeices {
   BezierPeices(aphys::MatxXd& cp, aphys::Matx4i& edges);
 
   void set_data(aphys::MatxXd& cp, aphys::Matx4i& edges);
+
+  void set_line_color(aphys::RGB color, float alpha);
+
+  void set_handler_size(float size);
+
+  void set_handler_edges_alpha(float alpha);
+
+  void set_line_width(float width);
 };
 
 RenderFunc get_render_func(BezierPeices& bp);

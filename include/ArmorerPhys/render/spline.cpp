@@ -394,4 +394,29 @@ RenderFunc get_render_func(BezierPeices& bp) {
   return render_func;
 }
 
+void BezierPeices::set_line_color(RGB color, float alpha) {
+  for (BezierSegment& seg : peices) {
+    seg.spline.spline.color = color;
+    seg.spline.spline.alpha = alpha;
+  }
+}
+
+void BezierPeices::set_handler_size(float size) {
+  for (BezierSegment& seg : peices) {
+    seg.spline.points.point_size = size;
+  }
+}
+
+void BezierPeices::set_handler_edges_alpha(float alpha) {
+  for (BezierSegment& seg : peices) {
+    seg.spline.edges.alpha = alpha;
+  }
+}
+
+void BezierPeices::set_line_width(float width) {
+  for (BezierSegment& seg : peices) {
+    seg.spline.spline.width = width;
+  }
+}
+
 }  // namespace aphys

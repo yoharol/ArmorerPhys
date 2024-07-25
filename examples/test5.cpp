@@ -104,7 +104,7 @@ int main() {
       0.0, 0.0, 1.0,                     //
       0.0, 1.0, 0.0;
   origin_points.color = aphys::RGB{255, 0, 0};
-  origin_points.point_size = 8.0f;
+  origin_points.point_size = 3.0f;
   aphys::set_points_data(origin_points, ref_point.cast<float>(),
                          origin_points_color);
   aphys::add_render_func(scene, aphys::get_render_func(origin_points));
@@ -140,14 +140,19 @@ int main() {
     aphys::MatxXd R1 = ExtractRotation(T1);
     aphys::MatxXd R2 = ExtractRotation(T2);
     double t = interpolate_t;
+    t = 0.0;
     aphys::MatxXd lhs =
         (1.0 - t) * (D1.transpose() * D1) + t * (D2.transpose() * D2);
-    aphys::MatxXd C1 = ref_point.row(0);
-    aphys::MatxXd C2 = ref_point.row(1);
     aphys::MatxXd rhs =
         (1.0 - t) * (D1.transpose() * R1) + t * (D2.transpose() * R2);
-    aphys::MatxXd newq = lhs.ldlt().solve(rhs);
-    shape_target = newq;
+    aphys::MatxXd newq1 = lhs.ldlt().solve(rhs);
+    t = 1.0;
+    lhs = (1.0 - t) * (D1.transpose() * D1) + t * (D2.transpose() * D2);
+    rhs = (1.0 - t) * (D1.transpose() * R1) + t * (D2.transpose() * R2);
+    aphys::MatxXd newq2 = lhs.ldlt().solve(rhs);
+    t = interpolate_t;
+    aphys::MatxXd resq = (1.0 - t) * newq1 + t * newq2;
+    shape_target = resq;
     bp_raw.set_data(shape_target, edges);
     LocalCompute();
   };
@@ -166,6 +171,7 @@ int main() {
       reset_basis();
       Initialize();
       LocalCompute();
+      OneStepOptimize();
     }
   });
 
@@ -186,12 +192,16 @@ int main() {
   aphys::Matx2i edges_idx(2, 2);
   edges_idx << 0, 1, 0, 2;
   aphys::Edges edges1 = aphys::create_edges();
+  edges1.alpha = 0.5f;
   aphys::MatxXd tr1(3, 2);
   aphys::Edges edges2 = aphys::create_edges();
+  edges2.alpha = 0.5f;
   aphys::MatxXd tr2(3, 2);
   aphys::Edges edges3 = aphys::create_edges();
+  edges3.alpha = 0.5f;
   aphys::MatxXd tr3(3, 2);
   aphys::Edges edges4 = aphys::create_edges();
+  edges4.alpha = 0.5f;
   aphys::MatxXd tr4(3, 2);
   aphys::add_render_func(scene, aphys::get_render_func(edges1));
   aphys::add_render_func(scene, aphys::get_render_func(edges2));
