@@ -140,15 +140,12 @@ int main() {
     aphys::MatxXd R1 = ExtractRotation(T1);
     aphys::MatxXd R2 = ExtractRotation(T2);
     double t = interpolate_t;
-    t = 0.0;
-    aphys::MatxXd lhs =
-        (1.0 - t) * (D1.transpose() * D1) + t * (D2.transpose() * D2);
-    aphys::MatxXd rhs =
-        (1.0 - t) * (D1.transpose() * R1) + t * (D2.transpose() * R2);
+    aphys::MatxXd lhs = (D1.transpose() * D1);
+    aphys::MatxXd rhs = (D1.transpose() * R1);
     aphys::MatxXd newq1 = lhs.ldlt().solve(rhs);
     t = 1.0;
-    lhs = (1.0 - t) * (D1.transpose() * D1) + t * (D2.transpose() * D2);
-    rhs = (1.0 - t) * (D1.transpose() * R1) + t * (D2.transpose() * R2);
+    lhs = (D2.transpose() * D2);
+    rhs = (D2.transpose() * R2);
     aphys::MatxXd newq2 = lhs.ldlt().solve(rhs);
     t = interpolate_t;
     aphys::MatxXd resq = (1.0 - t) * newq1 + t * newq2;

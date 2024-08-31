@@ -13,6 +13,47 @@
 
 namespace aphys {
 
+template <typename T>
+inline T clamp(T value, T min, T max) {
+  return std::max(min, std::min(max, value));
+}
+
+template <typename T>
+inline T lerp(T a, T b, double t) {
+  return (1.0 - t) * a + t * b;
+}
+
+inline float random(float rMin, float rMax) {
+  const float rRandMax = 1. / (float)RAND_MAX;
+  float u = rRandMax * (float)rand();
+  return u * (rMax - rMin) + rMin;
+}
+
+inline double closest_point_on_segment(const Vecxd& a, const Vecxd& b,
+                                       const Vecxd& refp) {
+  Vecxd p = b - a;
+  double t = clamp((refp - a).dot(p) / p.dot(p), 0., 1.);
+  return t;
+}
+
+inline double det2D(const Vecxd& a, const Vecxd& b) {
+  return a(0) * b(1) - a(1) * b(0);
+}
+
+inline bool segment_intersection2D(const Vecxd& a, const Vecxd& b,
+                                   const Vecxd& c, const Vecxd& d, double t1,
+                                   double t2) {
+  Vecxd p = b - a;
+  Vecxd q = d - c;
+  double det = det2D(p, q);
+  if (det == 0) return false;
+  Vecxd r = c - a;
+  t1 = det2D(r, q) / det;
+  t2 = det2D(r, p) / det;
+  if (t1 >= 0. && t1 <= 1. && t2 >= 0. && t2 <= 1.) return true;
+  return false;
+}
+
 struct RandomEngine {
   std::random_device rd;
   std::mt19937 gen;
@@ -33,11 +74,6 @@ struct RandomEngine {
  private:
   RandomEngine() : gen(rd()), dis(0.0, 1.0) {}
 };
-
-template <typename T>
-inline T clamp(T value, T min, T max) {
-  return std::max(min, std::min(max, value));
-}
 
 Vec3d heat_rgb(double value, double minv, double maxv);
 

@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.21)
+cmake_minimum_required(VERSION 3.5)
 
 project(ArmorerPhys
   DESCRIPTION "A simple OpenGL library"
@@ -7,12 +7,14 @@ project(ArmorerPhys
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 add_definitions(-DCMAKE_EXPORT_COMPILE_COMMANDS=ON)
+set(CMAKE_CXX_FLAGS_RELEASE "-O3")
 
 get_filename_component(ABS_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR} ABSOLUTE)
 add_definitions(-DASSETS_PATH="${ABS_SOURCE_DIR}/assets")
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/external)
 
 find_package(OpenGL REQUIRED)
+find_package(OpenMP REQUIRED)
 
 include("${CMAKE_CURRENT_SOURCE_DIR}/cmake/eigen3.cmake")
 include("${CMAKE_CURRENT_SOURCE_DIR}/cmake/glfw.cmake")
@@ -47,6 +49,7 @@ set(GL_TARGETS
   triangle::triangle
 #  nlohmann_json::nlohmann_json
   spdlog::spdlog
+  OpenMP::OpenMP_CXX
 )
 
 # set(USD_TARGETS
