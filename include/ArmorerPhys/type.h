@@ -21,6 +21,7 @@ using Matx3i = Eigen::Matrix<int, Eigen::Dynamic, 3, Eigen::RowMajor>;
 using Matx4i = Eigen::Matrix<int, Eigen::Dynamic, 4, Eigen::RowMajor>;
 using MatxXi =
     Eigen::Matrix<int, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor>;
+using Vecxb = Eigen::VectorX<bool>;
 using Vecxf = Eigen::VectorXf;
 using Vec4f = Eigen::Vector4f;
 using Vec3f = Eigen::Vector3f;
