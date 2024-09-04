@@ -77,8 +77,20 @@ struct RandomEngine {
 
 Vec3d heat_rgb(double value, double minv, double maxv);
 
+template <typename Func>
+inline void for_each_nonzero(SparseMatd& matrix, Func func) {
+  for (int k = 0; k < matrix.outerSize(); ++k) {
+    for (SparseMatd::InnerIterator it(matrix, k); it; ++it) {
+      func(it);
+    }
+  }
+}
+
 void set_sparse_block(SparseMatd& mat, const MatxXd& block, int row, int col,
                       int n, int m);
+
+void set_sparse_block_from_diagnol(SparseMatd& mat, const Vecxd& diag, int row,
+                                   int col);
 
 void set_diag_matrix(Vecxd& diag_vec, DiagMatxXd& diag_mat, int expand);
 

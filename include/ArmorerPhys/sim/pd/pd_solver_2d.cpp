@@ -147,9 +147,9 @@ ControlledProjDynSolver::ControlledProjDynSolver(
   SparseMatd control_weights_sparse = control_weights.sparseView();
   SparseMatd control_weights_sparse_T;
   control_weights_sparse_T = control_weights_sparse.transpose();
-  for (int k = 0; k < LHS.outerSize(); ++k)
-    for (SparseMatd::InnerIterator it(LHS, k); it; ++it)
-      combined_LHS.insert(it.row(), it.col()) = it.value();
+  for_each_nonzero(LHS, [&](SparseMatdIter it) {
+    combined_LHS.insert(it.row(), it.col()) = it.value();
+  });
   for (int i = 0; i < control_weights.rows(); i++)
     for (int j = 0; j < control_weights.cols(); j++) {
       combined_LHS.insert(n_verts + i, j) = control_weights(i, j);

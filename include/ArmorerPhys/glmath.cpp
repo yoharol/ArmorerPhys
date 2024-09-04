@@ -64,6 +64,13 @@ void set_sparse_block(SparseMatd& mat, const MatxXd& block, int row, int col,
   }
 }
 
+void set_sparse_block_from_diagnol(SparseMatd& mat, const Vecxd& diag, int row,
+                                   int col) {
+  for (int i = 0; i < diag.size(); ++i) {
+    mat.insert(row + i, col + i) = diag(i);
+  }
+}
+
 void set_diag_matrix(Vecxd& diag_vec, DiagMatxXd& diag_mat, int expand) {
   int n = diag_vec.size();
   Vecxd expanded_vec = Vecxd::Zero(n * expand);
