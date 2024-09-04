@@ -86,6 +86,15 @@ inline void for_each_nonzero(SparseMatd& matrix, Func func) {
   }
 }
 
+template <typename T>
+T sum_vector(const std::vector<T>& vec) {
+  T sum = 0;
+  for (const auto& v : vec) {
+    sum += v;
+  }
+  return sum;
+}
+
 void set_sparse_block(SparseMatd& mat, const MatxXd& block, int row, int col,
                       int n, int m);
 
