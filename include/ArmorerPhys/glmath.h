@@ -101,7 +101,7 @@ void set_sparse_block(SparseMatd& mat, const MatxXd& block, int row, int col,
 void set_sparse_block_from_diagnol(SparseMatd& mat, const Vecxd& diag, int row,
                                    int col);
 
-void set_diag_matrix(Vecxd& diag_vec, DiagMatxXd& diag_mat, int expand);
+void set_diag_matrix(const Vecxd& diag_vec, DiagMatxXd& diag_mat, int expand);
 
 void Mat3fToList3f(const Matx3d& mat, Listx3f& vec);
 

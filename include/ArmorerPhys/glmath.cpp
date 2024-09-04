@@ -71,7 +71,7 @@ void set_sparse_block_from_diagnol(SparseMatd& mat, const Vecxd& diag, int row,
   }
 }
 
-void set_diag_matrix(Vecxd& diag_vec, DiagMatxXd& diag_mat, int expand) {
+void set_diag_matrix(const Vecxd& diag_vec, DiagMatxXd& diag_mat, int expand) {
   int n = diag_vec.size();
   Vecxd expanded_vec = Vecxd::Zero(n * expand);
   for (int i = 0; i < n; ++i) {
