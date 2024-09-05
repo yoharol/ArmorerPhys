@@ -5,6 +5,7 @@
 
 #include "igl/readOBJ.h"
 #include "igl/readMESH.h"
+#include "igl/writeMESH.h"
 #include "igl/writeDMAT.h"
 #include "ArmorerPhys/data/tetrahetralize.h"
 
