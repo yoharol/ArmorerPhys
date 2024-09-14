@@ -19,6 +19,9 @@ struct Camera {
   Vec3f lookat;
   Vec3f up;
   Mat4f projection;
+  Mat4f inverse_projection;
+  Mat4f to_camera_space;
+  Mat4f from_camera_space;
   CameraType type;
   float aspect;
   float near;
@@ -34,6 +37,11 @@ void set_2d_camera(Camera& camera, float left, float right, float bottom,
                    float top);
 
 void camera2d_screen_to_world(Camera& camera, float& x, float& y);
+
+Vec3f camera_sceen_to_world(Camera& camera, float& x, float& y);
+
+void camera_screen_to_raycast(Camera& camera, float x, float y,
+                              Vec3f& ray_start, Vec3f& ray_dir);
 
 void update_camera(Camera& camera);
 

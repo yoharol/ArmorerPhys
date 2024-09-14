@@ -6,6 +6,8 @@
 #include <GLFW/glfw3.h>
 #include <cassert>
 
+#include <iostream>
+
 namespace aphys {
 
 Camera create_camera(Vec3f pos, Vec3f lookat, Vec3f up, float aspect) {
@@ -65,6 +67,8 @@ void update_camera(Camera& camera) {
       y.x(), y.y(), y.z(), -y.dot(camera.position),                 //
       z.x(), z.y(), z.z(), -z.dot(camera.position),                 //
       0.0f, 0.0f, 0.0f, 1.0f;
+  camera.to_camera_space = to_camera_space;
+  camera.from_camera_space = to_camera_space.inverse();
 
   if (camera.type == CameraType::Perspective) {
     Mat4f perspective;
@@ -80,6 +84,7 @@ void update_camera(Camera& camera) {
         0.0f, 0.0f, 0.0f, 1.0f;
 
     camera.projection = orthographic * perspective * to_camera_space;
+    camera.inverse_projection = (orthographic * perspective).inverse();
   } else if (camera.type == CameraType::Orthographic) {
     float dis = (camera.position - camera.lookat).norm();
     float y_window = tan(camera.fov / 2.0f) * dis * 2.0f;
@@ -97,6 +102,24 @@ void update_camera(Camera& camera) {
         0.0f, 0.0f, 0.0f, 1.0f;                          // w
     camera.projection = orthographic * to_camera_space;
   }
+}
+
+Vec3f camera_sceen_to_world(Camera& camera, float& x, float& y) {
+  float x_ndc = 2.0f * x - 1.0f;
+  float y_ndc = 2.0f * y - 1.0f;
+  float z_ndc = -1.0f;
+  Vec4f clip_coordinates(x_ndc, y_ndc, z_ndc, 1.0f);
+  Vec4f eye_coordinates = camera.inverse_projection * clip_coordinates;
+  eye_coordinates /= eye_coordinates.w();
+  Vec4f world_coordinates = camera.from_camera_space * eye_coordinates;
+  return world_coordinates.head(3);
+}
+
+void camera_screen_to_raycast(Camera& camera, float x, float y,
+                              Vec3f& ray_start, Vec3f& ray_dir) {
+  Vec3f world_pos = camera_sceen_to_world(camera, x, y);
+  ray_start = camera.position;
+  ray_dir = (world_pos - camera.position).normalized();
 }
 
 void set_camera(Camera& camera, Vec3f position, Vec3f lookat, Vec3f up,

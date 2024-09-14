@@ -23,6 +23,8 @@ struct Gui {
   std::vector<GuiKeyInputFunc> gui_key_input_func;
   int width;
   int height;
+  int window_width;
+  int window_height;
 };
 
 Gui create_gui(GLFWwindow *window, std::string name,

@@ -1,5 +1,8 @@
 #include "ArmorerPhys/render/gui.h"
 
+#include <glad/glad.h>
+#include <GLFW/glfw3.h>
+
 #include "imgui.h"
 #include "imgui_impl_glfw.h"
 #include "imgui_impl_opengl3.h"
@@ -23,6 +26,10 @@ Gui create_gui(GLFWwindow *window, std::string name, const char *glsl_version) {
   Gui imgui_window{name, io, true, {}, {}, {}, 300, 400};
   imgui_window.io = io;
   imgui_window.open = true;
+  int w, h;
+  glfwGetWindowSize(window, &w, &h);
+  imgui_window.window_width = w;
+  imgui_window.window_height = h;
   return imgui_window;
 }
 

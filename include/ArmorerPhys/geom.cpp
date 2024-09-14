@@ -23,6 +23,51 @@ int find_nearest_point(const MatxXd &points, const Vecxd &point) {
   return min_idx;
 }
 
+int raycast_face(const MatxXd &points, const Matx3i &faces,
+                 const Vec3d raycast_origin, const Vec3d raycast_dir) {
+  int n_faces = faces.rows();
+  double min_dist = std::numeric_limits<double>::max();
+  int min_idx = -1;
+  int min_vert_idx = -1;
+  for (int i = 0; i < n_faces; i++) {
+    Vec3d v0 = points.row(faces(i, 0));
+    Vec3d v1 = points.row(faces(i, 1));
+    Vec3d v2 = points.row(faces(i, 2));
+    Vec3d e1 = v1 - v0;
+    Vec3d e2 = v2 - v0;
+
+    Vec3d pvec = raycast_dir.cross(e2);
+    double det = e1.dot(pvec);
+    if (std::abs(det) < 1e-6) continue;
+
+    double inv_det = 1.0 / det;
+    Vec3d tvec = raycast_origin - v0;
+    double u = tvec.dot(pvec) * inv_det;
+    if (u < 0 || u > 1) continue;
+    Vec3d qvec = tvec.cross(e1);
+    double v = raycast_dir.dot(qvec) * inv_det;
+    if (v < 0 || u + v > 1) continue;
+    double t = e2.dot(qvec) * inv_det;
+    if (t < 0) continue;
+    if (t < min_dist) {
+      min_dist = t;
+      min_idx = i;
+
+      double d1 = (raycast_origin - v0).norm();
+      double d2 = (raycast_origin - v1).norm();
+      double d3 = (raycast_origin - v2).norm();
+      if (d1 < d2 && d1 < d3) {
+        min_vert_idx = faces(i, 0);
+      } else if (d2 < d1 && d2 < d3) {
+        min_vert_idx = faces(i, 1);
+      } else {
+        min_vert_idx = faces(i, 2);
+      }
+    }
+  }
+  return min_vert_idx;
+}
+
 MatxXf get_normals(const MatxXf &vertices, const MatxXi &indices) {
   assert(indices.cols() == 3);
   assert(indices.rows() > 0);

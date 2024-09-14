@@ -35,6 +35,8 @@ int main() {
   gui.width = 300;
   gui.height = 100;
 
+  std::cout << gui.window_width << " " << gui.window_height << std::endl;
+
   aphys::Vec3f diffuse_color(0.0f, 211.f / 255.f, 239.f / 255.f);
   aphys::add_gui_func(gui, [&diffuse_color]() {
     ImGui::Text("Diffuse Color:");
@@ -73,9 +75,25 @@ int main() {
   aphys::add_render_func(scene, aphys::get_render_func(points),
                          false);  // disable depth test
 
+  aphys::add_gui_mouse_input_func(gui, [&]() {
+    if (ImGui::IsMouseClicked(0)) {
+      ImVec2 pos = ImGui::GetMousePos();
+      float x = pos.x / gui.window_width;
+      float y = 1.0 - pos.y / gui.window_height;
+      aphys::Vec3f ray_origin, ray_dir;
+      aphys::camera_screen_to_raycast(scene.camera, x, y, ray_origin, ray_dir);
+      int idx =
+          aphys::raycast_face(V.cast<double>(), F, ray_origin.cast<double>(),
+                              ray_dir.cast<double>());
+      std::cout << "Select vert " << idx << std::endl;
+    }
+  });
+
   aphys::set_wireframe_mode(false);
 
   while (!glfwWindowShouldClose(window)) {
+    glfwPollEvents();
+    aphys::handle_gui_input(gui);
     aphys::set_background_RGB(aphys::RGB(250, 240, 228));
 
     float curr_time = glfwGetTime();
@@ -91,7 +109,6 @@ int main() {
     aphys::unuse_program();
 
     glfwSwapBuffers(window);
-    glfwPollEvents();
   }
   aphys::delete_mesh(mesh);
   aphys::destroy_gui(gui);

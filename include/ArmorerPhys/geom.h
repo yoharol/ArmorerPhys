@@ -7,6 +7,9 @@ namespace aphys {
 
 int find_nearest_point(const MatxXd &points, const Vecxd &point);
 
+int raycast_face(const MatxXd &points, const Matx3i &faces,
+                 const Vec3d raycast_origin, const Vec3d raycast_dir);
+
 struct Box2d {
   Matx2d bound;
   Box2d(double l, double r, double y, double b) {
