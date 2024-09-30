@@ -5,6 +5,7 @@
 
 #include "igl/readOBJ.h"
 #include "igl/writeMESH.h"
+#include "igl/writeDMAT.h"
 #include "ArmorerPhys/data/tetrahetralize.h"
 
 #include "ArmorerPhys/RenderCore.h"
@@ -46,15 +47,13 @@ int main() {
 
   aphys::MatxXd V0, V1;
   aphys::MatxXi F0, F1;
-  igl::readOBJ(std::string(ASSETS_PATH) + "/dino/dino.obj", V0, F0);
-  igl::readOBJ(std::string(ASSETS_PATH) + "/dino/dino_1.obj", V1, F1);
-  V0 = V0 * 0.3;
-  V1 = V1 * 0.3;
+  igl::readOBJ(std::string(ASSETS_PATH) + "/cheb/cheb.obj", V0, F0);
+  igl::readOBJ(std::string(ASSETS_PATH) + "/cheb/cheb_1.obj", V1, F1);
 
   aphys::TetMesh tm;
   aphys::tetgen(V1, F1, tm);
 
-  igl::writeMESH(std::string(ASSETS_PATH) + "/dino/dino.mesh", tm.verts,
+  igl::writeMESH(std::string(ASSETS_PATH) + "/cheb/cheb.mesh", tm.verts,
                  tm.tets, tm.faces);
 
   aphys::VisualTetMesh vtm;
@@ -67,6 +66,9 @@ int main() {
   aphys::generate_bind_mat(tm.verts.rows(), tm.tets, bc_index, bc_weights,
                            bind_mat);
 
+  igl::writeDMAT(std::string(ASSETS_PATH) + "/cheb/bind.dmat",
+                 bind_mat.toDense());
+
   // ===================== Simulation =====================
 
   int n_verts = tm.verts.rows();
@@ -75,8 +77,8 @@ int main() {
   aphys::compute_tet_mass(tm.verts, tm.tets, tet_mass, vert_mass);
   int substep = 2;
   double dt = 1.0f / 60.0f / (double)substep;
-  double devia_stiffness = 70.0f;
-  double hydro_stiffness = 70.0f;
+  double devia_stiffness = 270.0f;
+  double hydro_stiffness = 270.0f;
   double rho = 1000.0f;
   int dim = 3;
   aphys::Vecxd gravity(dim);
@@ -104,7 +106,7 @@ int main() {
   aphys::set_box_edges_data(box_edges, box);
 
   aphys::add_render_func(scene, aphys::get_render_func(mesh), true, true);
-  aphys::add_render_func(scene, aphys::get_render_func(fine_mesh), true);
+  // aphys::add_render_func(scene, aphys::get_render_func(fine_mesh), true);
   aphys::add_render_func(scene, aphys::get_render_func(box_edges));
 
   while (!glfwWindowShouldClose(window)) {

@@ -9,6 +9,7 @@
 #include <iostream>
 
 #include "ArmorerPhys/glmath.h"
+#include "ArmorerPhys/timer.h"
 
 namespace aphys {
 
@@ -100,6 +101,7 @@ ProjectiveDynamicsSolver3D::ProjectiveDynamicsSolver3D(
   }
   L = L_mat.sparseView();
   J = J_mat.sparseView();
+
   ratio = stiffness_devia / (stiffness_hydro + stiffness_devia);
 
   for (int i = 0; i < n_verts; i++) {
