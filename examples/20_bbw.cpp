@@ -164,6 +164,20 @@ int main() {
         }
       });
 
+  char* filename[128];
+  aphys::add_gui_func(gui, [&]() {
+    if (ImGui::Button("Save")) {
+      std::cout << "Save" << std::endl;
+      aphys::export2DPolygonToSVG(
+          v_p_rig, edge_indices, face_indices, aphys::Matx3f(), {128, 128, 128},
+          std::string(ASSETS_PATH) + "/capsule/capsule.svg", 100.0);
+      aphys::exportPolygonToPointBasedSVG(
+          v_p_rig, edge_indices, face_indices, weight_color, {255, 255, 255},
+          std::string(ASSETS_PATH) + "/capsule/capsule_point.svg", 1.0, 0.3,
+          0.5, 100.0, true);
+    }
+  });
+
   // ===================== main loop =====================
   glfwSwapInterval(1);
 
