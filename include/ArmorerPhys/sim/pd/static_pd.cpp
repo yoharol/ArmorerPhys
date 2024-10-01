@@ -42,7 +42,7 @@ void ARAPInterpolate2D::solver_static_shape(MatxXd& verts, const Matx3i& faces,
   rhs.block(rhs.rows() - fixed_pos.rows(), 0, fixed_pos.rows(), rhs.cols()) =
       fixed_pos;
   Eigen::MatrixXd result = solver.sparse_solver.solve(rhs);
-  verts = result;
+  verts = result.topRows(verts.rows());
 }
 
 ARAPTargetShape2D::ARAPTargetShape2D(const MatxXd& verts, const Matx3i& faces,
