@@ -11,8 +11,6 @@ The core concept is the data-oriented design for flexibility and adaptability. T
 - Eigen3
 - GLFW/GLAD
 - libigl
-- nlohmann_json
-- tinygltf
 - imgui
 
 (All the dependencies will be audomatically downloaded by git submodule and cmake fetch content.)
@@ -134,5 +132,6 @@ Implementing 2D deformable simulation from [stable neohookean flesh simulation](
 
 ## TODO
 
-- [ ] Export simulated animation to gltf
+- [x] Exportation to SVG for simple 2D scenes 
+- [ ] Optional exportation to OpenUSD
 - [ ] Cloth simulation by projective dynamics

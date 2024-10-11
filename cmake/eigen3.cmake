@@ -3,12 +3,12 @@ if(TARGET Eigen3::Eigen)
 else()
   find_package(Eigen3 QUIET)
   if(TARGET Eigen3::Eigen)
-    message(STATUS "[ArmorerGL] Third-party: Eigen3::Eigen loaded")
+    message(STATUS "[ArmorerPhys] Third-party: Eigen3::Eigen loaded")
     return()
   endif()
 endif()
 
-message(STATUS "[ArmorerGL] Third-party: Eigen3::Eigen not found, fetching it with git")
+message(STATUS "[ArmorerPhys] Third-party: Eigen3::Eigen not found, fetching it with git")
 
 include(FetchContent)
 FetchContent_Declare(

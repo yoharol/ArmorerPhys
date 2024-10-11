@@ -3,12 +3,12 @@ if(TARGET glfw)
 else()
   find_package(glfw3 QUIET)
   if(TARGET glfw)
-    message(STATUS "[ArmorerGL] Third-party: glfw3 loaded")
+    message(STATUS "[ArmorerPhys] Third-party: glfw3 loaded")
     return()
   endif()
 endif()
 
-message(STATUS "[ArmorerGL] Third-party: glfw3 not found, fetching it with git")
+message(STATUS "[ArmorerPhys] Third-party: glfw3 not found, fetching it with git")
 
 include(FetchContent)
 FetchContent_Declare(

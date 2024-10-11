@@ -21,18 +21,14 @@ include("${CMAKE_CURRENT_SOURCE_DIR}/cmake/glfw.cmake")
 include("${CMAKE_CURRENT_SOURCE_DIR}/cmake/glad.cmake")
 include ("${CMAKE_CURRENT_SOURCE_DIR}/cmake/imgui.cmake")
 include("${CMAKE_CURRENT_SOURCE_DIR}/cmake/libigl.cmake")
-# json is already included in tinygltf as header file
-# include("${CMAKE_CURRENT_SOURCE_DIR}/cmake/nlohmann_json.cmake")
 include("${CMAKE_CURRENT_SOURCE_DIR}/cmake/spdlog.cmake")
 
 # give up on USD and use gltf for now
-# option(LINK_USD "Include USD components" OFF)
-# if(PROJECT_IS_TOP_LEVEL)
-#   set(LINK_USD ON CACHE BOOL "Include USD components" FORCE)
-# endif()
-# if(LINK_USD)
-#   include("${CMAKE_CURRENT_SOURCE_DIR}/cmake/pxr.cmake")
-# endif()
+set(LINK_USD OFF)
+if(LINK_USD)
+  add_definitions(-DUSD_ENABLED)
+  include("${CMAKE_CURRENT_SOURCE_DIR}/cmake/pxr.cmake")
+endif()
 
 igl_include(copyleft tetgen)
 igl_include(restricted triangle)
@@ -47,7 +43,6 @@ set(GL_TARGETS
   igl::core
   tetgen::tetgen
   triangle::triangle
-#  nlohmann_json::nlohmann_json
   spdlog::spdlog
   OpenMP::OpenMP_CXX
 )
@@ -66,14 +61,18 @@ file(GLOB_RECURSE SIM_SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/include/ArmorerPhys/s
 # file(GLOB_RECURSE USD_SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/include/ArmorerPhys/USD/*.cpp")
 file(
   GLOB_RECURSE DATA_SOURCES 
-  "${CMAKE_CURRENT_SOURCE_DIR}/include/ArmorerPhys/data/*.cpp"
-  "${CMAKE_CURRENT_SOURCE_DIR}/include/tinygltf/tiny_gltf.cc")
+  "${CMAKE_CURRENT_SOURCE_DIR}/include/ArmorerPhys/data/*.cpp")
 
 
 set(LIBRARY_NAME ${PROJECT_NAME})
 add_library(${LIBRARY_NAME} STATIC)
 target_include_directories(${LIBRARY_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
 target_link_libraries(${LIBRARY_NAME} PUBLIC ${GL_TARGETS})
+
+if(LINK_USD)
+  target_link_libraries(${LIBRARY_NAME} PUBLIC ${USD_LIBS})
+endif()
+
 target_sources(${LIBRARY_NAME} PRIVATE ${CORE_SOURCES} ${RENDER_SOURCES} ${SIM_SOURCES} ${DATA_SOURCES})
 
 #if (LINK_USD)
