@@ -171,7 +171,7 @@ void exportPolygonToPointBasedSVG(const MatxXd& V, const Matx2i& edge,
       svgFile << "<polygon points=\"" << x0 << "," << y0 << " " << x1 << ","
               << y1 << " " << x2 << "," << y2 << "\" "
               << "style=\"fill:" << colorHex
-              << ";stroke:black;stroke-width:1\" />\n";
+              << ";stroke:black;stroke-width:" << stroke_width << "\" />\n";
     }
   }
 
@@ -194,7 +194,7 @@ void exportPolygonToPointBasedSVG(const MatxXd& V, const Matx2i& edge,
   }
 
   // Render vertex points
-  for (int i = 0; i < verts.rows(); ++i) {
+  /*for (int i = 0; i < verts.rows(); ++i) {
     double x = verts(i, 0);
     double y = verts(i, 1);
 
@@ -216,7 +216,7 @@ void exportPolygonToPointBasedSVG(const MatxXd& V, const Matx2i& edge,
             << "fill=\"" << colorHex << "\" "
             << "stroke=\"black\" "  // Stroke color set to black
             << "stroke-width=\"" << stroke_width << "\" />\n";
-  }
+  }*/
 
   // Close the SVG element
   svgFile << "</svg>\n";

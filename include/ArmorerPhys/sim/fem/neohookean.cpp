@@ -82,7 +82,7 @@ void NeoHookeanFEM2D::Jacobian(const MatxXd& F, const MatxXd& B,
                                const Matx3i& faces, const Vecxd& face_volume,
                                Vecxd& J, double mu, double lambda) {
   int n_faces = face_volume.size();
-  double alpha = 1.0 + mu / lambda - mu / (4.0 * lambda);
+  double alpha = 1.0 + 2.0 * mu / (3.0 * lambda);
   J.setZero();
   for (int i = 0; i < n_faces; i++) {
     Mat2d F_i = F.block<2, 2>(0, 2 * i);
@@ -118,9 +118,10 @@ void NeoHookeanFEM2D::Hessian(const MatxXd& F, const MatxXd& B,
                               const Matx3i& faces, const Vecxd& face_volume,
                               MatxXd& H, double mu, double lambda) {
   int n_faces = faces.rows();
-  double alpha = 1.0 + mu / lambda - mu / (4.0 * lambda);
+  double alpha = 1.0 + 2.0 * mu / (3.0 * lambda);
   H.setZero();
   for (int i = 0; i < n_faces; i++) {
+    using Mat2d = Eigen::Matrix<double, 2, 2, Eigen::RowMajor>;
     Mat2d F_i = F.block<2, 2>(0, 2 * i);
     Mat2d B_i = B.block<2, 2>(0, 2 * i);
     double Ic = F_i.squaredNorm();
@@ -157,15 +158,15 @@ void NeoHookeanFEM2D::Hessian(const MatxXd& F, const MatxXd& B,
     int i1 = faces(i, 1);
     int i2 = faces(i, 2);
 
-    H.block<2, 2>(i0 * 2, i0 * 2) = ddpsi_ddx.block<2, 2>(0, 0);
-    H.block<2, 2>(i0 * 2, i1 * 2) = ddpsi_ddx.block<2, 2>(0, 2);
-    H.block<2, 2>(i0 * 2, i2 * 2) = ddpsi_ddx.block<2, 2>(0, 4);
-    H.block<2, 2>(i1 * 2, i0 * 2) = ddpsi_ddx.block<2, 2>(2, 0);
-    H.block<2, 2>(i1 * 2, i1 * 2) = ddpsi_ddx.block<2, 2>(2, 2);
-    H.block<2, 2>(i1 * 2, i2 * 2) = ddpsi_ddx.block<2, 2>(2, 4);
-    H.block<2, 2>(i2 * 2, i0 * 2) = ddpsi_ddx.block<2, 2>(4, 0);
-    H.block<2, 2>(i2 * 2, i1 * 2) = ddpsi_ddx.block<2, 2>(4, 2);
-    H.block<2, 2>(i2 * 2, i2 * 2) = ddpsi_ddx.block<2, 2>(4, 4);
+    H.block<2, 2>(i0 * 2, i0 * 2) += ddpsi_ddx.block<2, 2>(0, 0);
+    H.block<2, 2>(i0 * 2, i1 * 2) += ddpsi_ddx.block<2, 2>(0, 2);
+    H.block<2, 2>(i0 * 2, i2 * 2) += ddpsi_ddx.block<2, 2>(0, 4);
+    H.block<2, 2>(i1 * 2, i0 * 2) += ddpsi_ddx.block<2, 2>(2, 0);
+    H.block<2, 2>(i1 * 2, i1 * 2) += ddpsi_ddx.block<2, 2>(2, 2);
+    H.block<2, 2>(i1 * 2, i2 * 2) += ddpsi_ddx.block<2, 2>(2, 4);
+    H.block<2, 2>(i2 * 2, i0 * 2) += ddpsi_ddx.block<2, 2>(4, 0);
+    H.block<2, 2>(i2 * 2, i1 * 2) += ddpsi_ddx.block<2, 2>(4, 2);
+    H.block<2, 2>(i2 * 2, i2 * 2) += ddpsi_ddx.block<2, 2>(4, 4);
   }
 }
 

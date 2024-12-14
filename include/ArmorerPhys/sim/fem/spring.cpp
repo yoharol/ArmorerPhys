@@ -58,7 +58,9 @@ void SpringFEM::Hessian(const MatxXd& verts, const MatxXd& verts_ref,
     MatxXd I = MatxXd::Identity(dim, dim);
     h = k * I - k * l / pij * (I - dir * dir.transpose());
     H.block(i1 * dim, i1 * dim, dim, dim) += h;
-    H.block(i2 * dim, i2 * dim, dim, dim) -= h;
+    H.block(i1 * dim, i2 * dim, dim, dim) -= h;
+    H.block(i2 * dim, i1 * dim, dim, dim) -= h;
+    H.block(i2 * dim, i2 * dim, dim, dim) += h;
   }
 }
 
