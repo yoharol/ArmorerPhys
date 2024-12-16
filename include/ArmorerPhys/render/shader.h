@@ -26,6 +26,8 @@ extern const ShaderSourceWithGeometry point_shader;
 
 extern const ShaderSourceWithGeometry line_shader;
 
+extern const ShaderSource triangle_shader;
+
 extern const ShaderSource basic_diffuse_shader;
 
 extern const ShaderSource color_diffuse_shader;

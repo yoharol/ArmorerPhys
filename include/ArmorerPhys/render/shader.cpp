@@ -185,6 +185,33 @@ const ShaderSourceWithGeometry line_shader = {
     }
   )"};
 
+const ShaderSource triangle_shader = {
+    R"(
+    #version 330 core
+  layout (location = 0) in vec3 aPos;
+  layout (location = 1) in vec3 aColor;
+
+  uniform mat4 projection;
+
+  flat out vec3 vertexColor; // flat to avoid interpolation
+
+  void main() {
+    gl_Position = projection * vec4(aPos, 1.0);
+    vertexColor = aColor;
+  }
+  )",
+    R"(
+  #version 330 core
+  flat in vec3 vertexColor;
+  out vec4 FragColor;
+
+  uniform float alpha;
+
+  void main() {
+    FragColor = vec4(vertexColor, alpha);
+  }
+  )"};
+
 const ShaderSource basic_diffuse_shader = {
     R"(
     #version 330 core

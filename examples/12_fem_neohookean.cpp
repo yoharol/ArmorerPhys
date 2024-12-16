@@ -65,6 +65,11 @@ int main() {
   aphys::add_render_func(scene, aphys::get_render_func(points));
   aphys::add_render_func(scene, aphys::get_render_func(edges));
 
+  aphys::Triangles tris = aphys::create_triangles();
+  tris.alpha = 0.5;
+  tris.color = aphys::RGB(0, 0, 255);
+  aphys::add_render_func(scene, aphys::get_render_func(tris));
+
   glfwSwapInterval(1);
 
   while (!glfwWindowShouldClose(window)) {
@@ -125,6 +130,8 @@ int main() {
     aphys::set_points_data(points, v_p.cast<float>(), aphys::MatxXf());
     aphys::set_edges_data(edges, v_p.cast<float>(), edge_indices,
                           aphys::MatxXf());
+    aphys::set_triangles_data(tris, v_p.cast<float>(), face_indices,
+                              aphys::MatxXf());
 
     aphys::set_background_RGB({244, 244, 244});
 

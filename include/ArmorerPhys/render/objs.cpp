@@ -497,4 +497,105 @@ void set_box_edges_data(Edges &edges, const Box3d &box) {
   set_edges_data(edges, points, indices, MatxXf());
 }
 
+Triangles create_triangles() {
+  return Triangles{
+      0,
+      create_vao(),
+      create_vbo(),
+      create_vbo(),
+      create_program(
+          create_shader(source::triangle_shader.vertex, GL_VERTEX_SHADER),
+          create_shader(source::triangle_shader.fragment, GL_FRAGMENT_SHADER)),
+      false,
+      RGB(255, 255, 255),
+      1.0f,
+      GL_TRIANGLES,
+      MatxXf()};
+}
+
+void set_triangles_data(Triangles &tris, const MatxXf &points_data,
+                        const Matx3i &face_indices,
+                        const MatxXf &per_face_color) {
+  tris.n_faces = face_indices.rows();
+
+  int n_faces = tris.n_faces;
+  if (tris.vertex_buffer_data.rows() == 0) {
+    tris.vertex_buffer_data.resize(3 * n_faces, 3);
+    tris.color_buffer_data.resize(3 * n_faces, 3);
+  }
+
+  MatxXf points_data_f = points_data;
+
+  // If points_data is Nx2, expand to Nx3:
+  if (points_data_f.cols() == 2) {
+    MatxXf expanded(points_data_f.rows(), 3);
+    expanded.block(0, 0, points_data_f.rows(), 2) = points_data_f;
+    expanded.col(2).setZero();
+    points_data_f = expanded;
+  }
+
+  for (int f = 0; f < n_faces; f++) {
+    int i0 = face_indices(f, 0);
+    int i1 = face_indices(f, 1);
+    int i2 = face_indices(f, 2);
+
+    tris.vertex_buffer_data.row(3 * f + 0) = points_data_f.row(i0);
+    tris.vertex_buffer_data.row(3 * f + 1) = points_data_f.row(i1);
+    tris.vertex_buffer_data.row(3 * f + 2) = points_data_f.row(i2);
+
+    // Face color
+    // If per_face_color has a color per face, say (R,G,B) in each row
+    Eigen::Vector3f face_col;
+    if (per_face_color.rows() > 0) {
+      face_col = per_face_color.row(f);
+      tris.uniform_color = false;
+    } else {
+      // If no per-face color is provided, use uniform color
+      face_col =
+          Eigen::Vector3f(tris.color.x() / 255.0f, tris.color.y() / 255.0f,
+                          tris.color.z() / 255.0f);
+      tris.uniform_color = true;
+    }
+    tris.color_buffer_data.row(3 * f + 0) = face_col;
+    tris.color_buffer_data.row(3 * f + 1) = face_col;
+    tris.color_buffer_data.row(3 * f + 2) = face_col;
+  }
+
+  use_program(tris.program);
+  bind_vao(tris.vertex_array);
+
+  bind_vbo(tris.vertex_buffer);
+  set_vbo_dynamic_data(tris.vertex_buffer_data.data(),
+                       tris.vertex_buffer_data.size() * sizeof(float));
+  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void *)0);
+  glEnableVertexAttribArray(0);
+  unbind_vbo();
+
+  bind_vbo(tris.color_buffer);
+  set_vbo_dynamic_data(tris.color_buffer_data.data(),
+                       tris.color_buffer_data.size() * sizeof(float));
+  glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void *)0);
+  glEnableVertexAttribArray(1);
+  unbind_vbo();
+
+  unbind_vao();
+  unuse_program();
+}
+
+RenderFunc get_render_func(Triangles &faces) {
+  Window &window = Window::get_instance();
+  float aspect_ratio = float(window.width) / float(window.height);
+
+  RenderFunc render_func = [&faces, aspect_ratio](Scene &scene) {
+    use_program(faces.program);
+    set_uniform_mat4(faces.program, "projection", scene.camera.projection);
+    set_uniform_float(faces.program, "alpha", faces.alpha);
+    bind_vao(faces.vertex_array);
+    glDrawArrays(faces.mode, 0, faces.n_faces * 3);
+    unbind_vao();
+    unuse_program();
+  };
+  return render_func;
+}
+
 }  // namespace aphys

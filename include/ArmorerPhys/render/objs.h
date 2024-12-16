@@ -135,6 +135,30 @@ Edges create_box_edges();
 
 void set_box_edges_data(Edges &edges, const Box3d &box);
 
+struct Triangles {
+  int n_faces;
+  VAO vertex_array;
+  VBO vertex_buffer;
+  VBO color_buffer;
+
+  Program program;
+  bool uniform_color;
+  RGB color;
+  float alpha;
+  GLenum mode;
+
+  MatxXf vertex_buffer_data;
+  MatxXf color_buffer_data;
+};
+
+Triangles create_triangles();
+
+void set_triangles_data(Triangles &tris, const MatxXf &points_data,
+                        const Matx3i &face_indices,
+                        const MatxXf &per_face_color);
+
+RenderFunc get_render_func(Triangles &faces);
+
 }  // namespace aphys
 
 #endif  // GL_OBJS_H_
