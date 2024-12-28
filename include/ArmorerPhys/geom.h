@@ -26,6 +26,14 @@ struct Box3d {
   }
 };
 
+struct Sphere3d {
+  Vec3d center;
+  double radius;
+  MatxXd V;
+  MatxXi F;
+  Sphere3d(Vec3d c, double r);
+};
+
 MatxXf get_normals(const MatxXf &vertices, const MatxXi &indices);
 
 void create_rectangle(double l, double r, int hori_count, double b, double t,
@@ -60,6 +68,8 @@ void update_affine_from_world_translation(AffineControls &controls,
                                           MatxXd &translation);
 
 void extract_edge(const Matx3i &faces, Matx2i &edge);
+
+void extract_edge_with_laplacian(const Matx3i &faces, Matx4i &edge);
 
 void compute_edge_length(const MatxXd &verts, const Matx2i &edge,
                          Vecxd &length);

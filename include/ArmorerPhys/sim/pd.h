@@ -7,5 +7,6 @@
 #include "ArmorerPhys/sim/pd/pd_solver.h"
 #include "ArmorerPhys/sim/pd/static_pd.h"
 #include "ArmorerPhys/sim/pd/skeletal_pd.h"
+#include "ArmorerPhys/sim/pd/pd_cloth.h"
 
 #endif  // ARMORER_SIM_PD_H_

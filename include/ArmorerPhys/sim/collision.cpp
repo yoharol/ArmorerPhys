@@ -37,4 +37,18 @@ void collision3d(const Box3d& box, MatxXd& pos, double epsilon) {
   }
 }
 
+void collision3d(const Sphere3d& sphere, MatxXd& pos, double epsilon) {
+  int N = pos.rows();
+  for (int i = 0; i < N; i++) {
+    Vec3d dir = pos.row(i).transpose() - sphere.center;
+    double dist = dir.norm();
+    if (dist < sphere.radius) {
+      dir.normalize();
+      pos.row(i) =
+          sphere.center +
+          dir * (sphere.radius + RandomEngine::getInstance()() * epsilon);
+    }
+  }
+}
+
 }  // namespace aphys
