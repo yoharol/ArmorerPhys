@@ -37,6 +37,28 @@ void collision3d(const Box3d& box, MatxXd& pos, double epsilon) {
   }
 }
 
+void collision3d(const Box3d& box, Vecxd& pos, double epsilon) {
+  int N = pos.size() / 3;
+  for (int i = 0; i < N; i++) {
+    if (pos(i * 3) < box.bound(0, 0))
+      pos(i * 3) = box.bound(0, 0) + epsilon * RandomEngine::getInstance()();
+    if (pos(i * 3) > box.bound(0, 1))
+      pos(i * 3) = box.bound(0, 1) - epsilon * RandomEngine::getInstance()();
+    if (pos(i * 3 + 1) < box.bound(1, 0))
+      pos(i * 3 + 1) =
+          box.bound(1, 0) + epsilon * RandomEngine::getInstance()();
+    if (pos(i * 3 + 1) > box.bound(1, 1))
+      pos(i * 3 + 1) =
+          box.bound(1, 1) - epsilon * RandomEngine::getInstance()();
+    if (pos(i * 3 + 2) < box.bound(2, 0))
+      pos(i * 3 + 2) =
+          box.bound(2, 0) + epsilon * RandomEngine::getInstance()();
+    if (pos(i * 3 + 2) > box.bound(2, 1))
+      pos(i * 3 + 2) =
+          box.bound(2, 1) - epsilon * RandomEngine::getInstance()();
+  }
+}
+
 void collision3d(const Sphere3d& sphere, MatxXd& pos, double epsilon) {
   int N = pos.rows();
   for (int i = 0; i < N; i++) {
@@ -47,6 +69,22 @@ void collision3d(const Sphere3d& sphere, MatxXd& pos, double epsilon) {
       pos.row(i) =
           sphere.center +
           dir * (sphere.radius + RandomEngine::getInstance()() * epsilon);
+    }
+  }
+}
+
+void collision3d(const Sphere3d& sphere, Vecxd& pos, double epsilon) {
+  int N = pos.size() / 3;
+  for (int i = 0; i < N; i++) {
+    Vec3d dir = pos.segment(i * 3, 3).transpose();
+    dir -= sphere.center;
+    double dist = dir.norm();
+    if (dist < sphere.radius) {
+      dir.normalize();
+      pos.segment(i * 3, 3) =
+          (sphere.center +
+           dir * (sphere.radius + RandomEngine::getInstance()() * epsilon))
+              .transpose();
     }
   }
 }

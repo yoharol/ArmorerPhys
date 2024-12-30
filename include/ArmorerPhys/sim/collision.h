@@ -11,6 +11,10 @@ void collision3d(const Box3d& box, MatxXd& pos, double epsilon = 1e-5);
 
 void collision3d(const Sphere3d& sphere, MatxXd& pos, double epsilon = 1e-5);
 
+void collision3d(const Box3d& box, Vecxd& pos, double epsilon = 1e-5);
+
+void collision3d(const Sphere3d& sphere, Vecxd& pos, double epsilon = 1e-5);
+
 }  // namespace aphys
 
 #endif  // ARMORER_SIM_COLLISION_H_
