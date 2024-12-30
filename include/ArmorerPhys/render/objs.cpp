@@ -82,7 +82,7 @@ DiffuseMesh create_diffuse_mesh(DiffuseMaterial &material) {
   return mesh;
 }
 
-void set_mesh_data(DiffuseMesh &mesh, MatxXf V, MatxXi F) {
+void set_mesh_data(DiffuseMesh &mesh, const MatxXf &V, const MatxXi &F) {
   mesh.n_vertices = V.rows();
   mesh.n_faces = F.rows();
 
@@ -159,7 +159,8 @@ ColorMesh create_color_mesh(DiffuseMaterial &material) {
   return mesh;
 }
 
-void set_color_mesh_data(ColorMesh &mesh, MatxXf V, MatxXi F, MatxXf C) {
+void set_color_mesh_data(ColorMesh &mesh, const MatxXf &V, const MatxXi &F,
+                         const MatxXf &C) {
   mesh.n_vertices = V.rows();
   mesh.n_faces = F.rows();
 

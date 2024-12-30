@@ -40,7 +40,7 @@ struct DiffuseMesh {
 
 DiffuseMesh create_diffuse_mesh(DiffuseMaterial &material);
 
-void set_mesh_data(DiffuseMesh &mesh, MatxXf V, MatxXi F);
+void set_mesh_data(DiffuseMesh &mesh, const MatxXf &V, const MatxXi &F);
 
 RenderFunc get_render_func(DiffuseMesh &mesh);
 
@@ -60,7 +60,8 @@ struct ColorMesh {
 
 ColorMesh create_color_mesh(DiffuseMaterial &material);
 
-void set_color_mesh_data(ColorMesh &mesh, MatxXf V, MatxXi F, MatxXf C);
+void set_color_mesh_data(ColorMesh &mesh, const MatxXf &V, const MatxXi &F,
+                         const MatxXf &C);
 
 RenderFunc get_render_func(ColorMesh &mesh);
 
