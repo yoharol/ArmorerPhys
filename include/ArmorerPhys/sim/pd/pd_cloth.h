@@ -15,11 +15,15 @@ struct ProjectiveCloth {
   int n_edges;
   std::vector<MatxXd> dx_ref_inv;
   MatxXd P;
+  MatxXd BP;
+  Vecxd ref_curvature;
   SparseMatd L;
   SparseMatd J;
   SparseMatd M_h2;
   SparseMatd LHS;
-  SparseMatd B;
+  SparseMatd B_L;
+  SparseMatd B_J;
+  MatxXd laplace_beltrami;
   double bending_stiffness;
   double stretching_stiffness;
   Eigen::SparseLU<SparseMatd, Eigen::COLAMDOrdering<int>> sparse_solver;

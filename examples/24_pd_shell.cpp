@@ -35,12 +35,19 @@ int main() {
   int nx = 100;
   int ny = 100;
   create_rectangle(-1.2, 1.2, nx, -1.2, 1.2, ny, mesh.verts, mesh.faces);
+  MatxXd v_p(mesh.verts.rows(), 3);
+  v_p.col(0) = mesh.verts.col(0);
+  v_p.col(2) = mesh.verts.col(1);
+
+  // add a sinwave to mesh.verts.col(1) based on mesh.verts.col(0)
+  for (int i = 0; i < mesh.verts.rows(); i++) {
+    v_p(i, 1) = 1.1;
+    // v_p(i, 1) = 1.1 + 0.15 * sin(6.0 * v_p(i, 0) * 3.1415926);
+  }
+  mesh.verts = v_p;
+
   mesh.Initialize();
 
-  MatxXd v_p(mesh.n_verts, 3);
-  v_p.col(0) = mesh.verts.col(0);
-  v_p.col(1).array() = 1.1;
-  v_p.col(2) = mesh.verts.col(1);
   Vecxd gravity(3);
   gravity << 0.0, -0.4, 0.0;
   MatxXd external_force;
